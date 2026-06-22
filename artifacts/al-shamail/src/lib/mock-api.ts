@@ -16,7 +16,7 @@ import {
 /* ──────────────────────────────────────────────────────────────────
  *  Server fetch helper
  * ────────────────────────────────────────────────────────────────── */
-const API_BASE = (import.meta as any).env?.VITE_API_BASE ?? "/api";
+const API_BASE = "https://alshamail.onrender.com/api";
 
 async function apiFetch<T = any>(
   path: string,
