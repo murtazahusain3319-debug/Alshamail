@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Al Shamail — Online School"
+version = "1.0.0"
+id = "artifacts/al-shamail"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24454
+
+[services.development]
+run = "pnpm --filter @workspace/al-shamail run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/al-shamail", "run", "build" ]
+publicDir = "artifacts/al-shamail/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24454"
+BASE_PATH = "/"

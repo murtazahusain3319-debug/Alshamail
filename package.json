@@ -1,0 +1,21 @@
+﻿{
+    "version":  "0.0.0",
+    "name":  "workspace",
+    "scripts":  {
+                    "start:api":  "pnpm --filter @workspace/api-server run start",
+                    "dev:api":  "pnpm --filter @workspace/api-server run dev",
+                    "build:api":  "pnpm --filter @workspace/api-server run build",
+                    "db:push":  "pnpm --filter @workspace/db run push",
+                    "db:push-force":  "pnpm --filter @workspace/db run push-force",
+                    "preinstall":  "node -e \"if(process.env.npm_config_user_agent\u0026\u0026!process.env.npm_config_user_agent.startsWith(\u0027pnpm\u0027)){process.stderr.write(\u0027Use pnpm instead\\n\u0027);process.exit(1)}\"",
+                    "build":  "pnpm run typecheck \u0026\u0026 pnpm -r --if-present run build",
+                    "typecheck:libs":  "tsc --build",
+                    "typecheck":  "pnpm run typecheck:libs \u0026\u0026 pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck"
+                },
+    "devDependencies":  {
+                            "prettier":  "^3.8.3",
+                            "typescript":  "~5.9.3"
+                        },
+    "private":  true,
+    "license":  "MIT"
+}
