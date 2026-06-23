@@ -12,11 +12,11 @@ import {
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
+import { API_BASE } from "./api-base";
 
 /* ──────────────────────────────────────────────────────────────────
  *  Server fetch helper
  * ────────────────────────────────────────────────────────────────── */
-const API_BASE = "https://alshamail.onrender.com/api";
 
 async function apiFetch<T = any>(
   path: string,

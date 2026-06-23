@@ -16,6 +16,7 @@ import {
 import { useGetCourseMembers, getGetCourseMembersQueryKey } from "@/lib/mock-api";
 import { B } from "@/lib/brand";
 import { DashboardLayout, Card, Pill, PrimaryButton, GoldButton, inputStyle } from "@/components/DashboardLayout";
+import { API_BASE } from "@/lib/api-base";
 
 type LessonKind = "video" | "reading" | "quiz" | "members";
 
@@ -391,7 +392,7 @@ function AddLessonPanel({
       const formData = new FormData();
       formData.append("video", file);
 
-      const res = await fetch("/api/lessons/upload-video", {
+      const res = await fetch(`${API_BASE}/lessons/upload-video`, {
         method: "POST",
         body: formData,
       });
@@ -1369,7 +1370,7 @@ function EnrollPanel({ courseId, onClose }: { courseId: number; onClose: () => v
     });
 
     try {
-      const res = await fetch(`/api/courses/${courseId}/enroll-user`, {
+      const res = await fetch(`${API_BASE}/courses/${courseId}/enroll-user`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: selectedUser.email, role: selectedUser.role || "student" }),
@@ -1713,7 +1714,7 @@ export default function CourseDetail() {
 
     setRemovingMemberIds((prev) => [...prev, memberId]);
     try {
-      const res = await fetch(`/api/courses/${id}/members/${memberId}`, {
+      const res = await fetch(`${API_BASE}/courses/${id}/members/${memberId}`, {
         method: "DELETE",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -1904,7 +1905,7 @@ export default function CourseDetail() {
         videoUrl: form.kind === "video" ? form.videoUrl : "",
         content: form.kind === "reading" ? (form.content ?? "") : null,
       };
-      const res = await fetch(`/api/lessons/${editingLesson.id}`, {
+      const res = await fetch(`${API_BASE}/lessons/${editingLesson.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -2202,7 +2203,7 @@ export default function CourseDetail() {
                 onSave={async (questions) => {
                   setIsUpdatingLesson(true);
                   try {
-                    const res = await fetch(`/api/lessons/${editingQuizLesson.id}`, {
+                    const res = await fetch(`${API_BASE}/lessons/${editingQuizLesson.id}`, {
                       method: "PUT",
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({
@@ -2346,7 +2347,7 @@ export default function CourseDetail() {
                 onComplete={async (answers) => {
                   if (!isStudent) return;
                   try {
-                    const res = await fetch(`/api/lessons/${activeQuizLesson.id}/complete`, {
+                    const res = await fetch(`${API_BASE}/lessons/${activeQuizLesson.id}/complete`, {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({ answers }),

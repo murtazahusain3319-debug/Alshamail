@@ -55,7 +55,7 @@ interface Teacher {
   avatarUrl?: string;
 }
 
-const API_BASE = "/api";
+import { API_BASE } from "@/lib/api-base";
 
 function getTeacherAssignments(cls: Class): TeacherAssignment[] {
   if (cls.teacherAssignments && cls.teacherAssignments.length > 0) return cls.teacherAssignments;

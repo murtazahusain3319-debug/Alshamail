@@ -52,7 +52,12 @@ export function setSessionCookie(res: Response, token: string): void {
 }
 
 export function clearSessionCookie(res: Response): void {
-  res.clearCookie(SESSION_COOKIE, { path: "/" });
+  const isProd = process.env.NODE_ENV === "production";
+  res.clearCookie(SESSION_COOKIE, {
+    path: "/",
+    sameSite: isProd ? "none" : "lax",
+    secure: isProd,
+  });
 }
 
 /**

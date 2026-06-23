@@ -18,6 +18,7 @@ import {
   buildContactsById,
   resolveContactAvatar,
 } from "@/components/UserAvatar";
+import { API_BASE } from "@/lib/api-base";
 
 export default function MessagesPage() {
   const [, params] = useRoute<{ userId: string }>("/messages/:userId");
@@ -171,7 +172,7 @@ export default function MessagesPage() {
 
       const form = new FormData();
       form.append("image", file);
-      const res = await fetch("/api/messages/upload-image", {
+      const res = await fetch(`${API_BASE}/messages/upload-image`, {
         method: "POST",
         credentials: "include",
         body: form,

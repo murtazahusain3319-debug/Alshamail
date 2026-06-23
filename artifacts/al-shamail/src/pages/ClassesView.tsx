@@ -28,7 +28,7 @@ interface ClassDetail {
   students: Array<{ id: number; firstName: string; lastName: string; email: string; role: string; avatarUrl?: string }>;
 }
 
-const API_BASE = "/api";
+import { API_BASE } from "@/lib/api-base";
 
 function getTeacherAssignments(cls: ClassDetail): TeacherAssignment[] {
   if (cls.teacherAssignments && cls.teacherAssignments.length > 0) return cls.teacherAssignments;

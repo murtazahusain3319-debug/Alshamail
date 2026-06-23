@@ -15,7 +15,7 @@ type ClassOption = {
   teacherAssignments?: Array<{ teacher: { id: number } }>;
 };
 
-const API_BASE = "/api";
+import { API_BASE } from "@/lib/api-base";
 
 async function fetchClasses(): Promise<ClassOption[]> {
   const res = await fetch(`${API_BASE}/classes`, { credentials: "include" });

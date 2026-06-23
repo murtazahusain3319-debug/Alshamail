@@ -13,6 +13,7 @@ import {
 import { getGetCourseMembersQueryKey } from "@/lib/mock-api";
 import { B } from "@/lib/brand";
 import { DashboardLayout, Card, Pill, PrimaryButton, GoldButton, inputStyle } from "@/components/DashboardLayout";
+import { API_BASE } from "@/lib/api-base";
 
 /* ── Curated emoji thumbnails ── */
 const EMOJI_PRESETS = [
@@ -294,7 +295,7 @@ function EnrollPanel({ courseId, onClose }: { courseId: number; onClose: () => v
     setIsLoading(true);
     setMessage("");
     try {
-      const res = await fetch(`/api/courses/${courseId}/enroll-user`, {
+      const res = await fetch(`${API_BASE}/courses/${courseId}/enroll-user`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: selectedUser.email, role: selectedUser.role || "student" }),

@@ -17,7 +17,7 @@ import {
   GraduationCap, Plus, ChevronDown, ChevronUp, Pencil, Trash2,
 } from "lucide-react";
 
-const API_BASE = "/api";
+import { API_BASE } from "@/lib/api-base";
 
 interface SchoolClass {
   id: number;

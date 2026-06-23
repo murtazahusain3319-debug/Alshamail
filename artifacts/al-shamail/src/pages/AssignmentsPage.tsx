@@ -9,7 +9,7 @@ import {
   Pencil, Trash2, Image as ImageIcon, MessageSquare,
 } from "lucide-react";
 
-const API_BASE = "/api";
+import { API_BASE } from "@/lib/api-base";
 
 type AssignmentType = "homework" | "test" | "project";
 type SubmissionStatus = "pending" | "submitted" | "graded" | "returned";
