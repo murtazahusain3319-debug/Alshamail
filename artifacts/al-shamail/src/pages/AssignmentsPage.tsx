@@ -93,8 +93,8 @@ function loadAssignments(): Assignment[] {
   return [
     {
       id: "asgn-1",
-      title: "Chapter 5 – Algebra Review",
-      description: "Complete exercises 1–20 on page 112. Show all working.",
+      title: "Chapter 5 ΓÇô Algebra Review",
+      description: "Complete exercises 1ΓÇô20 on page 112. Show all working.",
       type: "homework",
       dueDate: new Date(Date.now() + 2 * 86400000).toISOString(),
       createdBy: "teacher-demo",
@@ -108,7 +108,7 @@ function loadAssignments(): Assignment[] {
     {
       id: "asgn-2",
       title: "Mid-term Science Test",
-      description: "Covers chapters 3–7. Estimated 45 minutes. Submit your answer sheet as a clear photo.",
+      description: "Covers chapters 3ΓÇô7. Estimated 45 minutes. Submit your answer sheet as a clear photo.",
       type: "test",
       dueDate: new Date(Date.now() + 7 * 86400000).toISOString(),
       createdBy: "teacher-demo",
@@ -328,7 +328,7 @@ function ImageUploader({
               Drop your image here or click to browse
             </div>
             <div style={{ fontSize: 12, color: B.muted, marginTop: 4 }}>
-              JPG, PNG, WEBP — max 5 MB
+              JPG, PNG, WEBP ΓÇö max 5 MB
             </div>
           </>
         )}
@@ -507,7 +507,7 @@ function AssignmentForm({
           value={desc}
           onChange={(e) => setDesc(e.target.value)}
           rows={4}
-          placeholder="Describe what students need to do…"
+          placeholder="Describe what students need to doΓÇª"
           style={{ ...inp, marginTop: 6, resize: "vertical" }}
         />
       </div>
@@ -668,7 +668,7 @@ function SubmissionViewer({
                   value={feedback}
                   onChange={(e) => setFeedback(e.target.value)}
                   rows={3}
-                  placeholder="Write feedback for the student…"
+                  placeholder="Write feedback for the studentΓÇª"
                   disabled={isReturned}
                   style={{ ...inp, marginTop: 6, resize: "vertical", opacity: isReturned ? .7 : 1 }}
                 />
@@ -1037,8 +1037,8 @@ export default function AssignmentsPage() {
       toast({
         title: "Submission sent",
         description: assignment
-          ? `Successfully submitted ${assignmentLabel} 👍`
-          : "Submission sent 👍",
+          ? `Successfully submitted ${assignmentLabel} ≡ƒæì`
+          : "Submission sent ≡ƒæì",
       });
     },
     [userId, fullName, uploadImage, assignments],
@@ -1156,7 +1156,7 @@ export default function AssignmentsPage() {
           ? "Your homework, tests, and classwork"
           : isTeacher
           ? "Manage assignments and review submissions"
-          : "Assignments — admin view"
+          : "Assignments ΓÇö admin view"
       }
       action={
         !isStudent ? (
@@ -1355,7 +1355,7 @@ export default function AssignmentsPage() {
         </div>
       ) : (showCreate || editId) && createClassId ? (
         <div style={{ marginBottom: 24 }}>
-          <Card title={editId ? "Edit Assignment" : createSubjectId ? `Create Assignment · ${findCourseName(createSubjectId, courseOptions)}` : "Create Assignment"}>
+          <Card title={editId ? "Edit Assignment" : createSubjectId ? `Create Assignment ┬╖ ${findCourseName(createSubjectId, courseOptions)}` : "Create Assignment"}>
             <AssignmentForm
               initial={editId ? assignments.find((a) => a.id === editId) : createAssignmentInitial}
               courseOptions={courseOptions}
@@ -1512,7 +1512,7 @@ export default function AssignmentsPage() {
                                 alignItems: "center", justifyContent: "center",
                                 color: B.gold, flexShrink: 0, fontWeight: 700, fontSize: 12,
                               }}>
-                                📚
+                                ≡ƒôÜ
                               </div>
                               <div style={{ minWidth: 0 }}>
                                 <div style={{ fontWeight: 700, color: B.navy, fontSize: 13 }}>{subject.subjectName}</div>
@@ -1618,12 +1618,12 @@ export default function AssignmentsPage() {
                                           </span>
                                         </div>
                                         <div style={{ fontSize: 11, color: B.muted, marginTop: 3 }}>
-                                          {a.description.slice(0, 80)}{a.description.length > 80 ? "…" : ""}
+                                          {a.description.slice(0, 80)}{a.description.length > 80 ? "ΓÇª" : ""}
                                         </div>
                                         {!isStudent && (
                                           <div style={{ fontSize: 10, color: B.muted, marginTop: 4 }}>
                                             <span style={{ fontWeight: 700, color: B.navy }}>{submissionCount}</span> submission{submissionCount !== 1 ? "s" : ""}
-                                            {pendingCount > 0 && <span style={{ marginLeft: 5, color: B.warning, fontWeight: 700 }}>· {pendingCount} pending</span>}
+                                            {pendingCount > 0 && <span style={{ marginLeft: 5, color: B.warning, fontWeight: 700 }}>┬╖ {pendingCount} pending</span>}
                                           </div>
                                         )}
                                       </div>
@@ -1689,7 +1689,7 @@ export default function AssignmentsPage() {
                                         </div>
 
                                         <div style={{ fontSize: 10, color: B.muted, marginBottom: 14 }}>
-                                          By <strong>{a.createdByName}</strong> · Due {new Date(a.dueDate).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}
+                                          By <strong>{a.createdByName}</strong> ┬╖ Due {new Date(a.dueDate).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}
                                         </div>
 
                                         {isStudent && (

@@ -125,7 +125,7 @@ export default function ClassesAndClassmates() {
       <Card>
         {loading ? (
           <div style={{ color: B.muted, padding: "24px 0", textAlign: "center" }}>
-            Loading…
+            LoadingΓÇª
           </div>
         ) : error ? (
           <div style={{ color: "#dc2626", padding: "24px 0", textAlign: "center" }}>
@@ -227,7 +227,7 @@ export default function ClassesAndClassmates() {
                         transition: "transform .2s ease",
                       }}
                     >
-                      ▼
+                      Γû╝
                     </div>
                   </button>
 
@@ -246,7 +246,7 @@ export default function ClassesAndClassmates() {
                               marginBottom: 10,
                             }}
                           >
-                            📚 {teacherAssignments.length === 1 ? "Teacher" : "Teachers"}
+                            ≡ƒôÜ {teacherAssignments.length === 1 ? "Teacher" : "Teachers"}
                           </div>
                           {teacherAssignments.length === 0 ? (
                             <div style={{ fontSize: 13, color: B.muted }}>No teacher assigned</div>
@@ -323,7 +323,7 @@ export default function ClassesAndClassmates() {
                               marginBottom: 10,
                             }}
                           >
-                            👥 Students ({count})
+                            ≡ƒæÑ Students ({count})
                           </div>
                           {count === 0 ? (
                             <div style={{ fontSize: 13, color: B.muted }}>No students enrolled</div>
