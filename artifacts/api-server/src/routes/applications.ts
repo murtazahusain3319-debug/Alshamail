@@ -20,17 +20,20 @@ router.post("/applications", async (req, res): Promise<void> => {
   const firstName = String(d.firstName ?? "").trim();
   const lastName = String(d.lastName ?? "").trim();
   const email = String(d.email ?? "").trim().toLowerCase();
-  if (!firstName || !lastName || !email) {
-    res.status(400).json({ error: "Name and email are required." });
+  const password = String(d.password ?? "").trim();
+  if (!firstName || !lastName || !email || !password) {
+    res.status(400).json({ error: "Name, email, and password are required." });
     return;
   }
   const role = d.role === "teacher" ? "teacher" : "student";
+  const passwordHash = await bcrypt.hash(password, 10);
   const [app] = await db
     .insert(applicationsTable)
     .values({
       firstName,
       lastName,
       email,
+      passwordHash,
       phone: d.phone ?? null,
       city: d.city ?? null,
       role,
@@ -78,8 +81,8 @@ router.patch("/applications/:id", requireAdmin, async (req, res): Promise<void> 
       .where(eq(usersTable.email, app.email))
       .limit(1);
     if (existing.length === 0) {
-      const tempPassword = app.role === "teacher" ? "teacher123" : "student123";
-      const passwordHash = await bcrypt.hash(tempPassword, 10);
+      // Use the password hash from the application, or fall back to temp password if not available
+      const passwordHash = app.passwordHash || await bcrypt.hash(app.role === "teacher" ? "teacher123" : "student123", 10);
       try {
         await db.insert(usersTable).values({
           firstName: app.firstName,

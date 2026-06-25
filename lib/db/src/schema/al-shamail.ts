@@ -59,6 +59,7 @@ export const applicationsTable = pgTable("applications", {
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
   email: text("email").notNull(),
+  passwordHash: text("password_hash"),
   phone: text("phone"),
   city: text("city"),
   role: text("role").notNull().default("student"), // student | teacher
