@@ -788,6 +788,7 @@ export default function AssignmentsPage() {
 
   const [assignments, setAssignments] = useState<Assignment[]>(loadAssignments);
   const [classes, setClasses] = useState<SchoolClass[]>([]);
+  const [classesLoading, setClassesLoading] = useState(true);
   useEffect(() => { saveAssignments(assignments); }, [assignments]);
 
   const [showCreate, setShowCreate] = useState(false);
@@ -817,7 +818,14 @@ export default function AssignmentsPage() {
   }, [coursesQuery.data?.items]);
 
   useEffect(() => {
-    fetchClasses().then(setClasses).catch(() => setClasses([]));
+    setClassesLoading(true);
+    fetchClasses().then((data) => {
+      setClasses(data);
+      setClassesLoading(false);
+    }).catch(() => {
+      setClasses([]);
+      setClassesLoading(false);
+    });
   }, []);
 
   const classOptions = useMemo(() => classes.map((cls) => ({ id: String(cls.id), name: cls.name })), [classes]);
@@ -1143,8 +1151,8 @@ export default function AssignmentsPage() {
   }, [isAdmin, isTeacher, subjectCategories, visibleAssignments, canManageSubject]);
 
   const gradeGroups = useMemo(
-    () => groupAssignmentsByGradeAndSubject(visibleAssignments, availableClassOptions, filteredSubjectCategories),
-    [visibleAssignments, availableClassOptions, filteredSubjectCategories],
+    () => classesLoading ? [] : groupAssignmentsByGradeAndSubject(visibleAssignments, availableClassOptions, filteredSubjectCategories),
+    [visibleAssignments, availableClassOptions, filteredSubjectCategories, classesLoading],
   );
   const hasClassGroups = isAdmin ? classes.length > 0 : isTeacher ? teacherClassIds.length > 0 : studentClassIds.length > 0;
   const canCreateAssignment = isAdmin || availableClassOptions.length > 0;

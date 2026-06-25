@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Link } from "wouter";
 import {
   Search, Plus, BookOpen, Sparkles, Users, CheckCircle2,
@@ -545,7 +545,8 @@ export default function CoursesPage() {
   const me = useGetCurrentUser();
   const user = me.data?.user;
   const isAdmin = !!user?.isAdmin;
-  const isStaff = isAdmin || user?.role === "teacher";
+  const isTeacher = !isAdmin && user?.role === "teacher";
+  const isStaff = isAdmin || isTeacher;
   const isStudent = !!user && !isStaff;
 
   const list = useListCourses();
@@ -553,12 +554,38 @@ export default function CoursesPage() {
   const enrollments = useListMyEnrollments({ query: { enabled: !!user } });
   const enrolledIds = new Set<number>((enrollments.data?.items ?? []).map((e: any) => e.courseId));
 
+  // Fetch classes for filtering
+  const [classes, setClasses] = useState<any[]>([]);
+  useEffect(() => {
+    fetch(`${API_BASE}/classes`, { credentials: "include" })
+      .then((res) => res.json())
+      .then((data) => setClasses(data.items ?? []))
+      .catch(() => setClasses([]));
+  }, []);
+
+  // Get class IDs for current user
+  const userClassIds = useMemo(() => {
+    if (isAdmin) return classes.map((c) => String(c.id));
+    if (isTeacher) {
+      return classes
+        .filter((c) => c.teacherAssignments?.some((a: any) => Number(a.teacher?.id) === Number(user?.id)))
+        .map((c) => String(c.id));
+    }
+    if (isStudent) {
+      return classes
+        .filter((c) => c.students?.some((s: any) => Number(s.id) === Number(user?.id)))
+        .map((c) => String(c.id));
+    }
+    return [];
+  }, [classes, isAdmin, isTeacher, isStudent, user?.id]);
+
   const enroll = useEnrollInCourse();
   const create = useCreateCourse();
 
   const [search, setSearch] = useState("");
   const [levelFilter, setLevelFilter] = useState("All");
   const [teacherFilter, setTeacherFilter] = useState("All");
+  const [classFilter, setClassFilter] = useState("All");
   const [showNew, setShowNew] = useState(false);
   const [showEnrollCourseId, setShowEnrollCourseId] = useState<number | null>(null);
 
@@ -566,6 +593,22 @@ export default function CoursesPage() {
   const teacherOptions = ["All", ...Array.from(new Set(items
     .map((c: any) => c.teacherName || (c.teacher ? `${c.teacher.firstName ?? ""} ${c.teacher.lastName ?? ""}`.trim() : ""))
     .filter(Boolean)))];
+  
+  // Class options based on user role
+  const classOptions = useMemo(() => {
+    if (isAdmin) return ["All", ...classes.map((c) => c.name)];
+    if (isTeacher) {
+      return ["All", ...classes
+        .filter((c) => c.teacherAssignments?.some((a: any) => Number(a.teacher?.id) === Number(user?.id)))
+        .map((c) => c.name)];
+    }
+    if (isStudent) {
+      return ["All", ...classes
+        .filter((c) => c.students?.some((s: any) => Number(s.id) === Number(user?.id)))
+        .map((c) => c.name)];
+    }
+    return ["All"];
+  }, [classes, isAdmin, isTeacher, isStudent, user?.id]);
 
   const visibleItems = useMemo(() => {
     if (isStudent) return items.filter((c: any) => enrolledIds.has(c.id));
@@ -588,10 +631,14 @@ export default function CoursesPage() {
         const teacherName = c.teacherName || (c.teacher ? `${c.teacher.firstName ?? ""} ${c.teacher.lastName ?? ""}`.trim() : "");
         if (teacherName !== teacherFilter) return false;
       }
+      if (classFilter !== "All") {
+        const classObj = classes.find((cls) => cls.name === classFilter);
+        if (classObj && c.classId !== String(classObj.id)) return false;
+      }
       if (!term) return true;
       return [c.title, c.subject, c.description, c.level, c.teacherName].join(" ").toLowerCase().includes(term);
     });
-  }, [visibleItems, search, levelFilter, teacherFilter]);
+  }, [visibleItems, search, levelFilter, teacherFilter, classFilter, classes]);
 
   const onEnroll = async (id: number) => {
     await enroll.mutateAsync({ id });
@@ -654,34 +701,66 @@ export default function CoursesPage() {
             />
           </div>
 
-          {/* Level filter chips */}
-          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
-            {allLevels.slice(0, 6).map((level) => (
-              <button key={level} onClick={() => setLevelFilter(level)} style={{
-                padding: "7px 14px", borderRadius: 99, fontSize: 12, fontWeight: 700, cursor: "pointer",
-                border: `1.5px solid ${levelFilter === level ? B.gold : B.light}`,
-                background: levelFilter === level ? `${B.gold}18` : B.white,
-                color: levelFilter === level ? B.gold : B.muted, fontFamily: "inherit",
-              }}>
-                {level}
-              </button>
+          {/* Level filter selector */}
+          <select
+            value={levelFilter}
+            onChange={(e) => setLevelFilter(e.target.value)}
+            style={{
+              padding: "7px 14px",
+              borderRadius: 10,
+              fontSize: 12,
+              fontWeight: 700,
+              border: `1.5px solid ${B.light}`,
+              background: B.white,
+              color: B.navy,
+              cursor: "pointer",
+            }}
+          >
+            {allLevels.map((level) => (
+              <option key={level} value={level}>{level}</option>
             ))}
-          </div>
+          </select>
 
           {isAdmin && (
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
+            <select
+              value={teacherFilter}
+              onChange={(e) => setTeacherFilter(e.target.value)}
+              style={{
+                padding: "7px 14px",
+                borderRadius: 10,
+                fontSize: 12,
+                fontWeight: 700,
+                border: `1.5px solid ${B.light}`,
+                background: B.white,
+                color: B.navy,
+                cursor: "pointer",
+              }}
+            >
               {teacherOptions.map((teacher) => (
-                <button key={teacher} onClick={() => setTeacherFilter(teacher)} style={{
-                  padding: "7px 14px", borderRadius: 99, fontSize: 12, fontWeight: 700, cursor: "pointer",
-                  border: `1.5px solid ${teacherFilter === teacher ? B.navy : B.light}`,
-                  background: teacherFilter === teacher ? `${B.navy}14` : B.white,
-                  color: teacherFilter === teacher ? B.navy : B.muted, fontFamily: "inherit",
-                }}>
-                  {teacher}
-                </button>
+                <option key={teacher} value={teacher}>{teacher}</option>
               ))}
-            </div>
+            </select>
           )}
+
+          {/* Class filter selector */}
+          <select
+            value={classFilter}
+            onChange={(e) => setClassFilter(e.target.value)}
+            style={{
+              padding: "7px 14px",
+              borderRadius: 10,
+              fontSize: 12,
+              fontWeight: 700,
+              border: `1.5px solid ${B.light}`,
+              background: B.white,
+              color: B.navy,
+              cursor: "pointer",
+            }}
+          >
+            {classOptions.map((cls) => (
+              <option key={cls} value={cls}>{cls}</option>
+            ))}
+          </select>
 
           {isStaff && (
             <div style={{ display: "flex", gap: 8, marginLeft: "auto" }}>

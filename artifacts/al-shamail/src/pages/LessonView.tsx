@@ -396,8 +396,8 @@ export default function LessonView() {
           showinfo: 0,
           iv_load_policy: 3,
           cc_load_policy: 0,
-          disablekb: 1,
-          fs: 0,
+          disablekb: 0,
+          fs: 1,
           autoplay: 0,
           playsinline: 1,
         },
@@ -585,7 +585,17 @@ export default function LessonView() {
                   }}>
                     <div style={{ flex: "1 1 auto", minHeight: 0, width: "100%" }}>
                       {isYouTube && youTubeId ? (
-                        <div id="youtube-lesson-player" key={youTubeId} style={{ width: "100%", height: "100%" }} />
+                        <>
+                          <div id="youtube-lesson-player" key={youTubeId} style={{ width: "100%", height: "100%" }} />
+                          <style>{`
+                            #youtube-lesson-player iframe {
+                              pointer-events: auto;
+                            }
+                            .ytp-pause-overlay, .ytp-cards-teaser, .ytp-ce-element, .ytp-show-cards-title, .ytp-ce-video-shadow, .ytp-ce-channel-title {
+                              display: none !important;
+                            }
+                          `}</style>
+                        </>
                       ) : resolvedVideoUrl ? (
                         <>
                           <video key={resolvedVideoUrl} ref={videoRef} src={resolvedVideoUrl} controls crossOrigin="anonymous" onTimeUpdate={onTimeUpdate} onEnded={onVideoEnded} onError={handleVideoError} style={{ width: "100%", height: "100%", display: "block" }}/>
