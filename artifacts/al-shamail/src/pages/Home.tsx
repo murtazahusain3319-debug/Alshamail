@@ -14,7 +14,6 @@ import {
   Clock,
   Sparkles,
   Award,
-  MessageCircle,
 } from "lucide-react";
 import { createLucideIcon } from "lucide-react";
 
@@ -91,7 +90,7 @@ const slides = [
     image: publicUrl("hero-1.jpeg"),
     overlay: heroSlideOverlay,
     heading: "Taught by\nthe Very Best",
-    sub: "Our passionate, qualified educators bring every subject to life — making learning engaging, meaningful, and tailored to each child's unique needs and learning style.",
+    sub: "Our passionate, qualified educators bring every subject to life, making learning engaging, meaningful, and tailored to each child's unique needs and learning style.",
     cta: "Meet Our Teachers",
     accent: t.goldL,
   },
@@ -101,7 +100,7 @@ const slides = [
     image: publicUrl("hero-5.jpeg"),
     overlay: heroSlideOverlay,
     heading: "Study Anytime,\nAnywhere",
-    sub: "Our platform adapts to your child's schedule and pace. Access lessons, videos, and quizzes on any device — with progress tracking and rewards to keep them motivated.",
+    sub: "Our platform adapts to your child's schedule and pace. Access lessons, videos, and quizzes on any device, with progress tracking and rewards to keep them motivated.",
     cta: "Get Started Free",
     accent: t.gold,
   },
@@ -111,7 +110,7 @@ const features = [
   {
     icon: <BookOpen size={28} />,
     title: "Structured Curriculum",
-    desc: "Carefully designed learning paths covering Maths, English, Science and more — from beginner to advanced levels.",
+    desc: "Carefully designed learning paths covering Maths, English, Science and more, from beginner to advanced levels.",
   },
   {
     icon: <GraduationCap size={28} />,
@@ -126,7 +125,7 @@ const features = [
   {
     icon: <Zap size={28} />,
     title: "Gamified Learning",
-    desc: "Children earn XP, unlock badges, and maintain streaks — turning every lesson into something they look forward to.",
+    desc: "Children earn XP, unlock badges, and maintain streaks, turning every lesson into something they look forward to.",
   },
   {
     icon: <Clock size={28} />,
@@ -234,7 +233,7 @@ function ActivitiesGallery() {
             }}
           />
           <p style={{ fontSize: 15, color: t.muted, lineHeight: 1.75, maxWidth: 560, margin: "0 auto" }}>
-            Beyond the classroom, we run regular enrichment activities — from storytelling and art workshops to science experiments and seasonal celebrations — keeping children inspired, social, and excited to learn.
+            Beyond the classroom, we run regular enrichment activities from storytelling and art workshops to science experiments and seasonal celebrations, keeping children inspired, social, and excited to learn.
           </p>
         </div>
 
@@ -1003,7 +1002,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* Trust badges — absolutely pinned to bottom, matching story slides */}
+                {/* Trust badges absolutely pinned to bottom, matching story slides */}
                 <div
                   style={{
                     position: "absolute",
@@ -1164,9 +1163,6 @@ export default function Home() {
                   </button>
                   <button type="button" className="als-btn-outline" onClick={goLogin} style={{ fontSize: 15, padding: "14px 28px" }}>
                     Sign In
-                  </button>
-                  <button type="button" className="als-btn-gold" onClick={openWhatsApp} style={{ fontSize: 15, padding: "14px 28px" }}>
-                    <MessageCircle size={16} /> WhatsApp
                   </button>
                 </div>
 
@@ -1392,7 +1388,7 @@ export default function Home() {
             </h2>
             <div style={{ width: 52, height: 3, borderRadius: 99, background: `linear-gradient(90deg, ${t.gold}, ${t.goldL})`, margin: "16px auto 20px" }} />
             <p style={{ fontSize: 16, color: t.muted, lineHeight: 1.75, maxWidth: 520, margin: "0 auto" }}>
-              We believe every family deserves to know exactly what they&apos;re paying for. View our full fee schedule, payment plans, and sibling discounts — all in one place.
+              We believe every family deserves to know exactly what they&apos;re paying for. View our full fee schedule, payment plans, and sibling discounts all in one place.
             </p>
           </div>
           <motion.div
@@ -1489,7 +1485,7 @@ export default function Home() {
                 Learning That Rewards Every Step
               </h2>
               <p style={{ fontSize: 15, color: "rgba(255,255,255,.7)", lineHeight: 1.7, marginBottom: 32 }}>
-                Children learn best when they are motivated. Our gamified platform rewards effort at every stage — turning homework into an adventure and lessons into achievements.
+                Children learn best when they are motivated. Our gamified platform rewards effort at every stage, turning homework into an adventure and lessons into achievements.
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                 {[
@@ -1734,21 +1730,22 @@ export default function Home() {
           position: "fixed",
           right: 20,
           bottom: 20,
-          width: 58,
-          height: 58,
+          width: 64,
+          height: 64,
           borderRadius: "50%",
           border: "none",
-          background: "linear-gradient(135deg, #25D366, #128C7E)",
-          color: "#fff",
+          background: "transparent",
+          padding: 0,
           display: "inline-flex",
           alignItems: "center",
           justifyContent: "center",
           cursor: "pointer",
-          boxShadow: "0 10px 30px rgba(18, 140, 126, 0.28)",
+          boxShadow: "0 10px 30px rgba(18, 140, 126, 0.16)",
           zIndex: 1200,
+          overflow: "hidden",
         }}
       >
-        <MessageCircle size={24} />
+        <img src={publicUrl("whatsapp.png")} alt="WhatsApp" style={{ width: 64, height: 64, objectFit: "cover", display: "block" }} />
       </button>
 
       <footer style={{ background: t.navyD, padding: "64px 28px 32px", color: "rgba(255,255,255,.6)" }}>
