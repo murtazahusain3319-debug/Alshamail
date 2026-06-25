@@ -50,6 +50,14 @@ function getTeacherSummary(cls: ClassDetail): string {
   return `${assignments[0].teacher.firstName} ${assignments[0].teacher.lastName} + ${assignments.length - 1} more`;
 }
 
+function getSubjectSummary(cls: ClassDetail): string {
+  const assignments = getTeacherAssignments(cls);
+  if (assignments.length === 0) return cls.subject || "No subject";
+  const subjects = assignments.flatMap((assignment) => assignment.subjects).filter(Boolean);
+  if (subjects.length === 0) return cls.subject || "No subject";
+  return subjects.slice(0, 2).join(", ") + (subjects.length > 2 ? ` +${subjects.length - 2} more` : "");
+}
+
 function studentCount(cls: ClassDetail): number {
   return cls.students?.length ?? cls.studentCount ?? 0;
 }
@@ -193,7 +201,7 @@ export default function ClassesAndClassmates() {
                         }}
                       >
                         <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
-                          <BookOpen size={13} /> {cls.subject || "No subject"}
+                          <BookOpen size={13} /> {getSubjectSummary(cls)}
                         </span>
                         <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
                           <UserIcon size={13} /> {getTeacherSummary(cls)}

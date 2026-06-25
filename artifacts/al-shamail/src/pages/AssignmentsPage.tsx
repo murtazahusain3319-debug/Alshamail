@@ -918,8 +918,9 @@ export default function AssignmentsPage() {
   const availableClassOptions = useMemo(() => {
     if (isAdmin) return classOptions;
     if (isTeacher) return classOptions.filter((cls) => teacherClassIds.includes(cls.id));
+    if (isStudent) return classOptions.filter((cls) => studentClassIds.includes(cls.id));
     return [];
-  }, [classOptions, isAdmin, isTeacher, teacherClassIds]);
+  }, [classOptions, isAdmin, isTeacher, teacherClassIds, studentClassIds]);
 
   const hasClasses = classOptions.length > 0;
 

@@ -713,23 +713,25 @@ export default function GradesPage() {
         >
           Grades
         </button>
-        <button
-          type="button"
-          onClick={() => setActiveView("report")}
-          style={{
-            padding: "8px 14px",
-            borderRadius: 999,
-            border: `1px solid ${activeView === "report" ? B.gold : B.line}`,
-            background: activeView === "report" ? `${B.gold}12` : B.white,
-            color: activeView === "report" ? B.navy : B.muted,
-            fontWeight: 700,
-            fontSize: 13,
-            cursor: "pointer",
-            fontFamily: "inherit",
-          }}
-        >
-          Printable report
-        </button>
+        {!isStudent && (
+          <button
+            type="button"
+            onClick={() => setActiveView("report")}
+            style={{
+              padding: "8px 14px",
+              borderRadius: 999,
+              border: `1px solid ${activeView === "report" ? B.gold : B.line}`,
+              background: activeView === "report" ? `${B.gold}12` : B.white,
+              color: activeView === "report" ? B.navy : B.muted,
+              fontWeight: 700,
+              fontSize: 13,
+              cursor: "pointer",
+              fontFamily: "inherit",
+            }}
+          >
+            Printable report
+          </button>
+        )}
       </div>
 
       {loading ? (

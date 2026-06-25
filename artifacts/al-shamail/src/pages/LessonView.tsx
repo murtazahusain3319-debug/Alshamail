@@ -268,7 +268,7 @@ export default function LessonView() {
     }
     // Handle server upload paths like /uploads/videos/...
     if (normalized.startsWith("/uploads/")) {
-      // Remove /api from API_BASE if it exists, then prepend the uploads path
+      // Use the base URL without /api for static file serving
       const baseUrl = API_BASE.replace(/\/api$/, "");
       return `${baseUrl}${normalized}`;
     }
