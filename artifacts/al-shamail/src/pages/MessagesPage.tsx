@@ -93,6 +93,7 @@ export default function MessagesPage() {
   const [pendingImage, setPendingImage] = useState<{ url: string; preview: string } | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imageError, setImageError] = useState<string | null>(null);
+  const [viewingImage, setViewingImage] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
@@ -544,7 +545,7 @@ export default function MessagesPage() {
                           <img
                             src={resolveMessageMediaUrl(parsed.imageUrl)}
                             alt="Shared image"
-                            onClick={() => window.open(resolveMessageMediaUrl(parsed.imageUrl), "_blank")}
+                            onClick={() => setViewingImage(resolveMessageMediaUrl(parsed.imageUrl))}
                             style={{
                               width: "100%",
                               maxWidth: 280,
@@ -892,6 +893,65 @@ export default function MessagesPage() {
                 ))
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Image Viewer Modal */}
+      {viewingImage && (
+        <div
+          onClick={() => setViewingImage(null)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(15, 26, 60, 0.9)",
+            backdropFilter: "blur(4px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 20,
+            zIndex: 300,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: "relative",
+              maxWidth: "90vw",
+              maxHeight: "90vh",
+            }}
+          >
+            <img
+              src={viewingImage}
+              alt="Full size image"
+              style={{
+                maxWidth: "100%",
+                maxHeight: "90vh",
+                borderRadius: 12,
+                boxShadow: "0 28px 64px rgba(15,26,60,.4)",
+              }}
+            />
+            <button
+              onClick={() => setViewingImage(null)}
+              style={{
+                position: "absolute",
+                top: -16,
+                right: -16,
+                width: 40,
+                height: 40,
+                borderRadius: "50%",
+                background: B.white,
+                border: `1.5px solid ${B.light}`,
+                color: B.navy,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: "0 4px 12px rgba(15,26,60,.2)",
+              }}
+            >
+              <X size={20} />
+            </button>
           </div>
         </div>
       )}
