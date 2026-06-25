@@ -390,7 +390,17 @@ export default function LessonView() {
       if (!container || youtubePlayerRef.current) return;
       youtubePlayerRef.current = new (window as any).YT.Player(container, {
         videoId: youTubeId,
-        playerVars: { rel: 0, modestbranding: 1 },
+        playerVars: {
+          rel: 0,
+          modestbranding: 1,
+          showinfo: 0,
+          iv_load_policy: 3,
+          cc_load_policy: 0,
+          disablekb: 1,
+          fs: 0,
+          autoplay: 0,
+          playsinline: 1,
+        },
         events: {
           onReady: () => {
             updateYouTubeProgress();
@@ -608,17 +618,15 @@ export default function LessonView() {
                   }}
                 />
 
-                {/* Progress bar for native video */}
-                {!isYouTube && (
-                  <div style={{ marginBottom: 16 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: B.muted, fontWeight: 700, marginBottom: 5 }}>
-                      <span>Watched</span><span>{watched}%</span>
-                    </div>
-                    <div style={{ background: B.light, borderRadius: 999, height: 5, overflow: "hidden" }}>
-                      <div style={{ width: `${watched}%`, height: "100%", background: `linear-gradient(90deg, ${B.gold}, ${B.goldL})`, transition: "width .5s" }}/>
-                    </div>
+                {/* Progress bar */}
+                <div style={{ marginBottom: 16 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: B.muted, fontWeight: 700, marginBottom: 5 }}>
+                    <span>Watched</span><span>{watched}%</span>
                   </div>
-                )}
+                  <div style={{ background: B.light, borderRadius: 999, height: 5, overflow: "hidden" }}>
+                    <div style={{ width: `${watched}%`, height: "100%", background: `linear-gradient(90deg, ${B.gold}, ${B.goldL})`, transition: "width .5s" }}/>
+                  </div>
+                </div>
 
               </>
             )}

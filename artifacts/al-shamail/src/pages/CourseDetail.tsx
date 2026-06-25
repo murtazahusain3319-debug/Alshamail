@@ -465,7 +465,9 @@ function AddLessonPanel({
 
       <div style={{ display: "grid", gap: 10 }}>
         <input placeholder="Lesson title *" value={form.title} onChange={(e) => set("title", e.target.value)} style={inputStyle}/>
-        <textarea placeholder="Lesson description" value={form.description} onChange={(e) => set("description", e.target.value)} style={{ ...inputStyle, minHeight: 60, resize: "vertical" }}/>
+        {form.kind !== "video" && (
+          <textarea placeholder="Lesson description" value={form.description} onChange={(e) => set("description", e.target.value)} style={{ ...inputStyle, minHeight: 60, resize: "vertical" }}/>
+        )}
 
         {form.kind === "quiz" ? (
           <div style={{ padding: "14px 16px", background: B.offW, border: `1.5px solid ${B.light}`, borderRadius: 12, color: B.muted, fontSize: 12 }}>
