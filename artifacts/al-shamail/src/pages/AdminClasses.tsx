@@ -96,6 +96,17 @@ function getSubjectSummary(cls: Class): string {
   return subjects.slice(0, 2).join(", ") + (subjects.length > 2 ? ` +${subjects.length - 2} more` : "");
 }
 
+function subjectCount(cls: Class): number {
+  const assignments = getTeacherAssignments(cls);
+  if (assignments.length === 0) return cls.subject ? 1 : 0;
+  const subjects = assignments.flatMap((assignment) => assignment.subjects).filter(Boolean);
+  return subjects.length || (cls.subject ? 1 : 0);
+}
+
+function teacherCount(cls: Class): number {
+  return getTeacherAssignments(cls).length;
+}
+
 function initials(firstName: string, lastName: string): string {
   return `${firstName?.[0] ?? ""}${lastName?.[0] ?? ""}`.toUpperCase();
 }
@@ -860,15 +871,15 @@ export default function AdminClasses() {
                     <div>
                       <div style={{ fontWeight: 800, fontSize: 15, color: B.navy, marginBottom: 6 }}>{cls.name}</div>
                       <div style={{ fontSize: 12, color: B.muted, display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
-                        <span>
+                        <span style={{ fontWeight: 700, color: B.navy }}>
                           <BookOpen size={12} style={{ display: "inline", marginRight: 6 }} />
-                          {getSubjectSummary(cls)}
-                        </span>
-                        <span>
-                          <Users size={12} style={{ display: "inline", marginRight: 6 }} /> {getTeacherSummary(cls)}
+                          {subjectCount(cls)} {subjectCount(cls) === 1 ? "subject" : "subjects"}
                         </span>
                         <span style={{ fontWeight: 700, color: B.navy }}>
-                          <Users size={12} style={{ display: "inline", marginRight: 6 }} /> {cls.studentCount}
+                          <Users size={12} style={{ display: "inline", marginRight: 6 }} /> {teacherCount(cls)} {teacherCount(cls) === 1 ? "teacher" : "teachers"}
+                        </span>
+                        <span style={{ fontWeight: 700, color: B.navy }}>
+                          <Users size={12} style={{ display: "inline", marginRight: 6 }} /> {cls.studentCount} {cls.studentCount === 1 ? "student" : "students"}
                         </span>
                       </div>
                     </div>

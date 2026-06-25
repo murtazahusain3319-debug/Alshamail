@@ -266,9 +266,16 @@ export default function LessonView() {
     if (normalized.startsWith("data:") || normalized.startsWith("blob:") || /^https?:\/\//i.test(normalized)) {
       return normalized;
     }
-    // Handle server upload paths - use API_BASE for all /uploads/ paths since backend serves through API
+    // Handle paths that already include /api/uploads/ - strip the /api prefix
+    if (normalized.startsWith("/api/uploads/")) {
+      const baseUrl = API_BASE.replace(/\/api\/?$/, "");
+      const cleanPath = normalized.replace(/^\/api/, "");
+      return `${baseUrl}${cleanPath}`;
+    }
+    // Handle server upload paths - strip /api from base URL for static file serving
     if (normalized.startsWith("/uploads/")) {
-      return `${API_BASE}${normalized}`;
+      const baseUrl = API_BASE.replace(/\/api\/?$/, "");
+      return `${baseUrl}${normalized}`;
     }
     if (normalized.startsWith("/")) return `${API_BASE}${normalized}`;
     return `${API_BASE}/${normalized}`;
