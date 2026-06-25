@@ -100,7 +100,7 @@ export default function TeacherStudents() {
                     </td>
                     <td style={td}>
                       <span style={{ color: B.muted, fontSize: 13 }}>
-                        {u.grade ?? "—"}
+                        {u.grade ?? "-"}
                       </span>
                     </td>
                     <td style={{ ...td, textAlign: "right" }}>
@@ -161,7 +161,7 @@ export default function TeacherStudents() {
                           fontWeight: 700,
                         }}
                       >
-                        {u.quizAvg != null ? `${u.quizAvg}%` : "—"}
+                        {u.quizAvg != null ? `${u.quizAvg}%` : "-"}
                       </span>
                     </td>
                     <td style={{ ...td, textAlign: "right" }}>

@@ -32,7 +32,7 @@ const COVER_COLORS = [
   { label: "Slate",  value: "#334155" },
 ];
 
-/* ── Thumbnail component — supports image URL or emoji+color ── */
+/* ── Thumbnail component - supports image URL or emoji+color ── */
 function CourseThumbnail({
   thumbnailUrl, coverEmoji, coverColor, size = 180,
 }: {
@@ -162,7 +162,7 @@ function NewCoursePanel({
           <div>
             <label style={{ fontSize: 12, fontWeight: 700, color: B.navy, display: "block", marginBottom: 6 }}>
               <ImageIcon size={12} style={{ marginRight: 4, verticalAlign: "middle" }}/>
-              Thumbnail Image URL <span style={{ color: B.muted, fontWeight: 400 }}>(optional — leave blank to use emoji)</span>
+              Thumbnail Image URL <span style={{ color: B.muted, fontWeight: 400 }}>(optional - leave blank to use emoji)</span>
             </label>
             <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 8 }}>
               <input
@@ -178,7 +178,7 @@ function NewCoursePanel({
           </div>
           <div>
             <label style={{ fontSize: 12, fontWeight: 700, color: B.navy, display: "block", marginBottom: 6 }}>
-              Banner Image URL <span style={{ color: B.muted, fontWeight: 400 }}>(optional — used on course page hero)</span>
+              Banner Image URL <span style={{ color: B.muted, fontWeight: 400 }}>(optional - used on course page hero)</span>
             </label>
             <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 8 }}>
               <input
@@ -193,7 +193,7 @@ function NewCoursePanel({
             </div>
           </div>
 
-          {/* Emoji + colour — only shown if no thumbnail URL */}
+          {/* Emoji + colour - only shown if no thumbnail URL */}
           {!form.thumbnailUrl && (
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               <div>

@@ -171,7 +171,7 @@ export default function LeaderboardPage() {
             </div>
           )}
 
-          <Card title={selectedClass ? `${selectedClass.name} — Top students` : "Top students"}>
+          <Card title={selectedClass ? `${selectedClass.name} - Top students` : "Top students"}>
             {lb.isLoading ? (
               <div style={{ color: B.muted }}>Loading…</div>
             ) : items.length === 0 ? (

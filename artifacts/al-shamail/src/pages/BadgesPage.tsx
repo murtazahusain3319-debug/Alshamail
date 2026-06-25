@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Trophy, Plus } from "lucide-react";
+import { Trophy, Plus, CheckCircle2, Award } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   useListBadges,

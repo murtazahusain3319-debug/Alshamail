@@ -280,16 +280,18 @@ export default function LessonView() {
     }
   }, []);
 
-  const onVideoEnded = () => {
-    startConfetti();
-    if (lesson && !lesson?.completed && !complete.isPending) {
-      if (!isReading && watched < 80) {
-        setErrorMessage("Watch at least 80% of the lesson before marking it complete.");
-        return;
-      }
-      onComplete();
-    }
-  };
+  const user = me.data?.user;
+  const isStaff = !!user?.isAdmin || user?.role === "teacher";
+  const isReading = lesson?.kind === "reading";
+  const completionReady = lesson?.completed || isReading || watched >= 80;
+  const isYouTube = !isReading && resolvedVideoUrl && !resolvedVideoUrl.startsWith("data:") && (resolvedVideoUrl.includes("youtube.com") || resolvedVideoUrl.includes("youtu.be"));
+  const youTubeId = isYouTube ? extractYouTubeId(resolvedVideoUrl) : null;
+  const nextVideoLesson = lesson?.next?.kind === "video" ? lesson.next : lesson?.nextVideo ?? null;
+  const prevVideoLesson = lesson?.prev?.kind === "video" ? lesson.prev : lesson?.prevVideo ?? null;
+  const nextLesson = lesson?.next ?? null;
+  const prevLesson = lesson?.prev ?? null;
+
+  const pageTitle = lesson?.course?.title ?? lesson?.course?.subject ?? lesson?.title ?? "Lesson";
 
   const onComplete = useCallback(async () => {
     if (!isReading && watched < 80) {
@@ -322,6 +324,17 @@ export default function LessonView() {
     }
   }, [id, qc, complete, lesson?.courseId, isReading, watched]);
 
+  const onVideoEnded = () => {
+    startConfetti();
+    if (lesson && !lesson?.completed && !complete.isPending) {
+      if (!isReading && watched < 80) {
+        setErrorMessage("Watch at least 80% of the lesson before marking it complete.");
+        return;
+      }
+      onComplete();
+    }
+  };
+
   useEffect(() => {
     const handleResize = () => {
       if (confettiRunningRef.current) resizeConfettiCanvas();
@@ -340,19 +353,6 @@ export default function LessonView() {
   useEffect(() => {
     hasAutoCompletedRef.current = null;
   }, [id]);
-
-  const user = me.data?.user;
-  const isStaff = !!user?.isAdmin || user?.role === "teacher";
-  const isReading = lesson?.kind === "reading";
-  const completionReady = lesson?.completed || isReading || watched >= 80;
-  const isYouTube = !isReading && resolvedVideoUrl && !resolvedVideoUrl.startsWith("data:") && (resolvedVideoUrl.includes("youtube.com") || resolvedVideoUrl.includes("youtu.be"));
-  const youTubeId = isYouTube ? extractYouTubeId(resolvedVideoUrl) : null;
-  const nextVideoLesson = lesson?.next?.kind === "video" ? lesson.next : lesson?.nextVideo ?? null;
-  const prevVideoLesson = lesson?.prev?.kind === "video" ? lesson.prev : lesson?.prevVideo ?? null;
-  const nextLesson = lesson?.next ?? null;
-  const prevLesson = lesson?.prev ?? null;
-
-  const pageTitle = lesson?.course?.title ?? lesson?.course?.subject ?? lesson?.title ?? "Lesson";
 
   useEffect(() => {
     if (!isYouTube || !youTubeId) {
@@ -460,7 +460,7 @@ export default function LessonView() {
           {/* ── LEFT: Content ── */}
           <div style={{ minWidth: 0 }}>
             {isReading ? (
-              /* Reading lesson — beautiful article layout */
+              /* Reading lesson - beautiful article layout */
               <div style={{
                 background: B.white, borderRadius: 20, border: `1px solid ${B.light}`,
                 boxShadow: "0 4px 24px rgba(27,43,94,.07)", overflow: "hidden",
@@ -554,7 +554,17 @@ export default function LessonView() {
                       {isYouTube && youTubeId ? (
                         <div id="youtube-lesson-player" key={youTubeId} style={{ width: "100%", height: "100%" }} />
                       ) : resolvedVideoUrl ? (
-                        <video key={resolvedVideoUrl} ref={videoRef} src={resolvedVideoUrl} controls onTimeUpdate={onTimeUpdate} onEnded={onVideoEnded} onError={handleVideoError} style={{ width: "100%", height: "100%", display: "block" }}/>
+                        <>
+                          <video key={resolvedVideoUrl} ref={videoRef} src={resolvedVideoUrl} controls onTimeUpdate={onTimeUpdate} onEnded={onVideoEnded} onError={handleVideoError} style={{ width: "100%", height: "100%", display: "block" }}/>
+                          {videoError && (
+                            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.8)", color: "#fff", padding: 20, textAlign: "center" }}>
+                              <div>
+                                <div style={{ fontWeight: 700, marginBottom: 8 }}>Video Error</div>
+                                <div style={{ fontSize: 14 }}>{videoError}</div>
+                              </div>
+                            </div>
+                          )}
+                        </>
                       ) : (
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", height: "100%", color: B.offW, background: "#111827" }}>
                           No video is available for this lesson yet.

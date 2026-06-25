@@ -101,9 +101,9 @@ export default function SyllabusSemesters() {
 
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {[
-            { n: "1", title: "Semester 1 — Autumn Term", dates: "September – December 2025", body: "Foundation and introductory units across all subjects, plus initial assessments." },
-            { n: "2", title: "Semester 2 — Spring Term", dates: "January – April 2026", body: "Core curriculum deepens, projects begin, and mid-year assessments take place." },
-            { n: "3", title: "Semester 3 — Summer Term", dates: "April – July 2026", body: "Revision, end-of-year exams, reports, and end-of-year celebrations." },
+            { n: "1", title: "Semester 1 - Autumn Term", dates: "September – December 2025", body: "Foundation and introductory units across all subjects, plus initial assessments." },
+            { n: "2", title: "Semester 2 - Spring Term", dates: "January – April 2026", body: "Core curriculum deepens, projects begin, and mid-year assessments take place." },
+            { n: "3", title: "Semester 3 - Summer Term", dates: "April – July 2026", body: "Revision, end-of-year exams, reports, and end-of-year celebrations." },
           ].map((s) => (
             <div key={s.n} style={{ background: B.white, border: `1px solid ${B.light}`, borderRadius: 18, padding: "18px 18px" }}>
               <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>

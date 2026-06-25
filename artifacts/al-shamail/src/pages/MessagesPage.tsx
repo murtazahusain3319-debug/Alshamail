@@ -152,11 +152,11 @@ export default function MessagesPage() {
 
   const uploadMessageImage = async (file: File) => {
     if (!/^image\/(png|jpe?g|gif|webp)$/i.test(file.type)) {
-      setImageError("Please choose a PNG, JPEG, GIF, or WebP image.");
+      setImageError(`Please choose a PNG, JPEG, GIF, or WebP image. Got: ${file.type}`);
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      setImageError("Image is too large. Maximum size is 5 MB.");
+      setImageError(`Image is too large (${(file.size / 1024 / 1024).toFixed(2)} MB). Maximum size is 5 MB.`);
       return;
     }
 
@@ -172,19 +172,33 @@ export default function MessagesPage() {
 
       const form = new FormData();
       form.append("image", file);
+      
+      console.log("Uploading image to:", `${API_BASE}/messages/upload-image`);
       const res = await fetch(`${API_BASE}/messages/upload-image`, {
         method: "POST",
         credentials: "include",
         body: form,
       });
+      
+      console.log("Upload response status:", res.status);
+      
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.error ?? "Could not upload image.");
+        console.error("Upload error:", err);
+        throw new Error(err.error ?? `Upload failed with status ${res.status}`);
       }
+      
       const data = await res.json();
+      console.log("Upload success:", data);
+      
+      if (!data.url) {
+        throw new Error("Server did not return image URL");
+      }
+      
       setPendingImage({ url: data.url, preview });
     } catch (err: any) {
-      setImageError(err?.message ?? "Could not upload image.");
+      console.error("Image upload error:", err);
+      setImageError(err?.message ?? "Could not upload image. Please try again.");
     } finally {
       setUploadingImage(false);
     }
@@ -479,7 +493,7 @@ export default function MessagesPage() {
                       fontSize: 13,
                     }}
                   >
-                    No messages yet — send the first one!
+                    No messages yet - send the first one!
                   </div>
                 ) : (
                   messages.map((m) => {

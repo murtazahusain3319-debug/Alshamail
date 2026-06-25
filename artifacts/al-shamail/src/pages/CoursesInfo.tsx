@@ -6,7 +6,7 @@ export default function CoursesInfo() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 14 }}>
         {[
           { t: "Mathematics", d: "Primary to secondary coverage with strong foundations and problem solving." },
-          { t: "English & Literacy", d: "Reading, comprehension, writing, and grammar—paced for each learner." },
+          { t: "English & Literacy", d: "Reading, comprehension, writing, and grammar-paced for each learner." },
           { t: "Science", d: "Engaging explorations with clear explanations and real-world connections." },
           { t: "Geography", d: "Global perspectives and understanding the world around us." },
           { t: "Critical Thinking", d: "Logic, reasoning, and structured problem-solving skills." },

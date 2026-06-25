@@ -552,7 +552,7 @@ export default function TeacherDashboard() {
                           {s.firstName} {s.lastName}
                         </div>
                         <div style={{ fontSize: 11, color: B.muted }}>
-                          {s.grade ?? "—"} · L{s.level}
+                          {s.grade ?? "-"} · L{s.level}
                         </div>
                       </div>
                       <div style={{ fontSize: 12, fontWeight: 800, color: B.goldD }}>

@@ -230,14 +230,14 @@ const sections = [
       {
         rule: "Respectful Communication",
         detail:
-          "All students must communicate respectfully with teachers, staff, and fellow classmates at all times — in live sessions, the messaging portal, and all school-related channels.",
+          "All students must communicate respectfully with teachers, staff, and fellow classmates at all times - in live sessions, the messaging portal, and all school-related channels.",
         badge: "mandatory" as BadgeVariant,
         label: "Mandatory",
       },
       {
         rule: "Anti-Bullying Policy",
         detail:
-          "Any form of bullying, harassment, or targeted unkindness — verbal, written, or otherwise — is strictly prohibited and subject to immediate disciplinary review.",
+          "Any form of bullying, harassment, or targeted unkindness - verbal, written, or otherwise - is strictly prohibited and subject to immediate disciplinary review.",
         badge: "strict" as BadgeVariant,
         label: "Zero Tolerance",
       },
@@ -463,7 +463,7 @@ export default function EnrollmentRules() {
             }}
           >
             <Badge variant={item.variant} label={item.label} />
-            <span>— {item.desc}</span>
+            <span>- {item.desc}</span>
           </div>
         ))}
       </div>

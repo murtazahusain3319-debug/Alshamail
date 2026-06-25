@@ -103,10 +103,10 @@ export default function SyllabusBookList() {
 
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {[
-            { n: "01", title: "Primary Mathematics — Book 1A & 1B", detail: "Oxford University Press · Ages 5–7" },
+            { n: "01", title: "Primary Mathematics - Book 1A & 1B", detail: "Oxford University Press · Ages 5–7" },
             { n: "02", title: "Key Stage 2 Maths Practice", detail: "Collins · Ages 7–11" },
-            { n: "03", title: "Discover Science — Junior Level", detail: "Hodder Education · Ages 6–9" },
-            { n: "04", title: "Jolly Phonics — Workbook Set", detail: "Jolly Learning · Ages 4–7" },
+            { n: "03", title: "Discover Science - Junior Level", detail: "Hodder Education · Ages 6–9" },
+            { n: "04", title: "Jolly Phonics - Workbook Set", detail: "Jolly Learning · Ages 4–7" },
           ].map((b) => (
             <div key={b.n} style={{ display: "flex", gap: 16, padding: "16px 18px", background: B.white, border: `1px solid ${B.light}`, borderRadius: 16 }}>
               <div style={{ width: 36, height: 36, borderRadius: 10, background: B.navy, color: B.goldL, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>

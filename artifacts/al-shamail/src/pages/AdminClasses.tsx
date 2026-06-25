@@ -259,7 +259,7 @@ async function removeStudent(classId: number, userId: number): Promise<void> {
   if (!res.ok) throw new Error("Failed to remove student");
 }
 
-/* ΓöÇΓöÇΓöÇ Small shared UI bits ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
+/* ─── Small shared UI bits ─────────────────────────── */
 
 function Tag({
   icon,
@@ -566,7 +566,7 @@ function SolidButton({
   );
 }
 
-/* ΓöÇΓöÇΓöÇ End UI bits ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */
+/* ─── End UI bits ───────────────────────── */
 
 export default function AdminClasses() {
   const meQ = useGetCurrentUser();
@@ -784,7 +784,7 @@ export default function AdminClasses() {
               }}
             />
             <input
-              placeholder="Search classesΓÇª"
+              placeholder="Search classes…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               style={{
@@ -821,7 +821,7 @@ export default function AdminClasses() {
         </div>
 
         {loading ? (
-          <div style={{ color: B.muted }}>LoadingΓÇª</div>
+          <div style={{ color: B.muted }}>Loading…</div>
         ) : filtered.length === 0 ? (
           <div style={{ color: B.muted, textAlign: "center", padding: "24px 0" }}>
             No classes yet. {isAdmin && "Create one to get started!"}
@@ -1111,7 +1111,7 @@ export default function AdminClasses() {
                 } catch (err) {
                   toast({ title: "Failed to assign teacher", description: String(err instanceof Error ? err.message : err), variant: "destructive" });
                 } finally { setAssigning(false); }
-              }}>{assigning ? "AssigningΓÇª" : "Assign"}</SolidButton>
+              }}>{assigning ? "Assigning…" : "Assign"}</SolidButton>
             </div>
           </div>
         </ModalShell>
@@ -1148,7 +1148,7 @@ export default function AdminClasses() {
             <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
               <SecondaryButton onClick={closeEditTeacherSubjects}>Cancel</SecondaryButton>
               <SolidButton disabled={savingTeacherSubjects} onClick={onSaveTeacherSubjects}>
-                {savingTeacherSubjects ? "SavingΓÇª" : "Save changes"}
+                {savingTeacherSubjects ? "Saving…" : "Save changes"}
               </SolidButton>
             </div>
           </div>
@@ -1171,7 +1171,7 @@ export default function AdminClasses() {
                 }}
               />
               <input
-                placeholder="Search studentsΓÇª"
+                placeholder="Search students…"
                 value={enrollSearch}
                 onChange={(e) => setEnrollSearch(e.target.value)}
                 style={{
@@ -1217,7 +1217,7 @@ export default function AdminClasses() {
                 } catch (err) {
                   toast({ title: "Failed to enroll students", description: String(err instanceof Error ? err.message : err), variant: "destructive" });
                 } finally { setEnrolling(false); }
-              }}>{enrolling ? "EnrollingΓÇª" : "Assign"}</SolidButton>
+              }}>{enrolling ? "Enrolling…" : "Assign"}</SolidButton>
             </div>
           </div>
         </ModalShell>

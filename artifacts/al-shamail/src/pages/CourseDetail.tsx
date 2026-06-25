@@ -501,7 +501,7 @@ function AddLessonPanel({
                 <Upload size={28} color={B.gold}/>
                 <div>
                   <div style={{ fontWeight: 700, color: B.navy, fontSize: 14, marginBottom: 3 }}>Import PDF</div>
-                  <div style={{ fontSize: 12 }}>Click to browse — PDF files</div>
+                  <div style={{ fontSize: 12 }}>Click to browse - PDF files</div>
                 </div>
               </button>
             ) : (
@@ -1632,6 +1632,14 @@ export default function CourseDetail() {
   const [, params] = useRoute<{ id: string }>("/courses/:id");
   const id = parseInt(params?.id ?? "0", 10);
   const qc = useQueryClient();
+  const courseQ = useGetCourse(id, { query: { enabled: id > 0 } });
+  const data: any = courseQ.data;
+  const course = data?.course;
+  const lessons: any[] = data?.lessons ?? [];
+  const isEnrolled = !!data?.enrolled;
+  const completedSet = new Set<number>((data?.completedLessonIds ?? []) as number[]);
+  const progress = data?.progress ?? 0;
+
   const me = useGetCurrentUser();
   const user = me.data?.user;
   const isAdmin = !!user?.isAdmin;
@@ -1641,14 +1649,6 @@ export default function CourseDetail() {
     Number(course?.teacherId) === Number(user?.id) ||
     (course?.teacherAssignments ?? []).some((assignment: any) => Number(assignment.teacher?.id) === Number(user?.id))
   ));
-
-  const courseQ = useGetCourse(id, { query: { enabled: id > 0 } });
-  const data: any = courseQ.data;
-  const course = data?.course;
-  const lessons: any[] = data?.lessons ?? [];
-  const isEnrolled = !!data?.enrolled;
-  const completedSet = new Set<number>((data?.completedLessonIds ?? []) as number[]);
-  const progress = data?.progress ?? 0;
 
   const membersQ = useGetCourseMembers(id, { query: { enabled: id > 0 } });
   const members: any = membersQ.data ?? { admins: [], teachers: [], students: [] };
@@ -2115,7 +2115,7 @@ export default function CourseDetail() {
                     )}
                   </>
                 )}
-                {isEnrolled && lessons.length > 0 && (
+                {isEnrolled && lessons.length > 0 && !isStaff && (
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <div style={{ background: B.light, borderRadius: 999, height: 6, width: 160, overflow: "hidden" }}>
                       <div style={{ width: `${progress}%`, height: "100%", background: `linear-gradient(90deg, ${B.gold}, ${B.goldL})` }}/>
