@@ -545,6 +545,7 @@ export default function MessagesPage() {
                           <img
                             src={resolveMessageMediaUrl(parsed.imageUrl)}
                             alt="Shared image"
+                            crossOrigin="anonymous"
                             onClick={() => setViewingImage(resolveMessageMediaUrl(parsed.imageUrl))}
                             style={{
                               width: "100%",
@@ -924,6 +925,7 @@ export default function MessagesPage() {
             <img
               src={viewingImage}
               alt="Full size image"
+              crossOrigin="anonymous"
               style={{
                 maxWidth: "100%",
                 maxHeight: "90vh",
@@ -1002,6 +1004,17 @@ function resolveMessageMediaUrl(url: string): string {
   if (!value) return value;
   if (value.startsWith("data:") || value.startsWith("blob:") || /^https?:\/\//i.test(value)) {
     return value;
+  }
+  // Handle server uploads path - strip /api from base URL for /uploads/ paths
+  if (value.startsWith("/uploads/")) {
+    const baseUrl = API_BASE.replace(/\/api\/?$/, "");
+    return `${baseUrl}${value}`;
+  }
+  // Handle paths that might already include /api/uploads
+  if (value.startsWith("/api/uploads/")) {
+    const baseUrl = API_BASE.replace(/\/api\/?$/, "");
+    const cleanPath = value.replace(/^\/api/, "");
+    return `${baseUrl}${cleanPath}`;
   }
   return `${API_BASE}${value.startsWith("/") ? "" : "/"}${value}`;
 }
