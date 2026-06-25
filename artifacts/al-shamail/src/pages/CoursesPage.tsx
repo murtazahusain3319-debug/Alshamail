@@ -76,7 +76,7 @@ function NewCoursePanel({
   isLoading: boolean;
 }) {
   const [form, setForm] = useState({
-    title: "", subject: "", level: "All Ages", description: "",
+    title: "", subject: "", level: "KG - 1", description: "",
     coverEmoji: "📘", coverColor: B.navy, thumbnailUrl: "", bannerUrl: "",
   });
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
@@ -142,7 +142,7 @@ function NewCoursePanel({
           <div>
             <label style={{ fontSize: 12, fontWeight: 700, color: B.navy, display: "block", marginBottom: 6 }}>Level</label>
             <select value={form.level} onChange={(e) => set("level", e.target.value)} style={{ ...inputStyle, appearance: "none" as any }}>
-              {["All Ages","Beginner","Grade 1–3","Grade 4–6","Grade 7–9","Grade 10–12","Intermediate","Advanced"].map((l) => (
+              {["KG - 1","KG - 2","KG - 3","Grade 1","Grade 2","Grade 3","Grade 4","Grade 5","O-lev 1","O-lev 2","O-lev 3","O-lev 4","A-lev 1","A-lev 2","A-lev 3"].map((l) => (
                 <option key={l} value={l}>{l}</option>
               ))}
             </select>
@@ -554,38 +554,12 @@ export default function CoursesPage() {
   const enrollments = useListMyEnrollments({ query: { enabled: !!user } });
   const enrolledIds = new Set<number>((enrollments.data?.items ?? []).map((e: any) => e.courseId));
 
-  // Fetch classes for filtering
-  const [classes, setClasses] = useState<any[]>([]);
-  useEffect(() => {
-    fetch(`${API_BASE}/classes`, { credentials: "include" })
-      .then((res) => res.json())
-      .then((data) => setClasses(data.items ?? []))
-      .catch(() => setClasses([]));
-  }, []);
-
-  // Get class IDs for current user
-  const userClassIds = useMemo(() => {
-    if (isAdmin) return classes.map((c) => String(c.id));
-    if (isTeacher) {
-      return classes
-        .filter((c) => c.teacherAssignments?.some((a: any) => Number(a.teacher?.id) === Number(user?.id)))
-        .map((c) => String(c.id));
-    }
-    if (isStudent) {
-      return classes
-        .filter((c) => c.students?.some((s: any) => Number(s.id) === Number(user?.id)))
-        .map((c) => String(c.id));
-    }
-    return [];
-  }, [classes, isAdmin, isTeacher, isStudent, user?.id]);
-
   const enroll = useEnrollInCourse();
   const create = useCreateCourse();
 
   const [search, setSearch] = useState("");
   const [levelFilter, setLevelFilter] = useState("All");
   const [teacherFilter, setTeacherFilter] = useState("All");
-  const [classFilter, setClassFilter] = useState("All");
   const [showNew, setShowNew] = useState(false);
   const [showEnrollCourseId, setShowEnrollCourseId] = useState<number | null>(null);
 
@@ -593,22 +567,6 @@ export default function CoursesPage() {
   const teacherOptions = ["All", ...Array.from(new Set(items
     .map((c: any) => c.teacherName || (c.teacher ? `${c.teacher.firstName ?? ""} ${c.teacher.lastName ?? ""}`.trim() : ""))
     .filter(Boolean)))];
-  
-  // Class options based on user role
-  const classOptions = useMemo(() => {
-    if (isAdmin) return ["All", ...classes.map((c) => c.name)];
-    if (isTeacher) {
-      return ["All", ...classes
-        .filter((c) => c.teacherAssignments?.some((a: any) => Number(a.teacher?.id) === Number(user?.id)))
-        .map((c) => c.name)];
-    }
-    if (isStudent) {
-      return ["All", ...classes
-        .filter((c) => c.students?.some((s: any) => Number(s.id) === Number(user?.id)))
-        .map((c) => c.name)];
-    }
-    return ["All"];
-  }, [classes, isAdmin, isTeacher, isStudent, user?.id]);
 
   const visibleItems = useMemo(() => {
     if (isStudent) return items.filter((c: any) => enrolledIds.has(c.id));
@@ -631,14 +589,10 @@ export default function CoursesPage() {
         const teacherName = c.teacherName || (c.teacher ? `${c.teacher.firstName ?? ""} ${c.teacher.lastName ?? ""}`.trim() : "");
         if (teacherName !== teacherFilter) return false;
       }
-      if (classFilter !== "All") {
-        const classObj = classes.find((cls) => cls.name === classFilter);
-        if (classObj && c.classId !== String(classObj.id)) return false;
-      }
       if (!term) return true;
       return [c.title, c.subject, c.description, c.level, c.teacherName].join(" ").toLowerCase().includes(term);
     });
-  }, [visibleItems, search, levelFilter, teacherFilter, classFilter, classes]);
+  }, [visibleItems, search, levelFilter, teacherFilter]);
 
   const onEnroll = async (id: number) => {
     await enroll.mutateAsync({ id });
@@ -741,26 +695,6 @@ export default function CoursesPage() {
               ))}
             </select>
           )}
-
-          {/* Class filter selector */}
-          <select
-            value={classFilter}
-            onChange={(e) => setClassFilter(e.target.value)}
-            style={{
-              padding: "7px 14px",
-              borderRadius: 10,
-              fontSize: 12,
-              fontWeight: 700,
-              border: `1.5px solid ${B.light}`,
-              background: B.white,
-              color: B.navy,
-              cursor: "pointer",
-            }}
-          >
-            {classOptions.map((cls) => (
-              <option key={cls} value={cls}>{cls}</option>
-            ))}
-          </select>
 
           {isStaff && (
             <div style={{ display: "flex", gap: 8, marginLeft: "auto" }}>

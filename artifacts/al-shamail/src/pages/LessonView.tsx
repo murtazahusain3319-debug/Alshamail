@@ -323,6 +323,7 @@ export default function LessonView() {
     try {
       const r = await complete.mutateAsync({ id });
       setReward({ xpAwarded: (r as any).xpAwarded, leveledUp: (r as any).leveledUp, level: (r as any).level, newBadges: (r as any).newBadges ?? [] });
+      startConfetti();
       // Ensure caches reflect server state
       await qc.invalidateQueries({ queryKey: getGetLessonQueryKey(id) });
       if (lesson?.courseId) await qc.invalidateQueries({ queryKey: getGetCourseQueryKey(lesson.courseId) });
@@ -338,7 +339,6 @@ export default function LessonView() {
   }, [id, qc, complete, lesson?.courseId, isReading, watched]);
 
   const onVideoEnded = () => {
-    startConfetti();
     if (lesson && !lesson?.completed && !complete.isPending) {
       if (!isReading && watched < 80) {
         setErrorMessage("Watch at least 80% of the lesson before marking it complete.");
@@ -416,7 +416,6 @@ export default function LessonView() {
               if (youtubePlayerRef.current) {
                 youtubePlayerRef.current.stopVideo();
                 setYoutubeEnded(true);
-                startConfetti();
                 if (lesson && !lesson?.completed && !complete.isPending && watched >= 80) {
                   onComplete();
                 }
