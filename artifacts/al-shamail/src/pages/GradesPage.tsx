@@ -283,6 +283,9 @@ export default function GradesPage() {
   } | null>(null);
   const [editEntry, setEditEntry] = useState<GradeEntry | null>(null);
   const [activeView, setActiveView] = useState<"grades" | "report">("grades");
+  const [reportClassId, setReportClassId] = useState<string>("");
+  const [reportStudentId, setReportStudentId] = useState<number | null>(null);
+  const [studentSearch, setStudentSearch] = useState<string>("");
 
   const coursesQuery = useListCourses();
   const courseOptions = useMemo(() => {
@@ -408,6 +411,30 @@ export default function GradesPage() {
     () => groupGradesByClassAndSubject(availableClassOptions, filteredSubjects, visibleEntries),
     [availableClassOptions, filteredSubjects, visibleEntries],
   );
+
+  const reportGradeGroups = useMemo(() => {
+    if (!reportClassId && !reportStudentId) return gradeGroups;
+    
+    let filtered = gradeGroups;
+    
+    // Filter by class
+    if (reportClassId) {
+      filtered = filtered.filter((g) => g.gradeKey === reportClassId);
+    }
+    
+    // Filter by student
+    if (reportStudentId) {
+      filtered = filtered.map((grade) => ({
+        ...grade,
+        subjects: grade.subjects.map((subject) => ({
+          ...subject,
+          items: subject.items.filter((entry) => entry.studentId === reportStudentId),
+        })).filter((subject) => subject.items.length > 0),
+      })).filter((grade) => grade.subjects.length > 0);
+    }
+    
+    return filtered;
+  }, [gradeGroups, reportClassId, reportStudentId]);
 
   const allowedSubjectOptionsForSelectedClass = useMemo(() => {
     if (!createClassId) return courseOptions;
@@ -702,7 +729,7 @@ export default function GradesPage() {
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap", padding: "16px 18px", borderRadius: 16, border: `1px solid ${B.line}`, background: B.white }}>
             <div>
               <div style={{ fontWeight: 800, color: B.navy, fontSize: 15 }}>Printable grade report</div>
-              <div style={{ fontSize: 12, color: B.muted, marginTop: 2 }}>Use your browser's print dialog to save this view as PDF.</div>
+              <div style={{ fontSize: 12, color: B.muted, marginTop: 2 }}>Filter by grade and student to generate individual reports.</div>
             </div>
             <button
               type="button"
@@ -722,20 +749,83 @@ export default function GradesPage() {
               Print / Save PDF
             </button>
           </div>
-          {gradeGroups.length === 0 ? (
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12, padding: "16px 18px", borderRadius: 16, border: `1px solid ${B.line}`, background: B.white }}>
+            <div>
+              <label style={{ fontSize: 11, fontWeight: 700, color: B.muted, textTransform: "uppercase", letterSpacing: ".08em", display: "block", marginBottom: 6 }}>
+                Grade / Class
+              </label>
+              <select
+                value={reportClassId}
+                onChange={(e) => {
+                  setReportClassId(e.target.value);
+                  setReportStudentId(null);
+                  setStudentSearch("");
+                }}
+                style={{ ...inputStyle, width: "100%" }}
+              >
+                <option value="">All Grades</option>
+                {classOptions.map((cls) => (
+                  <option key={cls.id} value={cls.id}>{cls.name}</option>
+                ))}
+              </select>
+            </div>
+            
+            <div>
+              <label style={{ fontSize: 11, fontWeight: 700, color: B.muted, textTransform: "uppercase", letterSpacing: ".08em", display: "block", marginBottom: 6 }}>
+                Student
+              </label>
+              <select
+                value={reportStudentId ?? ""}
+                onChange={(e) => setReportStudentId(e.target.value ? parseInt(e.target.value, 10) : null)}
+                disabled={!reportClassId}
+                style={{ ...inputStyle, width: "100%" }}
+              >
+                <option value="">All Students</option>
+                {filteredStudentsForReport.map((s) => (
+                  <option key={s.id} value={s.id}>{s.firstName} {s.lastName}</option>
+                ))}
+              </select>
+            </div>
+
+            {reportClassId && (
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: B.muted, textTransform: "uppercase", letterSpacing: ".08em", display: "block", marginBottom: 6 }}>
+                  Search Students
+                </label>
+                <input
+                  type="text"
+                  placeholder="Search by name..."
+                  value={studentSearch}
+                  onChange={(e) => setStudentSearch(e.target.value)}
+                  style={{ ...inputStyle, width: "100%" }}
+                />
+              </div>
+            )}
+          </div>
+
+          {reportGradeGroups.length === 0 ? (
             <div style={{ textAlign: "center", padding: "60px 20px", background: B.white, borderRadius: 20, border: `1px solid ${B.line}` }}>
               <GraduationCap size={36} style={{ color: B.muted, opacity: 0.4, marginBottom: 12 }} />
-              <div style={{ fontWeight: 700, color: B.navy, fontSize: 15 }}>No grades yet</div>
+              <div style={{ fontWeight: 700, color: B.navy, fontSize: 15 }}>No grades found</div>
+              <div style={{ color: B.muted, fontSize: 13, marginTop: 4 }}>
+                {reportClassId ? "Try selecting a different grade or student." : "Select a grade to view reports."}
+              </div>
             </div>
           ) : (
             <div style={{ background: B.white, borderRadius: 16, border: `1px solid ${B.line}`, padding: "32px", maxWidth: 800, margin: "0 auto" }}>
               <div style={{ textAlign: "center", marginBottom: 32, paddingBottom: 20, borderBottom: `2px solid ${B.gold}` }}>
                 <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: 28, color: B.navy, marginBottom: 8 }}>Al Shamail School</div>
                 <div style={{ fontSize: 14, color: B.muted, fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase" }}>Student Grade Report</div>
+                {reportStudentId && (
+                  <div style={{ fontSize: 16, fontWeight: 700, color: B.navy, marginTop: 8 }}>
+                    {filteredStudentsForReport.find((s) => s.id === reportStudentId)?.firstName} {filteredStudentsForReport.find((s) => s.id === reportStudentId)?.lastName}
+                  </div>
+                )}
                 <div style={{ fontSize: 12, color: B.muted, marginTop: 8 }}>{new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</div>
               </div>
               
-              {gradeGroups.map((grade) => (
+              {reportGradeGroups.map((grade) => (
                 <div key={`${grade.gradeKey}-report`} style={{ marginBottom: 24 }}>
                   <div style={{ 
                     background: `linear-gradient(135deg, ${B.navy}, ${B.navyL})`, 
@@ -783,7 +873,9 @@ export default function GradesPage() {
                             <thead>
                               <tr style={{ background: `${B.navy}08`, borderBottom: `2px solid ${B.light}` }}>
                                 <th style={{ padding: "10px 14px", textAlign: "left", fontWeight: 700, color: B.navy, fontSize: 12 }}>Assessment</th>
-                                <th style={{ padding: "10px 14px", textAlign: "left", fontWeight: 700, color: B.navy, fontSize: 12 }}>Student</th>
+                                {!reportStudentId && (
+                                  <th style={{ padding: "10px 14px", textAlign: "left", fontWeight: 700, color: B.navy, fontSize: 12 }}>Student</th>
+                                )}
                                 <th style={{ padding: "10px 14px", textAlign: "right", fontWeight: 700, color: B.navy, fontSize: 12 }}>Score</th>
                               </tr>
                             </thead>
@@ -791,9 +883,11 @@ export default function GradesPage() {
                               {subject.items.map((entry, idx) => (
                                 <tr key={entry.id} style={{ borderBottom: idx < subject.items.length - 1 ? `1px solid ${B.light}` : "none" }}>
                                   <td style={{ padding: "10px 14px", color: B.text }}>{entry.title}</td>
-                                  <td style={{ padding: "10px 14px", color: B.text }}>
-                                    {entry.student?.firstName ?? "Student"} {entry.student?.lastName ?? ""}
-                                  </td>
+                                  {!reportStudentId && (
+                                    <td style={{ padding: "10px 14px", color: B.text }}>
+                                      {entry.student?.firstName ?? "Student"} {entry.student?.lastName ?? ""}
+                                    </td>
+                                  )}
                                   <td style={{ padding: "10px 14px", textAlign: "right", fontWeight: 700, color: scoreColor(entry.score, entry.maxScore) }}>
                                     {entry.score}/{entry.maxScore}
                                   </td>

@@ -392,27 +392,38 @@ function AddLessonPanel({
       const formData = new FormData();
       formData.append("video", file);
 
+      console.log("Uploading video to:", `${API_BASE}/lessons/upload-video`);
       const res = await fetch(`${API_BASE}/lessons/upload-video`, {
         method: "POST",
         credentials: "include",
         body: formData,
       });
 
+      console.log("Upload response status:", res.status);
+
       if (!res.ok) {
         const errorText = await res.text();
+        console.error("Video upload failed:", errorText);
         throw new Error(errorText || "Failed to upload video.");
       }
 
       const { videoUrl } = await res.json();
+      console.log("Video upload successful, URL:", videoUrl);
+      
+      if (!videoUrl) {
+        throw new Error("Server did not return a video URL");
+      }
+      
       setVideoObjectUrl(videoUrl);
       setVideoFileName(file.name);
       set("videoUrl", videoUrl);
     } catch (err: any) {
-      const localPreviewUrl = window.URL.createObjectURL(file);
-      setVideoObjectUrl(localPreviewUrl);
-      setVideoFileName(file.name);
-      set("videoUrl", localPreviewUrl);
-      window.alert(err?.message ?? "The upload did not complete, so a local preview was attached instead.");
+      console.error("Video upload error:", err);
+      // Don't use blob URL as fallback - it won't persist
+      setVideoObjectUrl(null);
+      setVideoFileName("");
+      set("videoUrl", "");
+      window.alert(`Video upload failed: ${err?.message ?? "Please check your server configuration and try again."}`);
     } finally {
       setIsUploadingVideo(false);
     }

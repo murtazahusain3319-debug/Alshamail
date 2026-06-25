@@ -541,25 +541,21 @@ export default function MessagesPage() {
                           }}
                         >
                         {parsed.imageUrl && (
-                          <a
-                            href={resolveMessageMediaUrl(parsed.imageUrl)}
-                            target="_blank"
-                            rel="noreferrer"
-                            style={{ display: "block", marginBottom: parsed.text ? 8 : 0 }}
-                          >
-                            <img
-                              src={resolveMessageMediaUrl(parsed.imageUrl)}
-                              alt="Shared image"
-                              style={{
-                                width: "100%",
-                                maxWidth: 280,
-                                maxHeight: 280,
-                                objectFit: "cover",
-                                borderRadius: 10,
-                                display: "block",
-                              }}
-                            />
-                          </a>
+                          <img
+                            src={resolveMessageMediaUrl(parsed.imageUrl)}
+                            alt="Shared image"
+                            onClick={() => window.open(resolveMessageMediaUrl(parsed.imageUrl), "_blank")}
+                            style={{
+                              width: "100%",
+                              maxWidth: 280,
+                              maxHeight: 280,
+                              objectFit: "cover",
+                              borderRadius: 10,
+                              display: "block",
+                              marginBottom: parsed.text ? 8 : 0,
+                              cursor: "pointer",
+                            }}
+                          />
                         )}
                         {parsed.text && <div>{parsed.text}</div>}
                         {!parsed.imageUrl && !parsed.text && m.body}
