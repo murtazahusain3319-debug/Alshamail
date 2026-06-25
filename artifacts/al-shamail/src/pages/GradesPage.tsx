@@ -446,6 +446,16 @@ export default function GradesPage() {
   const getStudentsForClass = (classId: string) =>
     classes.find((cls) => String(cls.id) === classId)?.students ?? [];
 
+  const filteredStudentsForReport = useMemo(() => {
+    if (!reportClassId) return [];
+    const students = getStudentsForClass(reportClassId);
+    if (!studentSearch) return students;
+    const searchLower = studentSearch.toLowerCase();
+    return students.filter((s) =>
+      `${s.firstName} ${s.lastName}`.toLowerCase().includes(searchLower)
+    );
+  }, [reportClassId, studentSearch, classes]);
+
   const canAddSubjectToClass = (classId: string) => {
     if (isAdmin) return true;
     if (!isTeacher) return false;

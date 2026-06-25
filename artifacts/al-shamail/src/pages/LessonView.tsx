@@ -555,7 +555,7 @@ export default function LessonView() {
                         <div id="youtube-lesson-player" key={youTubeId} style={{ width: "100%", height: "100%" }} />
                       ) : resolvedVideoUrl ? (
                         <>
-                          <video key={resolvedVideoUrl} ref={videoRef} src={resolvedVideoUrl} controls onTimeUpdate={onTimeUpdate} onEnded={onVideoEnded} onError={handleVideoError} style={{ width: "100%", height: "100%", display: "block" }}/>
+                          <video key={resolvedVideoUrl} ref={videoRef} src={resolvedVideoUrl} controls crossOrigin="anonymous" onTimeUpdate={onTimeUpdate} onEnded={onVideoEnded} onError={handleVideoError} style={{ width: "100%", height: "100%", display: "block" }}/>
                           {videoError && (
                             <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.8)", color: "#fff", padding: 20, textAlign: "center" }}>
                               <div>
