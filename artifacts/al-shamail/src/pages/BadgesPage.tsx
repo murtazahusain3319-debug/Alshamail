@@ -1,13 +1,11 @@
 import { useState } from "react";
-import { Trophy, Award, CheckCircle2, Plus, Sparkles } from "lucide-react";
+import { Trophy, Plus } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   useListBadges,
   useGetMyGamification,
   useGetCurrentUser,
   useCreateBadge,
-  useAwardAchievementToUser,
-  useListUsers,
   getListBadgesQueryKey,
 } from "@workspace/api-client-react";
 import { B, formatDate } from "@/lib/brand";
@@ -30,24 +28,14 @@ export default function BadgesPage() {
   const earnedMap = new Map<number, any>(earned.map((b: any) => [b.badge.id, b]));
 
   const createBadge = useCreateBadge();
-  const awardAchievement = useAwardAchievementToUser();
-  const usersQ = useListUsers({}, { query: { enabled: isAdminOrTeacher } });
-  const allUsers: any[] = (usersQ.data as any)?.items ?? [];
-  const students = allUsers.filter((u) => u.role === "student");
 
-  const [showCreate, setShowCreate] = useState<"badge" | "achievement" | null>(null);
+  const [showCreate, setShowCreate] = useState<"badge" | null>(null);
   const [bForm, setBForm] = useState({
     name: "",
     description: "",
     color: BADGE_COLORS[0],
     criteria: "manual" as (typeof BADGE_CRITERIA)[number],
     xpThreshold: 0,
-  });
-  const [aForm, setAForm] = useState({
-    userId: "",
-    title: "",
-    description: "",
-    kind: "milestone",
   });
   const [error, setError] = useState<string | null>(null);
   const [okMsg, setOkMsg] = useState<string | null>(null);
@@ -87,40 +75,9 @@ export default function BadgesPage() {
     }
   };
 
-  const submitAchievement = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setOkMsg(null);
-    const userId = parseInt(aForm.userId, 10);
-    if (!Number.isFinite(userId)) {
-      setError("Please pick a student.");
-      return;
-    }
-    if (!aForm.title.trim()) {
-      setError("Please enter an achievement title.");
-      return;
-    }
-    try {
-      await awardAchievement.mutateAsync({
-        userId,
-        data: {
-          title: aForm.title.trim(),
-          description: aForm.description.trim(),
-          kind: aForm.kind.trim() || "milestone",
-        },
-      });
-      setAForm({ userId: "", title: "", description: "", kind: "milestone" });
-      setShowCreate(null);
-      setOkMsg("Achievement awarded!");
-      setTimeout(() => setOkMsg(null), 2500);
-    } catch (err: any) {
-      setError(err?.response?.data?.error ?? "Could not award achievement.");
-    }
-  };
-
   return (
     <DashboardLayout
-      title="Badges & Achievements"
+      title="Badges"
       subtitle={
         isStudent
           ? "Earn badges by completing lessons, quizzes and keeping streaks."
@@ -148,11 +105,10 @@ export default function BadgesPage() {
                     fontSize: 16,
                   }}
                 >
-                  Recognise students
+                  Create badges
                 </div>
                 <div style={{ color: B.muted, fontSize: 13, marginTop: 2 }}>
-                  Create new badges that everyone can earn, or award an achievement to a specific
-                  student.
+                  Create new badges that students can earn for progress, effort, and milestones.
                 </div>
               </div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -166,16 +122,6 @@ export default function BadgesPage() {
                   <Plus size={14} style={{ marginRight: 4 }} />
                   New badge
                 </GoldButton>
-                <PrimaryButton
-                  type="button"
-                  onClick={() => {
-                    setError(null);
-                    setShowCreate(showCreate === "achievement" ? null : "achievement");
-                  }}
-                >
-                  <Sparkles size={14} style={{ marginRight: 4 }} />
-                  New achievement
-                </PrimaryButton>
               </div>
             </div>
 
@@ -294,76 +240,6 @@ export default function BadgesPage() {
                 <div style={{ display: "flex", gap: 8 }}>
                   <PrimaryButton type="submit" disabled={createBadge.isPending}>
                     {createBadge.isPending ? "Creating…" : "Create badge"}
-                  </PrimaryButton>
-                  <button
-                    type="button"
-                    onClick={() => setShowCreate(null)}
-                    style={cancelBtn}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            )}
-
-            {showCreate === "achievement" && (
-              <form
-                onSubmit={submitAchievement}
-                style={{
-                  marginTop: 14,
-                  padding: 14,
-                  background: B.offW,
-                  borderRadius: 12,
-                  display: "grid",
-                  gap: 10,
-                }}
-              >
-                <FormField label="Student">
-                  <select
-                    value={aForm.userId}
-                    onChange={(e) => setAForm((f) => ({ ...f, userId: e.target.value }))}
-                    style={inputStyle}
-                  >
-                    <option value="">Pick a student…</option>
-                    {students.map((s) => (
-                      <option key={s.id} value={s.id}>
-                        {s.firstName} {s.lastName}
-                        {s.grade ? ` — ${s.grade}` : ""}
-                      </option>
-                    ))}
-                  </select>
-                </FormField>
-                <Row>
-                  <FormField label="Title">
-                    <input
-                      value={aForm.title}
-                      onChange={(e) => setAForm((f) => ({ ...f, title: e.target.value }))}
-                      placeholder="e.g. Top of the class"
-                      style={inputStyle}
-                    />
-                  </FormField>
-                  <FormField label="Kind">
-                    <input
-                      value={aForm.kind}
-                      onChange={(e) => setAForm((f) => ({ ...f, kind: e.target.value }))}
-                      placeholder="milestone"
-                      style={inputStyle}
-                    />
-                  </FormField>
-                </Row>
-                <FormField label="Description">
-                  <input
-                    value={aForm.description}
-                    onChange={(e) =>
-                      setAForm((f) => ({ ...f, description: e.target.value }))
-                    }
-                    placeholder="A short note for the student"
-                    style={inputStyle}
-                  />
-                </FormField>
-                <div style={{ display: "flex", gap: 8 }}>
-                  <PrimaryButton type="submit" disabled={awardAchievement.isPending}>
-                    {awardAchievement.isPending ? "Awarding…" : "Award achievement"}
                   </PrimaryButton>
                   <button
                     type="button"

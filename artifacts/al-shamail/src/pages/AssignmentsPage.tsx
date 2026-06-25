@@ -328,7 +328,7 @@ function ImageUploader({
               Drop your image here or click to browse
             </div>
             <div style={{ fontSize: 12, color: B.muted, marginTop: 4 }}>
-              JPG, PNG, WEBP ΓÇö max 5 MB
+              JPG, PNG, WEBP — max 5 MB
             </div>
           </>
         )}
@@ -1037,8 +1037,8 @@ export default function AssignmentsPage() {
       toast({
         title: "Submission sent",
         description: assignment
-          ? `Successfully submitted ${assignmentLabel} ≡ƒæì`
-          : "Submission sent ≡ƒæì",
+          ? `Successfully submitted ${assignmentLabel} ✓`
+          : "Submission sent ✓",
       });
     },
     [userId, fullName, uploadImage, assignments],
@@ -1156,7 +1156,7 @@ export default function AssignmentsPage() {
           ? "Your homework, tests, and classwork"
           : isTeacher
           ? "Manage assignments and review submissions"
-          : "Assignments ΓÇö admin view"
+          : "Assignments — admin view"
       }
       action={
         !isStudent ? (
@@ -1506,14 +1506,6 @@ export default function AssignmentsPage() {
                             }}
                           >
                             <div style={{ display: "flex", alignItems: "center", gap: 9, flex: 1, minWidth: 0 }}>
-                              <div style={{
-                                width: 36, height: 36, borderRadius: 10,
-                                background: `${B.gold}12`, display: "flex",
-                                alignItems: "center", justifyContent: "center",
-                                color: B.gold, flexShrink: 0, fontWeight: 700, fontSize: 12,
-                              }}>
-                                ≡ƒôÜ
-                              </div>
                               <div style={{ minWidth: 0 }}>
                                 <div style={{ fontWeight: 700, color: B.navy, fontSize: 13 }}>{subject.subjectName}</div>
                                 <div style={{ fontSize: 10, color: B.muted, marginTop: 1 }}>

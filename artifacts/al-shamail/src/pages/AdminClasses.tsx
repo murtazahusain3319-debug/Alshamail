@@ -1056,7 +1056,7 @@ export default function AdminClasses() {
               style={inputStyle}
             >
               <option value="">Select a teacher</option>
-              {teachers.map((t) => <option key={t.id} value={t.id}>{t.firstName} {t.lastName} ΓÇö {t.email}</option>)}
+              {teachers.map((t) => <option key={t.id} value={t.id}>{t.firstName} {t.lastName} — {t.email}</option>)}
             </select>
             {availableSubjects.length > 0 && (
               <div>

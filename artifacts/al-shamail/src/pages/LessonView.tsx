@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { useRoute, Link, useLocation } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -11,6 +11,7 @@ import {
   getListMyEnrollmentsQueryKey,
 } from "@workspace/api-client-react";
 import { B } from "@/lib/brand";
+import { API_BASE } from "@/lib/api-base";
 import { DashboardLayout, Card, Pill, GoldButton } from "@/components/DashboardLayout";
 
 /* ── Reading renderer ── */
@@ -133,6 +134,7 @@ export default function LessonView() {
   const [watched, setWatched] = useState(0);
   const [reward, setReward] = useState<{ xpAwarded: number; leveledUp: boolean; level: number; newBadges: any[] } | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [videoError, setVideoError] = useState<string | null>(null);
   const [confettiActive, setConfettiActive] = useState(false);
   const youtubePlayerRef = useRef<any>(null);
   const progressIntervalRef = useRef<number | null>(null);
@@ -140,6 +142,7 @@ export default function LessonView() {
   useEffect(() => {
     setReward(null);
     setWatched(0);
+    setVideoError(null);
     stopConfetti();
   }, [id]);
 
@@ -251,6 +254,22 @@ export default function LessonView() {
     setWatched(Math.min(100, Math.round((v.currentTime / v.duration) * 100)));
   };
 
+  const handleVideoError = useCallback(() => {
+    setVideoError("The video could not be loaded. Please refresh and try again.");
+  }, []);
+
+  const resolvedVideoUrl = useMemo(() => {
+    const value = lesson?.videoUrl;
+    if (!value) return null;
+    const normalized = String(value).trim();
+    if (!normalized) return null;
+    if (normalized.startsWith("data:") || normalized.startsWith("blob:") || /^https?:\/\//i.test(normalized)) {
+      return normalized;
+    }
+    if (normalized.startsWith("/")) return `${API_BASE}${normalized}`;
+    return `${API_BASE}/${normalized}`;
+  }, [lesson?.videoUrl]);
+
   const updateYouTubeProgress = useCallback(() => {
     const player = youtubePlayerRef.current;
     if (!player?.getCurrentTime || !player?.getDuration) return;
@@ -326,8 +345,8 @@ export default function LessonView() {
   const isStaff = !!user?.isAdmin || user?.role === "teacher";
   const isReading = lesson?.kind === "reading";
   const completionReady = lesson?.completed || isReading || watched >= 80;
-  const isYouTube = !isReading && lesson?.videoUrl && !lesson.videoUrl.startsWith("data:") && (lesson.videoUrl.includes("youtube.com") || lesson.videoUrl.includes("youtu.be"));
-  const youTubeId = isYouTube ? extractYouTubeId(lesson.videoUrl) : null;
+  const isYouTube = !isReading && resolvedVideoUrl && !resolvedVideoUrl.startsWith("data:") && (resolvedVideoUrl.includes("youtube.com") || resolvedVideoUrl.includes("youtu.be"));
+  const youTubeId = isYouTube ? extractYouTubeId(resolvedVideoUrl) : null;
   const nextVideoLesson = lesson?.next?.kind === "video" ? lesson.next : lesson?.nextVideo ?? null;
   const prevVideoLesson = lesson?.prev?.kind === "video" ? lesson.prev : lesson?.prevVideo ?? null;
   const nextLesson = lesson?.next ?? null;
@@ -534,8 +553,12 @@ export default function LessonView() {
                     <div style={{ flex: "1 1 auto", minHeight: 0, width: "100%" }}>
                       {isYouTube && youTubeId ? (
                         <div id="youtube-lesson-player" key={youTubeId} style={{ width: "100%", height: "100%" }} />
+                      ) : resolvedVideoUrl ? (
+                        <video key={resolvedVideoUrl} ref={videoRef} src={resolvedVideoUrl} controls onTimeUpdate={onTimeUpdate} onEnded={onVideoEnded} onError={handleVideoError} style={{ width: "100%", height: "100%", display: "block" }}/>
                       ) : (
-                        <video key={lesson.videoUrl} ref={videoRef} src={lesson.videoUrl} controls onTimeUpdate={onTimeUpdate} onEnded={onVideoEnded} style={{ width: "100%", height: "100%", display: "block" }}/>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", height: "100%", color: B.offW, background: "#111827" }}>
+                          No video is available for this lesson yet.
+                        </div>
                       )}
                     </div>
                   </div>

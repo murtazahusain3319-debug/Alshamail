@@ -414,7 +414,7 @@ export default function Home() {
 
   const goApply = () => navigate("/apply");
   const goLogin = () => navigate("/login");
-  const WHATSAPP_NUMBER = "YOUR_WHATSAPP_NUMBER";
+  const WHATSAPP_NUMBER = "0544074690";
   const openWhatsApp = () => {
     const number = WHATSAPP_NUMBER.replace(/\D/g, "");
     if (!number) return;
@@ -1674,6 +1674,7 @@ export default function Home() {
               ["How do I enroll?", "Start by opening the enrollment form and submitting your details. Our admin team will review your request and confirm the next step."],
               ["Can I access lessons on my phone?", "Yes. The platform is mobile-friendly, and students can continue learning from any device with an internet connection."],
               ["Do teachers monitor progress?", "Yes. Teachers can track course activity, lessons, and student completion from their dashboard."],
+              ["What books are we using?", "Our curriculum uses trusted Cambridge and Oxford resources, with additional teacher-selected materials to support each learner’s stage and level."],
             ].map(([title, body]) => (
               <div key={title} style={{ background: t.offW, border: `1px solid ${t.light}`, borderRadius: 18, padding: "20px 24px" }}>
                 <div style={{ fontSize: 15, fontWeight: 800, color: t.navy, marginBottom: 6 }}>{title}</div>
@@ -1723,6 +1724,32 @@ export default function Home() {
           <p style={{ fontSize: 12, color: "rgba(255,255,255,.4)", marginTop: 20 }}>No credit card required · Free trial available</p>
         </div>
       </section>
+
+      <button
+        type="button"
+        onClick={openWhatsApp}
+        aria-label="Chat on WhatsApp"
+        title="Chat on WhatsApp"
+        style={{
+          position: "fixed",
+          right: 20,
+          bottom: 20,
+          width: 58,
+          height: 58,
+          borderRadius: "50%",
+          border: "none",
+          background: "linear-gradient(135deg, #25D366, #128C7E)",
+          color: "#fff",
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          cursor: "pointer",
+          boxShadow: "0 10px 30px rgba(18, 140, 126, 0.28)",
+          zIndex: 1200,
+        }}
+      >
+        <MessageCircle size={24} />
+      </button>
 
       <footer style={{ background: t.navyD, padding: "64px 28px 32px", color: "rgba(255,255,255,.6)" }}>
         <div style={{ maxWidth: 1160, margin: "0 auto" }}>

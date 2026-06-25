@@ -227,7 +227,7 @@ export default function ClassesAndClassmates() {
                         transition: "transform .2s ease",
                       }}
                     >
-                      Γû╝
+                      ▾
                     </div>
                   </button>
 
@@ -246,7 +246,7 @@ export default function ClassesAndClassmates() {
                               marginBottom: 10,
                             }}
                           >
-                            ≡ƒôÜ {teacherAssignments.length === 1 ? "Teacher" : "Teachers"}
+                            {teacherAssignments.length === 1 ? "Teacher" : "Teachers"}
                           </div>
                           {teacherAssignments.length === 0 ? (
                             <div style={{ fontSize: 13, color: B.muted }}>No teacher assigned</div>
@@ -323,7 +323,7 @@ export default function ClassesAndClassmates() {
                               marginBottom: 10,
                             }}
                           >
-                            ≡ƒæÑ Students ({count})
+                            Students ({count})
                           </div>
                           {count === 0 ? (
                             <div style={{ fontSize: 13, color: B.muted }}>No students enrolled</div>

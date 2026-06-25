@@ -282,6 +282,7 @@ export default function GradesPage() {
     subjectName: string;
   } | null>(null);
   const [editEntry, setEditEntry] = useState<GradeEntry | null>(null);
+  const [activeView, setActiveView] = useState<"grades" | "report">("grades");
 
   const coursesQuery = useListCourses();
   const courseOptions = useMemo(() => {
@@ -657,8 +658,100 @@ export default function GradesPage() {
         </div>
       )}
 
+      <div style={{ display: "flex", gap: 8, marginBottom: 18, flexWrap: "wrap" }}>
+        <button
+          type="button"
+          onClick={() => setActiveView("grades")}
+          style={{
+            padding: "8px 14px",
+            borderRadius: 999,
+            border: `1px solid ${activeView === "grades" ? B.gold : B.line}`,
+            background: activeView === "grades" ? `${B.gold}12` : B.white,
+            color: activeView === "grades" ? B.navy : B.muted,
+            fontWeight: 700,
+            fontSize: 13,
+            cursor: "pointer",
+            fontFamily: "inherit",
+          }}
+        >
+          Grades
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveView("report")}
+          style={{
+            padding: "8px 14px",
+            borderRadius: 999,
+            border: `1px solid ${activeView === "report" ? B.gold : B.line}`,
+            background: activeView === "report" ? `${B.gold}12` : B.white,
+            color: activeView === "report" ? B.navy : B.muted,
+            fontWeight: 700,
+            fontSize: 13,
+            cursor: "pointer",
+            fontFamily: "inherit",
+          }}
+        >
+          Printable report
+        </button>
+      </div>
+
       {loading ? (
         <div style={{ color: B.muted, padding: "40px 0", textAlign: "center" }}>Loading grades…</div>
+      ) : activeView === "report" ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap", padding: "16px 18px", borderRadius: 16, border: `1px solid ${B.line}`, background: B.white }}>
+            <div>
+              <div style={{ fontWeight: 800, color: B.navy, fontSize: 15 }}>Printable grade report</div>
+              <div style={{ fontSize: 12, color: B.muted, marginTop: 2 }}>Use your browser’s print dialog to save this view as PDF.</div>
+            </div>
+            <button
+              type="button"
+              onClick={() => window.print()}
+              style={{
+                padding: "10px 14px",
+                borderRadius: 10,
+                border: "none",
+                background: `linear-gradient(135deg, ${B.gold}, ${B.goldD})`,
+                color: B.white,
+                fontWeight: 700,
+                fontSize: 13,
+                cursor: "pointer",
+                fontFamily: "inherit",
+              }}
+            >
+              Print / Save PDF
+            </button>
+          </div>
+          {gradeGroups.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "60px 20px", background: B.white, borderRadius: 20, border: `1px solid ${B.line}` }}>
+              <GraduationCap size={36} style={{ color: B.muted, opacity: 0.4, marginBottom: 12 }} />
+              <div style={{ fontWeight: 700, color: B.navy, fontSize: 15 }}>No grades yet</div>
+            </div>
+          ) : (
+            gradeGroups.map((grade) => (
+              <div key={`${grade.gradeKey}-report`} style={{ padding: "16px 18px", borderRadius: 16, border: `1px solid ${B.line}`, background: B.white }}>
+                <div style={{ fontWeight: 800, color: B.navy, fontSize: 15, marginBottom: 6 }}>{grade.gradeName}</div>
+                {grade.subjects.map((subject) => (
+                  <div key={`${grade.gradeKey}-${subject.subjectKey}`} style={{ paddingTop: 10, marginTop: 10, borderTop: `1px solid ${B.line}` }}>
+                    <div style={{ fontWeight: 700, color: B.navy, fontSize: 13 }}>{subject.subjectName}</div>
+                    {subject.items.length === 0 ? (
+                      <div style={{ color: B.muted, fontSize: 12, marginTop: 6 }}>No scores recorded</div>
+                    ) : (
+                      <div style={{ display: "grid", gap: 6, marginTop: 8 }}>
+                        {subject.items.map((entry) => (
+                          <div key={entry.id} style={{ display: "flex", justifyContent: "space-between", gap: 12, fontSize: 12, color: B.text }}>
+                            <span>{entry.title} — {entry.student?.firstName ?? "Student"} {entry.student?.lastName ?? ""}</span>
+                            <span style={{ fontWeight: 700 }}>{entry.score}/{entry.maxScore}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ))
+          )}
+        </div>
       ) : gradeGroups.length === 0 ? (
         <div style={{
           textAlign: "center", padding: "60px 20px",

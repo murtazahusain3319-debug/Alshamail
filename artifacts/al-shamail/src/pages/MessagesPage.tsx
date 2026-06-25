@@ -528,13 +528,13 @@ export default function MessagesPage() {
                         >
                         {parsed.imageUrl && (
                           <a
-                            href={parsed.imageUrl}
+                            href={resolveMessageMediaUrl(parsed.imageUrl)}
                             target="_blank"
                             rel="noreferrer"
                             style={{ display: "block", marginBottom: parsed.text ? 8 : 0 }}
                           >
                             <img
-                              src={parsed.imageUrl}
+                              src={resolveMessageMediaUrl(parsed.imageUrl)}
                               alt="Shared image"
                               style={{
                                 width: "100%",
@@ -925,4 +925,13 @@ function parseMessageBody(body: string): { imageUrl?: string; text?: string } {
   const imageUrl = body.slice("[image:".length, closingIndex).trim();
   const rest = body.slice(closingIndex + 1).replace(/^\n/, "").trim();
   return { imageUrl, text: rest || undefined };
+}
+
+function resolveMessageMediaUrl(url: string): string {
+  const value = url?.trim();
+  if (!value) return value;
+  if (value.startsWith("data:") || value.startsWith("blob:") || /^https?:\/\//i.test(value)) {
+    return value;
+  }
+  return `${API_BASE}${value.startsWith("/") ? "" : "/"}${value}`;
 }
