@@ -774,7 +774,7 @@ export default function GradesPage() {
                 }}
                 style={{ ...inputStyle, width: "100%" }}
               >
-                <option value="">All Grades</option>
+                <option value="">Select Grade</option>
                 {classOptions.map((cls) => (
                   <option key={cls.id} value={cls.id}>{cls.name}</option>
                 ))}
@@ -791,7 +791,7 @@ export default function GradesPage() {
                 disabled={!reportClassId}
                 style={{ ...inputStyle, width: "100%" }}
               >
-                <option value="">All Students</option>
+                <option value="">Select Student</option>
                 {filteredStudentsForReport.map((s) => (
                   <option key={s.id} value={s.id}>{s.firstName} {s.lastName}</option>
                 ))}
@@ -814,12 +814,20 @@ export default function GradesPage() {
             )}
           </div>
 
-          {reportGradeGroups.length === 0 ? (
+          {!reportClassId || !reportStudentId ? (
+            <div style={{ textAlign: "center", padding: "60px 20px", background: B.white, borderRadius: 20, border: `1px solid ${B.line}` }}>
+              <GraduationCap size={36} style={{ color: B.muted, opacity: 0.4, marginBottom: 12 }} />
+              <div style={{ fontWeight: 700, color: B.navy, fontSize: 15 }}>Select Grade and Student</div>
+              <div style={{ color: B.muted, fontSize: 13, marginTop: 4 }}>
+                {!reportClassId ? "Please select a grade first." : "Please select a student to generate their report."}
+              </div>
+            </div>
+          ) : reportGradeGroups.length === 0 ? (
             <div style={{ textAlign: "center", padding: "60px 20px", background: B.white, borderRadius: 20, border: `1px solid ${B.line}` }}>
               <GraduationCap size={36} style={{ color: B.muted, opacity: 0.4, marginBottom: 12 }} />
               <div style={{ fontWeight: 700, color: B.navy, fontSize: 15 }}>No grades found</div>
               <div style={{ color: B.muted, fontSize: 13, marginTop: 4 }}>
-                {reportClassId ? "Try selecting a different grade or student." : "Select a grade to view reports."}
+                Try selecting a different grade or student.
               </div>
             </div>
           ) : (

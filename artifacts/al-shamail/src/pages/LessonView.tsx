@@ -266,6 +266,12 @@ export default function LessonView() {
     if (normalized.startsWith("data:") || normalized.startsWith("blob:") || /^https?:\/\//i.test(normalized)) {
       return normalized;
     }
+    // Handle server upload paths like /uploads/videos/...
+    if (normalized.startsWith("/uploads/")) {
+      // Remove /api from API_BASE if it exists, then prepend the uploads path
+      const baseUrl = API_BASE.replace(/\/api$/, "");
+      return `${baseUrl}${normalized}`;
+    }
     if (normalized.startsWith("/")) return `${API_BASE}${normalized}`;
     return `${API_BASE}/${normalized}`;
   }, [lesson?.videoUrl]);
