@@ -66,6 +66,17 @@ function studentCount(cls: ClassDetail): number {
   return cls.students?.length ?? cls.studentCount ?? 0;
 }
 
+function subjectCount(cls: ClassDetail): number {
+  const assignments = getTeacherAssignments(cls);
+  if (assignments.length === 0) return cls.subject ? 1 : 0;
+  const subjects = assignments.flatMap((assignment) => assignment.subjects).filter(Boolean);
+  return subjects.length || (cls.subject ? 1 : 0);
+}
+
+function teacherCount(cls: ClassDetail): number {
+  return getTeacherAssignments(cls).length;
+}
+
 function classesForUser(
   allClasses: ClassDetail[],
   user: { id: number; role?: string; isAdmin?: boolean },
@@ -212,10 +223,10 @@ export default function ClassesAndClassmates() {
                       <div style={{ fontSize: 12, color: B.muted, display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
                         <span>
                           <BookOpen size={12} style={{ display: "inline", marginRight: 6 }} />
-                          {getSubjectSummary(cls)}
+                          {subjectCount(cls)} {subjectCount(cls) === 1 ? "subject" : "subjects"}
                         </span>
                         <span>
-                          <UserIcon size={12} style={{ display: "inline", marginRight: 6 }} /> {getTeacherSummary(cls)}
+                          <UserIcon size={12} style={{ display: "inline", marginRight: 6 }} /> {teacherCount(cls)} {teacherCount(cls) === 1 ? "teacher" : "teachers"}
                         </span>
                         <span style={{ fontWeight: 700, color: B.navy }}>
                           <Users size={12} style={{ display: "inline", marginRight: 6 }} /> {count} {count === 1 ? "student" : "students"}

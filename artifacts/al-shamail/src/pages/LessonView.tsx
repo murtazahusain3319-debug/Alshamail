@@ -266,11 +266,9 @@ export default function LessonView() {
     if (normalized.startsWith("data:") || normalized.startsWith("blob:") || /^https?:\/\//i.test(normalized)) {
       return normalized;
     }
-    // Handle server upload paths like /uploads/videos/...
+    // Handle server upload paths - use API_BASE for all /uploads/ paths since backend serves through API
     if (normalized.startsWith("/uploads/")) {
-      // Use the base URL without /api for static file serving
-      const baseUrl = API_BASE.replace(/\/api$/, "");
-      return `${baseUrl}${normalized}`;
+      return `${API_BASE}${normalized}`;
     }
     if (normalized.startsWith("/")) return `${API_BASE}${normalized}`;
     return `${API_BASE}/${normalized}`;
@@ -485,6 +483,7 @@ export default function LessonView() {
                   <div style={{ display: "flex", gap: 16, marginTop: 12, fontSize: 12.5, color: "rgba(255,255,255,.65)", fontWeight: 600 }}>
                     {lesson.durationMinutes > 0 && <span style={{ display: "flex", alignItems: "center", gap: 5 }}><Clock size={12}/> {lesson.durationMinutes} min read</span>}
                     <span style={{ display: "flex", alignItems: "center", gap: 5 }}><Sparkles size={12} color={B.goldL}/> {lesson.xpReward ?? 50} XP on completion</span>
+                    {lesson?.completed && <span style={{ display: "flex", alignItems: "center", gap: 5, color: B.success }}><CheckCircle2 size={12}/> Completed</span>}
                   </div>
                 </div>
 

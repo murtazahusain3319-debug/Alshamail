@@ -1005,10 +1005,9 @@ function resolveMessageMediaUrl(url: string): string {
   if (value.startsWith("data:") || value.startsWith("blob:") || /^https?:\/\//i.test(value)) {
     return value;
   }
-  // Handle server uploads path - strip /api from base URL for /uploads/ paths
+  // Handle server uploads paths - use API_BASE for all /uploads/ paths since backend serves through API
   if (value.startsWith("/uploads/")) {
-    const baseUrl = API_BASE.replace(/\/api\/?$/, "");
-    return `${baseUrl}${value}`;
+    return `${API_BASE}${value}`;
   }
   // Handle paths that might already include /api/uploads
   if (value.startsWith("/api/uploads/")) {
