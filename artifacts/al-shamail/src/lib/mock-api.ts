@@ -212,6 +212,7 @@ export function useCreateApplication() {
         firstName: d.firstName ?? "",
         lastName: d.lastName ?? "",
         email: d.email ?? "",
+        password: d.password ?? "",
         phone: d.phone ?? null,
         city: d.city ?? null,
         role,
