@@ -405,6 +405,7 @@ export default function LessonView() {
           controls: 1,
           loop: 0,
           html5: 1,
+          origin: window.location.origin,
         },
         events: {
           onReady: () => {

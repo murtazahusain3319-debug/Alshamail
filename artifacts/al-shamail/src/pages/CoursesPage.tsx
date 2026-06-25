@@ -298,6 +298,7 @@ function EnrollPanel({ courseId, onClose }: { courseId: number; onClose: () => v
       const res = await fetch(`${API_BASE}/courses/${courseId}/enroll-user`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ email: selectedUser.email, role: selectedUser.role || "student" }),
       });
       if (!res.ok) {
