@@ -181,7 +181,7 @@ export default function ClassesAndClassmates() {
 
         {loading ? (
           <div style={{ color: B.muted, padding: "24px 0", textAlign: "center" }}>
-            LoadingΓÇª
+            Loading...
           </div>
         ) : error ? (
           <div style={{ color: "#dc2626", padding: "24px 0", textAlign: "center" }}>
@@ -221,11 +221,11 @@ export default function ClassesAndClassmates() {
                     <div>
                       <div style={{ fontWeight: 800, fontSize: 15, color: B.navy, marginBottom: 6 }}>{cls.name}</div>
                       <div style={{ fontSize: 12, color: B.muted, display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
-                        <span>
+                        <span style={{ fontWeight: 700, color: B.navy }}>
                           <BookOpen size={12} style={{ display: "inline", marginRight: 6 }} />
                           {subjectCount(cls)} {subjectCount(cls) === 1 ? "subject" : "subjects"}
                         </span>
-                        <span>
+                        <span style={{ fontWeight: 700, color: B.navy }}>
                           <UserIcon size={12} style={{ display: "inline", marginRight: 6 }} /> {teacherCount(cls)} {teacherCount(cls) === 1 ? "teacher" : "teachers"}
                         </span>
                         <span style={{ fontWeight: 700, color: B.navy }}>

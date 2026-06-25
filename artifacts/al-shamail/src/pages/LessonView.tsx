@@ -360,10 +360,21 @@ export default function LessonView() {
 
   const readingEndRef = useRef<HTMLDivElement | null>(null);
   const hasAutoCompletedRef = useRef<number | null>(null);
+  const hasAutoCompletedVideoRef = useRef<boolean>(false);
 
   useEffect(() => {
     hasAutoCompletedRef.current = null;
+    hasAutoCompletedVideoRef.current = false;
   }, [id]);
+
+  // Auto-complete video lesson when 80% watched
+  useEffect(() => {
+    if (isReading || isStaff || lesson?.completed || hasAutoCompletedVideoRef.current) return;
+    if (watched >= 80 && !complete.isPending && !reward) {
+      hasAutoCompletedVideoRef.current = true;
+      onComplete();
+    }
+  }, [watched, isReading, isStaff, lesson?.completed, complete.isPending, reward, onComplete]);
 
   useEffect(() => {
     if (!isYouTube || !youTubeId) {
@@ -632,7 +643,7 @@ export default function LessonView() {
           {/* ── RIGHT: Sidebar ── */}
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             {/* Complete card */}
-            <Card title="Mark Complete">
+            <Card title={lesson?.completed ? "Good job 👍" : "Complete to earn XP"}>
               {errorMessage ? (
                 <div style={{ color: B.error, fontWeight: 700, fontSize: 14, lineHeight: 1.6 }}>
                   {errorMessage}
