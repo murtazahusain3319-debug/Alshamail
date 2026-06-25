@@ -16,7 +16,7 @@ router.get("/applications", requireAdmin, async (_req, res): Promise<void> => {
 });
 
 router.post("/applications", async (req, res): Promise<void> => {
-  const d = req.body ?? {};
+  const d = req.body?.data ?? req.body ?? {};
   const firstName = String(d.firstName ?? "").trim();
   const lastName = String(d.lastName ?? "").trim();
   const email = String(d.email ?? "").trim().toLowerCase();
