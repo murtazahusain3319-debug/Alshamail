@@ -394,6 +394,7 @@ function AddLessonPanel({
 
       const res = await fetch(`${API_BASE}/lessons/upload-video`, {
         method: "POST",
+        credentials: "include",
         body: formData,
       });
 
@@ -407,7 +408,11 @@ function AddLessonPanel({
       setVideoFileName(file.name);
       set("videoUrl", videoUrl);
     } catch (err: any) {
-      window.alert(err?.message ?? "Could not upload video. Please try again.");
+      const localPreviewUrl = window.URL.createObjectURL(file);
+      setVideoObjectUrl(localPreviewUrl);
+      setVideoFileName(file.name);
+      set("videoUrl", localPreviewUrl);
+      window.alert(err?.message ?? "The upload did not complete, so a local preview was attached instead.");
     } finally {
       setIsUploadingVideo(false);
     }
@@ -1632,6 +1637,10 @@ export default function CourseDetail() {
   const isAdmin = !!user?.isAdmin;
   const isStaff = isAdmin || user?.role === "teacher";
   const isStudent = !!user && !isStaff;
+  const canManageCourse = isAdmin || (user?.role === "teacher" && (
+    Number(course?.teacherId) === Number(user?.id) ||
+    (course?.teacherAssignments ?? []).some((assignment: any) => Number(assignment.teacher?.id) === Number(user?.id))
+  ));
 
   const courseQ = useGetCourse(id, { query: { enabled: id > 0 } });
   const data: any = courseQ.data;
@@ -2043,7 +2052,7 @@ export default function CourseDetail() {
               </div>
 
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                {user?.isAdmin && (
+                {isAdmin && (
                   <>
                     <button
                       onClick={() => setShowEnrollPanel(true)}
@@ -2060,9 +2069,10 @@ export default function CourseDetail() {
                     >
                       Enroll Users
                     </button>
-                    <button
-                      onClick={() => setShowEditCourseModal(true)}
-                      style={{
+                    {canManageCourse && (
+                      <button
+                        onClick={() => setShowEditCourseModal(true)}
+                        style={{
                         padding: "9px 14px",
                         borderRadius: 10,
                         background: B.white,
@@ -2076,13 +2086,15 @@ export default function CourseDetail() {
                         gap: 6,
                       }}
                     >
-                      <Edit2 size={14} />
-                      Edit Course
-                    </button>
-                    <button
-                      onClick={onDeleteCourse}
-                      disabled={deleteCourse.isPending}
-                      style={{
+                        <Edit2 size={14} />
+                        Edit Course
+                      </button>
+                    )}
+                    {isAdmin && (
+                      <button
+                        onClick={onDeleteCourse}
+                        disabled={deleteCourse.isPending}
+                        style={{
                         padding: "9px 14px",
                         borderRadius: 10,
                         background: deleteCourse.isPending ? "#ccc" : "#dc2626",
@@ -2097,9 +2109,10 @@ export default function CourseDetail() {
                         gap: 6,
                       }}
                     >
-                      <Trash2 size={14} />
-                      {deleteCourse.isPending ? "Deleting..." : "Delete Course"}
-                    </button>
+                        <Trash2 size={14} />
+                        {deleteCourse.isPending ? "Deleting..." : "Delete Course"}
+                      </button>
+                    )}
                   </>
                 )}
                 {isEnrolled && lessons.length > 0 && (
@@ -2120,7 +2133,7 @@ export default function CourseDetail() {
               )}
 
               {/* Staff: thumbnail editor */}
-              {isStaff && <ThumbnailEditor course={course} onSave={onUpdateThumbnail}/>}
+              {canManageCourse && <ThumbnailEditor course={course} onSave={onUpdateThumbnail}/>}
             </div>
           </div>
 
@@ -2152,7 +2165,7 @@ export default function CourseDetail() {
             <EnrollPanel courseId={id} onClose={() => setShowEnrollPanel(false)} />
           )}
 
-          {showEditCourseModal && course && user?.isAdmin && (
+          {showEditCourseModal && course && canManageCourse && (
             <EditCourseModal
               course={course}
               onClose={() => setShowEditCourseModal(false)}
@@ -2171,13 +2184,13 @@ export default function CourseDetail() {
 
           <Card
             title={tab === "video" ? "Video Lessons" : tab === "reading" ? "Reading Lessons" : tab === "quiz" ? "Quiz Lessons" : "Members"}
-            action={isStaff && tab !== "members" && (
+            action={canManageCourse && tab !== "members" && (
               <GoldButton onClick={() => setShowAdd((v) => !v)} style={{ padding: "7px 14px", fontSize: 12 }}>
                 <PlusCircle size={13}/> Add {tab === "video" ? "Video" : tab === "reading" ? "Reading" : "Quiz"}
               </GoldButton>
             )}
           >
-            {showAdd && isStaff && (
+            {showAdd && canManageCourse && (
               <AddLessonPanel
                 defaultKind={tab}
                 onSave={onAddLesson}
@@ -2376,7 +2389,7 @@ export default function CourseDetail() {
                   No {tab === "video" ? "videos" : tab === "reading" ? "reading material" : "quizzes"} yet
                 </div>
                 <div style={{ fontSize: 13, color: B.muted }}>
-                  {isStaff ? `Click "Add ${tab === "video" ? "Video" : tab === "reading" ? "Reading" : "Quiz"}" to add content.` : "Your teacher hasn't added this yet."}
+                  {canManageCourse ? `Click "Add ${tab === "video" ? "Video" : tab === "reading" ? "Reading" : "Quiz"}" to add content.` : "Your teacher hasn't added this yet."}
                 </div>
               </div>
             ) : tab === "members" ? (
@@ -2578,7 +2591,7 @@ export default function CourseDetail() {
                             <Play size={12}/> Watch
                             <ChevronRight size={12}/>
                           </Link>
-                          {isStaff && (
+                          {canManageCourse && (
                             <button type="button" onClick={() => setEditingLesson(l)} style={{
                               background: "transparent", border: "1px solid rgba(0,0,0,0.25)", outline: "1px solid rgba(0,0,0,0.15)", color: B.navy,
                               padding: "8px 16px", borderRadius: 10, fontSize: 12.5, fontWeight: 700,
@@ -2599,7 +2612,7 @@ export default function CourseDetail() {
                             <BookOpen size={12}/> Read
                             <ChevronRight size={12}/>
                           </button>
-                          {isStaff && (
+                          {canManageCourse && (
                             <button type="button" onClick={() => setEditingLesson(l)} style={{
                               background: "transparent", border: "1px solid rgba(0,0,0,0.25)", outline: "1px solid rgba(0,0,0,0.15)", color: B.navy,
                               padding: "8px 16px", borderRadius: 10, fontSize: 12.5, fontWeight: 700,
@@ -2620,7 +2633,7 @@ export default function CourseDetail() {
                             <HelpCircle size={12}/> {done ? "Retake" : "Take"}
                             <ChevronRight size={12}/>
                           </Link>
-                          {isStaff && (
+                          {canManageCourse && (
                             <button
                               type="button"
                               onClick={() => setEditingQuizLesson(l)}
@@ -2645,7 +2658,7 @@ export default function CourseDetail() {
                             <BookOpen size={12}/> Read
                             <ChevronRight size={12}/>
                           </Link>
-                          {isStaff && (
+                          {canManageCourse && (
                             <button type="button" onClick={() => setEditingLesson(l)} style={{
                               background: "transparent", border: "1px solid rgba(0,0,0,0.25)", outline: "1px solid rgba(0,0,0,0.15)", color: B.navy,
                               padding: "8px 16px", borderRadius: 10, fontSize: 12.5, fontWeight: 700,
@@ -2657,7 +2670,7 @@ export default function CourseDetail() {
                         </div>
                       )}
 
-                      {isStaff && (
+                      {canManageCourse && (
                         <button type="button" onClick={() => onDelete(l.id)} disabled={deleteLesson.isPending} style={{
                           background: "transparent", border: "1px solid rgba(0,0,0,0.25)", outline: "1px solid rgba(0,0,0,0.15)", color: B.error,
                           padding: 8, borderRadius: 9, cursor: deleteLesson.isPending ? "wait" : "pointer", display: "flex",

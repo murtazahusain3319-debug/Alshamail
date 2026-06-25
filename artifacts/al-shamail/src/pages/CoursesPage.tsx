@@ -558,23 +558,40 @@ export default function CoursesPage() {
 
   const [search, setSearch] = useState("");
   const [levelFilter, setLevelFilter] = useState("All");
+  const [teacherFilter, setTeacherFilter] = useState("All");
   const [showNew, setShowNew] = useState(false);
   const [showEnrollCourseId, setShowEnrollCourseId] = useState<number | null>(null);
 
   const allLevels = ["All", ...Array.from(new Set(items.map((c: any) => c.level).filter(Boolean)))];
+  const teacherOptions = ["All", ...Array.from(new Set(items
+    .map((c: any) => c.teacherName || (c.teacher ? `${c.teacher.firstName ?? ""} ${c.teacher.lastName ?? ""}`.trim() : ""))
+    .filter(Boolean)))];
 
-  const visibleItems = isStudent
-    ? items.filter((c: any) => enrolledIds.has(c.id))
-    : items;
+  const visibleItems = useMemo(() => {
+    if (isStudent) return items.filter((c: any) => enrolledIds.has(c.id));
+    if (isAdmin) return items;
+    if (user?.role === "teacher") {
+      return items.filter((c: any) => {
+        const isOwner = Number(c.teacherId) === Number(user.id);
+        const isAssigned = (c.teacherAssignments ?? []).some((assignment: any) => Number(assignment.teacher?.id) === Number(user.id));
+        return isOwner || isAssigned;
+      });
+    }
+    return items;
+  }, [items, enrolledIds, isStudent, isAdmin, user?.id, user?.role]);
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
     return visibleItems.filter((c: any) => {
       if (levelFilter !== "All" && c.level !== levelFilter) return false;
+      if (teacherFilter !== "All") {
+        const teacherName = c.teacherName || (c.teacher ? `${c.teacher.firstName ?? ""} ${c.teacher.lastName ?? ""}`.trim() : "");
+        if (teacherName !== teacherFilter) return false;
+      }
       if (!term) return true;
-      return [c.title, c.subject, c.description, c.level].join(" ").toLowerCase().includes(term);
+      return [c.title, c.subject, c.description, c.level, c.teacherName].join(" ").toLowerCase().includes(term);
     });
-  }, [visibleItems, search, levelFilter]);
+  }, [visibleItems, search, levelFilter, teacherFilter]);
 
   const onEnroll = async (id: number) => {
     await enroll.mutateAsync({ id });
@@ -583,15 +600,31 @@ export default function CoursesPage() {
   };
 
   const onCreate = async (form: any) => {
-    await create.mutateAsync({
+    const created = await create.mutateAsync({
       data: {
         title: form.title, subject: form.subject, level: form.level,
         description: form.description, coverEmoji: form.coverEmoji,
         coverColor: form.coverColor, published: true,
+        ...(user?.id ? { teacherId: user.id } : {}),
         ...(form.thumbnailUrl ? { thumbnailUrl: form.thumbnailUrl } : {}),
         ...(form.bannerUrl ? { bannerUrl: form.bannerUrl } : {}),
       },
     });
+
+    const courseId = created?.id ?? created?.course?.id;
+    if (courseId && user?.id && user?.role === "teacher" && user?.email) {
+      try {
+        await fetch(`${API_BASE}/courses/${courseId}/enroll-user`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ email: user.email, role: "teacher" }),
+        });
+      } catch (err) {
+        console.warn("Could not auto-enroll teacher into their new course", err);
+      }
+    }
+
     await qc.invalidateQueries({ queryKey: getListCoursesQueryKey() });
     setShowNew(false);
   };
@@ -634,6 +667,21 @@ export default function CoursesPage() {
               </button>
             ))}
           </div>
+
+          {isAdmin && (
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
+              {teacherOptions.map((teacher) => (
+                <button key={teacher} onClick={() => setTeacherFilter(teacher)} style={{
+                  padding: "7px 14px", borderRadius: 99, fontSize: 12, fontWeight: 700, cursor: "pointer",
+                  border: `1.5px solid ${teacherFilter === teacher ? B.navy : B.light}`,
+                  background: teacherFilter === teacher ? `${B.navy}14` : B.white,
+                  color: teacherFilter === teacher ? B.navy : B.muted, fontFamily: "inherit",
+                }}>
+                  {teacher}
+                </button>
+              ))}
+            </div>
+          )}
 
           {isStaff && (
             <div style={{ display: "flex", gap: 8, marginLeft: "auto" }}>

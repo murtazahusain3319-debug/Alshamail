@@ -14,6 +14,7 @@ import {
   Clock,
   Sparkles,
   Award,
+  MessageCircle,
 } from "lucide-react";
 import { createLucideIcon } from "lucide-react";
 
@@ -405,7 +406,7 @@ export default function Home() {
   const [slideIdx, setSlideIdx] = useState(0);
   const [scrolled, setScrolled] = useState(false);
   const [testimonialIdx, setTestimonialIdx] = useState(0);
-  const [navOpen, setNavOpen] = useState<null | "syllabus" | "enrollment">(null);
+  const [navOpen, setNavOpen] = useState<null | "enrollment">(null);
 
   const autoplayRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const navRef = useRef<HTMLElement | null>(null);
@@ -413,6 +414,16 @@ export default function Home() {
 
   const goApply = () => navigate("/apply");
   const goLogin = () => navigate("/login");
+  const WHATSAPP_NUMBER = "YOUR_WHATSAPP_NUMBER";
+  const openWhatsApp = () => {
+    const number = WHATSAPP_NUMBER.replace(/\D/g, "");
+    if (!number) return;
+    window.open(`https://wa.me/${number}`, "_blank", "noopener,noreferrer");
+  };
+  const scrollToFaq = () => {
+    setNavOpen(null);
+    document.getElementById("faq-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
   const goTo = useCallback(
     (path: string) => {
       setNavOpen(null);
@@ -604,37 +615,9 @@ export default function Home() {
           </div>
 
           <nav ref={navRef} className="als-nav-links" style={{ display: "flex", alignItems: "center", gap: 4, position: "relative" }} aria-label="Primary">
-            <div style={{ position: "relative" }}>
-              <button
-                type="button"
-                className="als-nav-trigger"
-                aria-expanded={navOpen === "syllabus"}
-                aria-haspopup="true"
-                onClick={() => setNavOpen((v) => (v === "syllabus" ? null : "syllabus"))}
-              >
-                Syllabus{" "}
-                <span
-                  style={{
-                    opacity: 0.7,
-                    fontSize: 12,
-                    transform: navOpen === "syllabus" ? "rotate(180deg)" : "none",
-                    display: "inline-block",
-                  }}
-                >
-                  ▾
-                </span>
-              </button>
-              {navOpen === "syllabus" ? (
-                <div className="als-nav-dd" role="menu">
-                  <button type="button" role="menuitem" onClick={() => goTo("/syllabus/book-list")}>
-                    <span>Book List</span>
-                  </button>
-                  <button type="button" role="menuitem" onClick={() => goTo("/syllabus/semesters")}>
-                    <span>Semesters</span>
-                  </button>
-                </div>
-              ) : null}
-            </div>
+            <button type="button" className="als-nav-pill" onClick={scrollToFaq}>
+              FAQ
+            </button>
             <button type="button" className="als-nav-pill" onClick={() => goTo("/courses-info")}>
               Courses
             </button>
@@ -1182,6 +1165,9 @@ export default function Home() {
                   <button type="button" className="als-btn-outline" onClick={goLogin} style={{ fontSize: 15, padding: "14px 28px" }}>
                     Sign In
                   </button>
+                  <button type="button" className="als-btn-gold" onClick={openWhatsApp} style={{ fontSize: 15, padding: "14px 28px" }}>
+                    <MessageCircle size={16} /> WhatsApp
+                  </button>
                 </div>
 
                 {/* marginTop auto eats spare height so trust row never collides with CTAs */}
@@ -1673,6 +1659,26 @@ export default function Home() {
                   transition: "all .3s",
                 }}
               />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="faq-section" style={{ padding: "96px 28px", background: t.white, borderTop: `1px solid ${t.light}` }}>
+        <div style={{ maxWidth: 960, margin: "0 auto" }}>
+          <div style={{ fontSize: 12, fontWeight: 800, color: t.gold, textTransform: "uppercase", letterSpacing: ".14em", marginBottom: 12 }}>FAQ</div>
+          <h2 style={{ fontSize: "clamp(26px, 4vw, 40px)", fontWeight: 900, color: t.navy, fontFamily: "'Playfair Display', serif", marginBottom: 8 }}>Common Questions</h2>
+          <div className="als-divider-gold" style={{ margin: "0 auto 40px" }} />
+          <div style={{ display: "grid", gap: 14 }}>
+            {[
+              ["How do I enroll?", "Start by opening the enrollment form and submitting your details. Our admin team will review your request and confirm the next step."],
+              ["Can I access lessons on my phone?", "Yes. The platform is mobile-friendly, and students can continue learning from any device with an internet connection."],
+              ["Do teachers monitor progress?", "Yes. Teachers can track course activity, lessons, and student completion from their dashboard."],
+            ].map(([title, body]) => (
+              <div key={title} style={{ background: t.offW, border: `1px solid ${t.light}`, borderRadius: 18, padding: "20px 24px" }}>
+                <div style={{ fontSize: 15, fontWeight: 800, color: t.navy, marginBottom: 6 }}>{title}</div>
+                <div style={{ fontSize: 14, color: t.muted, lineHeight: 1.7 }}>{body}</div>
+              </div>
             ))}
           </div>
         </div>

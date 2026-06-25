@@ -134,6 +134,8 @@ export default function LessonView() {
   const [reward, setReward] = useState<{ xpAwarded: number; leveledUp: boolean; level: number; newBadges: any[] } | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [confettiActive, setConfettiActive] = useState(false);
+  const youtubePlayerRef = useRef<any>(null);
+  const progressIntervalRef = useRef<number | null>(null);
 
   useEffect(() => {
     setReward(null);
@@ -249,14 +251,32 @@ export default function LessonView() {
     setWatched(Math.min(100, Math.round((v.currentTime / v.duration) * 100)));
   };
 
+  const updateYouTubeProgress = useCallback(() => {
+    const player = youtubePlayerRef.current;
+    if (!player?.getCurrentTime || !player?.getDuration) return;
+    const currentTime = player.getCurrentTime();
+    const duration = player.getDuration();
+    if (duration) {
+      setWatched(Math.min(100, Math.round((currentTime / duration) * 100)));
+    }
+  }, []);
+
   const onVideoEnded = () => {
     startConfetti();
     if (lesson && !lesson?.completed && !complete.isPending) {
+      if (!isReading && watched < 80) {
+        setErrorMessage("Watch at least 80% of the lesson before marking it complete.");
+        return;
+      }
       onComplete();
     }
   };
 
   const onComplete = useCallback(async () => {
+    if (!isReading && watched < 80) {
+      setErrorMessage("Watch at least 80% of the lesson before marking it complete.");
+      return;
+    }
     // Update cache optimistically
     qc.setQueryData(getGetLessonQueryKey(id), (old: any) => (old ? { ...old, completed: true } : old));
     if (lesson?.courseId) {
@@ -281,7 +301,7 @@ export default function LessonView() {
       await qc.invalidateQueries({ queryKey: getGetLessonQueryKey(id) });
       if (lesson?.courseId) await qc.invalidateQueries({ queryKey: getGetCourseQueryKey(lesson.courseId) });
     }
-  }, [id, qc, complete, lesson?.courseId]);
+  }, [id, qc, complete, lesson?.courseId, isReading, watched]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -305,6 +325,7 @@ export default function LessonView() {
   const user = me.data?.user;
   const isStaff = !!user?.isAdmin || user?.role === "teacher";
   const isReading = lesson?.kind === "reading";
+  const completionReady = lesson?.completed || isReading || watched >= 80;
   const isYouTube = !isReading && lesson?.videoUrl && !lesson.videoUrl.startsWith("data:") && (lesson.videoUrl.includes("youtube.com") || lesson.videoUrl.includes("youtu.be"));
   const youTubeId = isYouTube ? extractYouTubeId(lesson.videoUrl) : null;
   const nextVideoLesson = lesson?.next?.kind === "video" ? lesson.next : lesson?.nextVideo ?? null;
@@ -313,6 +334,53 @@ export default function LessonView() {
   const prevLesson = lesson?.prev ?? null;
 
   const pageTitle = lesson?.course?.title ?? lesson?.course?.subject ?? lesson?.title ?? "Lesson";
+
+  useEffect(() => {
+    if (!isYouTube || !youTubeId) {
+      if (progressIntervalRef.current) {
+        window.clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
+      }
+      return;
+    }
+
+    const initializePlayer = () => {
+      const container = document.getElementById("youtube-lesson-player");
+      if (!container || youtubePlayerRef.current) return;
+      youtubePlayerRef.current = new (window as any).YT.Player(container, {
+        videoId: youTubeId,
+        playerVars: { rel: 0, modestbranding: 1 },
+        events: {
+          onReady: () => {
+            updateYouTubeProgress();
+          },
+        },
+      });
+    };
+
+    if (!(window as any).YT) {
+      const tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      tag.async = true;
+      (window as any).onYouTubeIframeAPIReady = initializePlayer;
+      document.body.appendChild(tag);
+    } else {
+      initializePlayer();
+    }
+
+    progressIntervalRef.current = window.setInterval(updateYouTubeProgress, 500);
+
+    return () => {
+      if (progressIntervalRef.current) {
+        window.clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
+      }
+      if (youtubePlayerRef.current?.destroy) {
+        youtubePlayerRef.current.destroy();
+        youtubePlayerRef.current = null;
+      }
+    };
+  }, [isYouTube, youTubeId, updateYouTubeProgress]);
 
   useEffect(() => {
     if (!isReading || isStaff || lesson?.completed || hasAutoCompletedRef.current === id) return;
@@ -465,12 +533,7 @@ export default function LessonView() {
                   }}>
                     <div style={{ flex: "1 1 auto", minHeight: 0, width: "100%" }}>
                       {isYouTube && youTubeId ? (
-                        <iframe
-                          key={youTubeId}
-                          src={`https://www.youtube.com/embed/${youTubeId}`}
-                          title={lesson.title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen style={{ width: "100%", height: "100%", border: 0 }}
-                        />
+                        <div id="youtube-lesson-player" key={youTubeId} style={{ width: "100%", height: "100%" }} />
                       ) : (
                         <video key={lesson.videoUrl} ref={videoRef} src={lesson.videoUrl} controls onTimeUpdate={onTimeUpdate} onEnded={onVideoEnded} style={{ width: "100%", height: "100%", display: "block" }}/>
                       )}
@@ -536,9 +599,9 @@ export default function LessonView() {
                   </div>
                 </>
               ) : (
-                <GoldButton onClick={onComplete} disabled={complete.isPending} full>
+                <GoldButton onClick={onComplete} disabled={complete.isPending || (!isReading && !completionReady)} full>
                   <CheckCircle2 size={15}/>
-                  Complete (+{lesson?.xpReward ?? 50} XP)
+                  {completionReady ? `Complete (+${lesson?.xpReward ?? 50} XP)` : `Watch ${80 - watched}% more to unlock`}
                 </GoldButton>
               )}
 

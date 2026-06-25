@@ -96,7 +96,7 @@ export default function SchedulePage() {
       title="Schedule"
       subtitle={
         isStaff
-          ? "Manage classes, exams, assemblies and meetings."
+          ? "Manage classes, exams, meetings and holidays."
           : "Your upcoming classes and events."
       }
     >
@@ -166,10 +166,8 @@ export default function SchedulePage() {
                 >
                   <option value="class">Class</option>
                   <option value="exam">Exam</option>
-                  <option value="assembly">Assembly</option>
                   <option value="holiday">Holiday</option>
                   <option value="meeting">Meeting</option>
-                  <option value="club">Club</option>
                 </select>
               </label>
             </div>
@@ -378,10 +376,8 @@ function kindColor(kind: string): string {
   const map: Record<string, string> = {
     class: "#1B2B5E",
     exam: "#dc2626",
-    assembly: "#C9A84C",
     holiday: "#16a34a",
     meeting: "#7c3aed",
-    club: "#0891b2",
   };
   return map[kind] ?? "#1B2B5E";
 }

@@ -722,7 +722,7 @@ export default function Apply() {
                   </h1>
                   <p style={{ fontSize: 13, color: B.muted }}>
                     Fill in your details below. Fields marked{" "}
-                    <span style={{ color: B.gold }}>*</span> are required.
+                    <span style={{ color: B.gold }}>*</span> are required. Your application will be reviewed by our team before an account is approved.
                   </p>
                 </div>
 
@@ -1157,9 +1157,7 @@ export default function Apply() {
                   Welcome to Al Shamail{formData.name ? `, ${formData.name.split(" ")[0]}` : ""}!
                 </h2>
                 <p style={{ fontSize: 15, color: B.muted, lineHeight: 1.7, marginBottom: 32 }}>
-                  Thank you for applying. We've recorded your details and our admissions team will
-                  be in touch within 24 hours to confirm your{" "}
-                  {userType === "student" ? "student" : "teaching"} place and next steps.
+                  Thank you for applying. We've recorded your details and our admissions team will review your request before creating or approving your account. We will be in touch shortly with the next step.
                 </p>
                 <button
                   onClick={() => navigate("/login")}
