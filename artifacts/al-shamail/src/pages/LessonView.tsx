@@ -136,6 +136,7 @@ export default function LessonView() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [videoError, setVideoError] = useState<string | null>(null);
   const [confettiActive, setConfettiActive] = useState(false);
+  const [youtubeEnded, setYoutubeEnded] = useState(false);
   const youtubePlayerRef = useRef<any>(null);
   const progressIntervalRef = useRef<number | null>(null);
 
@@ -143,6 +144,7 @@ export default function LessonView() {
     setReward(null);
     setWatched(0);
     setVideoError(null);
+    setYoutubeEnded(false);
     stopConfetti();
   }, [id]);
 
@@ -400,10 +402,28 @@ export default function LessonView() {
           fs: 1,
           autoplay: 0,
           playsinline: 1,
+          controls: 1,
+          loop: 0,
+          html5: 1,
         },
         events: {
           onReady: () => {
             updateYouTubeProgress();
+          },
+          onStateChange: (event: any) => {
+            if (event.data === (window as any).YT.PlayerState.ENDED) {
+              // Video ended - stop to prevent recommendations from showing
+              if (youtubePlayerRef.current) {
+                youtubePlayerRef.current.stopVideo();
+                setYoutubeEnded(true);
+                startConfetti();
+                if (lesson && !lesson?.completed && !complete.isPending && watched >= 80) {
+                  onComplete();
+                }
+              }
+            } else {
+              setYoutubeEnded(false);
+            }
           },
         },
       });
@@ -583,18 +603,50 @@ export default function LessonView() {
                     display: "flex", flexDirection: "column",
                     aspectRatio: "16 / 9", width: "100%",
                   }}>
-                    <div style={{ flex: "1 1 auto", minHeight: 0, width: "100%" }}>
+                    <div style={{ flex: "1 1 auto", minHeight: 0, width: "100%", position: "relative" }}>
                       {isYouTube && youTubeId ? (
                         <>
                           <div id="youtube-lesson-player" key={youTubeId} style={{ width: "100%", height: "100%" }} />
-                          <style>{`
-                            #youtube-lesson-player iframe {
-                              pointer-events: auto;
-                            }
-                            .ytp-pause-overlay, .ytp-cards-teaser, .ytp-ce-element, .ytp-show-cards-title, .ytp-ce-video-shadow, .ytp-ce-channel-title {
-                              display: none !important;
-                            }
-                          `}</style>
+                          {youtubeEnded && (
+                            <div style={{
+                              position: "absolute",
+                              inset: 0,
+                              background: "rgba(0,0,0,0.85)",
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              zIndex: 10,
+                            }}>
+                              <button
+                                onClick={() => {
+                                  setYoutubeEnded(false);
+                                  if (youtubePlayerRef.current) {
+                                    youtubePlayerRef.current.seekTo(0);
+                                    youtubePlayerRef.current.playVideo();
+                                  }
+                                }}
+                                style={{
+                                  padding: "16px 32px",
+                                  borderRadius: 12,
+                                  background: B.gold,
+                                  color: B.white,
+                                  border: "none",
+                                  fontSize: 16,
+                                  fontWeight: 700,
+                                  cursor: "pointer",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 10,
+                                }}
+                              >
+                                <span>▶</span> Replay Video
+                              </button>
+                              <div style={{ color: B.white, fontSize: 14, marginTop: 12 }}>
+                                {watched}% watched
+                              </div>
+                            </div>
+                          )}
                         </>
                       ) : resolvedVideoUrl ? (
                         <>
