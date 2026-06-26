@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Trophy, Plus, CheckCircle2, Award, Image as ImageIcon, X, Trash2 } from "lucide-react";
+import { Trophy, Plus, CheckCircle2, Award, Image as ImageIcon, X } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   useListBadges,
@@ -68,10 +68,19 @@ export default function BadgesPage() {
     }
   };
 
+  const deleteBadge = async (badgeId: number) => {
+    try {
+      await fetch(`${API_BASE}/badges/${badgeId}`, { method: "DELETE" });
+      await qc.invalidateQueries({ queryKey: getListBadgesQueryKey() });
+      setOkMsg("Badge deleted successfully!");
+      setTimeout(() => setOkMsg(null), 2500);
+    } catch (err: any) {
+      setError(err?.message ?? "Failed to delete badge.");
+    }
+  };
+
   const [showCreate, setShowCreate] = useState<"badge" | null>(null);
   const [showAssign, setShowAssign] = useState<number | null>(null);
-  const [showRemove, setShowRemove] = useState<number | null>(null);
-  const [studentBadges, setStudentBadges] = useState<any[]>([]);
   const [bForm, setBForm] = useState({
     name: "",
     description: "",
@@ -177,16 +186,6 @@ export default function BadgesPage() {
                   <Award size={14} style={{ marginRight: 4 }} />
                   Assign badge
                 </GoldButton>
-                <GoldButton
-                  type="button"
-                  onClick={() => {
-                    setError(null);
-                    setShowRemove(showRemove === -1 ? null : -1);
-                  }}
-                >
-                  <Trash2 size={14} style={{ marginRight: 4 }} />
-                  Remove badge
-                </GoldButton>
               </div>
             </div>
 
@@ -212,102 +211,6 @@ export default function BadgesPage() {
                 }}
               >
                 {error}
-              </div>
-            )}
-
-            {showRemove === -1 && (
-              <div
-                style={{
-                  marginTop: 14,
-                  padding: 14,
-                  background: B.offW,
-                  borderRadius: 12,
-                  display: "grid",
-                  gap: 10,
-                }}
-              >
-                <div style={{ fontWeight: 700, color: B.navy, fontSize: 14 }}>Remove Badge from Student</div>
-                <div style={{ display: "grid", gap: 8 }}>
-                  <label style={{ fontSize: 12, fontWeight: 700, color: B.muted }}>Select Student</label>
-                  <select
-                    onChange={(e) => {
-                      const userId = parseInt(e.target.value, 10);
-                      setShowRemove(userId);
-                      setStudentBadges(earned.filter((e: any) => e.userId === userId));
-                    }}
-                    style={inputStyle}
-                  >
-                    <option value="">Choose a student...</option>
-                    {students.map((s: any) => (
-                      <option key={s.id} value={s.id}>
-                        {s.firstName} {s.lastName} ({s.email})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                {showRemove !== null && showRemove !== -1 && (
-                  <div style={{ display: "grid", gap: 8 }}>
-                    <label style={{ fontSize: 12, fontWeight: 700, color: B.muted }}>Student's Badges</label>
-                    <div style={{ marginTop: 8, display: "grid", gap: 8 }}>
-                      {studentBadges.length === 0 ? (
-                        <div style={{ fontSize: 13, color: B.muted }}>No badges earned yet.</div>
-                      ) : (
-                        studentBadges.map((e: any) => (
-                          <div
-                            key={e.id}
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "space-between",
-                              padding: 10,
-                              borderRadius: 10,
-                              border: `1.5px solid ${e.badge.color}55`,
-                              background: `linear-gradient(135deg, ${e.badge.color}11 0%, ${e.badge.color}33 100%)`,
-                            }}
-                          >
-                            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                              {e.badge.imageUrl ? (
-                                <img src={resolveImageUrl(e.badge.imageUrl) || e.badge.imageUrl} alt={e.badge.name} style={{ width: 32, height: 32, objectFit: "contain" }} />
-                              ) : (
-                                <div style={{ fontSize: 24 }}>🏆</div>
-                              )}
-                              <div>
-                                <div style={{ fontWeight: 700, color: B.navy, fontSize: 13 }}>{e.badge.name}</div>
-                                <div style={{ fontSize: 11, color: B.muted }}>Earned {formatDate(e.earnedAt)}</div>
-                              </div>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => removeBadge(showRemove, e.badge.id)}
-                              style={{
-                                padding: 6,
-                                borderRadius: 8,
-                                border: `1px solid ${B.error}`,
-                                background: B.white,
-                                color: B.error,
-                                cursor: "pointer",
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 4,
-                                fontSize: 12,
-                                fontWeight: 600,
-                              }}
-                            >
-                              <Trash2 size={14} /> Remove
-                            </button>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </div>
-                )}
-                <button
-                  type="button"
-                  onClick={() => setShowRemove(null)}
-                  style={cancelBtn}
-                >
-                  Cancel
-                </button>
               </div>
             )}
 
@@ -609,12 +512,35 @@ export default function BadgesPage() {
                     position: "relative",
                   }}
                 >
+                  {isAdminOrTeacher && (
+                    <button
+                      type="button"
+                      onClick={() => deleteBadge(b.id)}
+                      style={{
+                        position: "absolute",
+                        top: 10,
+                        right: 10,
+                        background: B.white,
+                        border: `1px solid ${B.error}`,
+                        borderRadius: "50%",
+                        width: 28,
+                        height: 28,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer",
+                        color: B.error,
+                      }}
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
                   {owned && (
                     <span
                       style={{
                         position: "absolute",
                         top: 10,
-                        right: 10,
+                        right: isAdminOrTeacher ? 44 : 10,
                         background: B.success,
                         color: B.white,
                         borderRadius: "50%",

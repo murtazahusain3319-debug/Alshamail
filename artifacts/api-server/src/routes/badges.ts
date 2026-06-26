@@ -32,8 +32,8 @@ router.post("/badges", requireAdmin, async (req, res): Promise<void> => {
 });
 
 router.delete("/badges/:userId/:badgeId", requireAdmin, async (req, res): Promise<void> => {
-  const userId = parseInt(req.params.userId, 10);
-  const badgeId = parseInt(req.params.badgeId, 10);
+  const userId = parseInt(String(req.params.userId), 10);
+  const badgeId = parseInt(String(req.params.badgeId), 10);
   if (isNaN(userId) || isNaN(badgeId)) {
     res.status(400).json({ error: "Invalid user ID or badge ID." });
     return;
@@ -41,6 +41,16 @@ router.delete("/badges/:userId/:badgeId", requireAdmin, async (req, res): Promis
   await db
     .delete(achievementsTable)
     .where(and(eq(achievementsTable.userId, userId), eq(achievementsTable.badgeId, badgeId)));
+  res.status(204).send();
+});
+
+router.delete("/badges/:id", requireAdmin, async (req, res): Promise<void> => {
+  const id = parseInt(String(req.params.id), 10);
+  if (isNaN(id)) {
+    res.status(400).json({ error: "Invalid badge ID." });
+    return;
+  }
+  await db.delete(badgesTable).where(eq(badgesTable.id, id));
   res.status(204).send();
 });
 
