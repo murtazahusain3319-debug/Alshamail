@@ -13,6 +13,7 @@ import {
 import { B } from "@/lib/brand";
 import { API_BASE } from "@/lib/api-base";
 import { DashboardLayout, Card, Pill, GoldButton } from "@/components/DashboardLayout";
+import { toast } from "@/hooks/use-toast";
 
 function resolveImageUrl(url: string | null | undefined): string | undefined {
   if (!url) return undefined;
@@ -159,7 +160,6 @@ export default function LessonView() {
   const [youtubeEnded, setYoutubeEnded] = useState(false);
   const [showBadgePopup, setShowBadgePopup] = useState(false);
   const [badgePopupBadge, setBadgePopupBadge] = useState<any | null>(null);
-  const [badgeToast, setBadgeToast] = useState<any | null>(null);
   const youtubePlayerRef = useRef<any>(null);
   const progressIntervalRef = useRef<number | null>(null);
   const completingRef = useRef(false);
@@ -178,7 +178,6 @@ export default function LessonView() {
     setVideoError(null);
     setYoutubeEnded(false);
     stopConfetti();
-    setBadgeToast(null);
     setShowBadgePopup(false);
     setBadgePopupBadge(null);
   }, [id]);
@@ -927,8 +926,12 @@ export default function LessonView() {
             <button
               onClick={() => {
                 setShowBadgePopup(false);
-                setBadgeToast(badgePopupBadge);
-                setTimeout(() => setBadgeToast(null), 5000);
+                if (badgePopupBadge) {
+                  toast({
+                    title: "Badge Earned!",
+                    description: badgePopupBadge.name,
+                  });
+                }
               }}
               style={{
                 background: B.gold,
@@ -943,56 +946,6 @@ export default function LessonView() {
             >
               Awesome!
             </button>
-          </div>
-        </div>
-      )}
-      {badgeToast && (
-        <div
-          style={{
-            position: "fixed",
-            bottom: 24,
-            right: 24,
-            background: B.white,
-            border: `2px solid ${B.gold}`,
-            borderRadius: 12,
-            padding: 16,
-            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            zIndex: 10001,
-            animation: "slideInRight 0.5s ease-out",
-          }}
-        >
-          {badgeToast.imageUrl ? (
-            <img
-              src={resolveImageUrl(badgeToast.imageUrl) || undefined}
-              alt={badgeToast.name}
-              style={{ width: 48, height: 48, objectFit: "contain" }}
-            />
-          ) : (
-            <div
-              style={{
-                width: 48,
-                height: 48,
-                borderRadius: "50%",
-                background: `linear-gradient(135deg, ${badgeToast.color || B.gold} 0%, ${badgeToast.color || B.gold}cc 100%)`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 24,
-              }}
-            >
-              🏆
-            </div>
-          )}
-          <div>
-            <div style={{ fontWeight: 700, fontSize: 14, color: B.navy, marginBottom: 2 }}>
-              Badge Earned!
-            </div>
-            <div style={{ fontSize: 12, color: B.muted }}>
-              {badgeToast.name}
-            </div>
           </div>
         </div>
       )}
