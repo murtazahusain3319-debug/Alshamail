@@ -159,10 +159,10 @@ export default function LessonView() {
   const [youtubeEnded, setYoutubeEnded] = useState(false);
   const [showBadgePopup, setShowBadgePopup] = useState(false);
   const [badgePopupBadge, setBadgePopupBadge] = useState<any | null>(null);
-  const badgeToastRef = useRef<{ badge: any; show: boolean } | null>(null);
-  const [badgeToastVisible, setBadgeToastVisible] = useState(false);
+  const [badgeToast, setBadgeToast] = useState<{ badge: any; show: boolean } | null>(null);
   const youtubePlayerRef = useRef<any>(null);
   const progressIntervalRef = useRef<number | null>(null);
+  const completingRef = useRef(false);
 
   useEffect(() => {
     console.log("LessonView mounted");
@@ -178,8 +178,7 @@ export default function LessonView() {
     setVideoError(null);
     setYoutubeEnded(false);
     stopConfetti();
-    badgeToastRef.current = null;
-    setBadgeToastVisible(false);
+    setBadgeToast(null);
   }, [id]);
 
   const resizeConfettiCanvas = () => {
@@ -341,18 +340,15 @@ export default function LessonView() {
   const pageTitle = lesson?.course?.title ?? lesson?.course?.subject ?? lesson?.title ?? "Lesson";
 
   const onComplete = useCallback(async () => {
+    if (completingRef.current) return;
+
+    completingRef.current = true;
+
     console.log("onComplete called");
     if (!isReading && watched < 80) {
       setErrorMessage("Watch at least 80% of the lesson before marking it complete.");
+      completingRef.current = false;
       return;
-    }
-    // Update cache optimistically
-    qc.setQueryData(getGetLessonQueryKey(id), (old: any) => (old ? { ...old, completed: true } : old));
-    if (lesson?.courseId) {
-      qc.setQueryData(getGetCourseQueryKey(lesson.courseId), (old: any) => {
-        if (!old || !Array.isArray(old.lessons)) return old;
-        return { ...old, lessons: old.lessons.map((l: any) => (l.id === id ? { ...l, completed: true } : l)) };
-      });
     }
 
     try {
@@ -366,12 +362,10 @@ export default function LessonView() {
         setBadgePopupBadge(newBadges[0]);
         // Show toast notification
         console.log("Showing badge toast for:", newBadges[0]);
-        badgeToastRef.current = { badge: newBadges[0], show: true };
-        setBadgeToastVisible(true);
+        setBadgeToast({ badge: newBadges[0], show: true });
         setTimeout(() => {
           console.log("Hiding badge toast");
-          badgeToastRef.current = null;
-          setBadgeToastVisible(false);
+          setBadgeToast(null);
         }, 5000); // Hide after 5 seconds
       }
       startConfetti();
@@ -388,6 +382,8 @@ export default function LessonView() {
       // Revalidate cache to ensure consistency
       await qc.invalidateQueries({ queryKey: getGetLessonQueryKey(id) });
       if (lesson?.courseId) await qc.invalidateQueries({ queryKey: getGetCourseQueryKey(lesson.courseId) });
+    } finally {
+      completingRef.current = false;
     }
   }, [id, qc, complete, lesson?.courseId, isReading, watched]);
 
@@ -949,8 +945,7 @@ export default function LessonView() {
           </div>
         </div>
       )}
-      {badgeToastVisible && badgeToastRef.current && console.log("Rendering badge toast:", badgeToastRef.current.badge)}
-      {badgeToastVisible && badgeToastRef.current && (
+      {badgeToast && (
         <div
           style={{
             position: "fixed",
@@ -968,10 +963,10 @@ export default function LessonView() {
             animation: "slideInRight 0.5s ease-out",
           }}
         >
-          {badgeToastRef.current.badge.imageUrl ? (
+          {badgeToast.badge.imageUrl ? (
             <img
-              src={resolveImageUrl(badgeToastRef.current.badge.imageUrl) || undefined}
-              alt={badgeToastRef.current.badge.name}
+              src={resolveImageUrl(badgeToast.badge.imageUrl) || undefined}
+              alt={badgeToast.badge.name}
               style={{ width: 48, height: 48, objectFit: "contain" }}
             />
           ) : (
@@ -980,7 +975,7 @@ export default function LessonView() {
                 width: 48,
                 height: 48,
                 borderRadius: "50%",
-                background: `linear-gradient(135deg, ${badgeToastRef.current.badge.color || B.gold} 0%, ${badgeToastRef.current.badge.color || B.gold}cc 100%)`,
+                background: `linear-gradient(135deg, ${badgeToast.badge.color || B.gold} 0%, ${badgeToast.badge.color || B.gold}cc 100%)`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -995,7 +990,7 @@ export default function LessonView() {
               Badge Earned!
             </div>
             <div style={{ fontSize: 12, color: B.muted }}>
-              {badgeToastRef.current.badge.name}
+              {badgeToast.badge.name}
             </div>
           </div>
         </div>
