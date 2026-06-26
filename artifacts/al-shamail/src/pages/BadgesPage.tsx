@@ -14,7 +14,6 @@ import {
 import { B, formatDate } from "@/lib/brand";
 import { DashboardLayout, Card, Pill, PrimaryButton, GoldButton } from "@/components/DashboardLayout";
 import { API_BASE } from "@/lib/api-base";
-import { customFetch } from "@workspace/api-client-react";
 
 const BADGE_COLORS = ["#C9A84C", "#1F3A5F", "#7C3AED", "#16A34A", "#DC2626", "#0EA5E9"];
 const BADGE_CRITERIA = ["manual", "xp", "lessons", "streak"] as const;
@@ -59,7 +58,7 @@ export default function BadgesPage() {
 
   const removeBadge = async (userId: number, badgeId: number) => {
     try {
-      await customFetch(`${API_BASE}/badges/${userId}/${badgeId}`, { method: "DELETE" });
+      await fetch(`${API_BASE}/badges/${userId}/${badgeId}`, { method: "DELETE" });
       await qc.invalidateQueries({ queryKey: getListBadgesQueryKey() });
       await qc.invalidateQueries({ queryKey: getListUsersQueryKey() });
       setOkMsg("Badge removed successfully!");
