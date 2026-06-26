@@ -16,12 +16,7 @@ const BADGE_COLORS = ["#C9A84C", "#1F3A5F", "#7C3AED", "#16A34A", "#DC2626", "#0
 const BADGE_CRITERIA = ["manual", "xp", "lessons", "streak"] as const;
 
 const BADGE_IMAGES = [
-  "https://cdn-icons-png.flaticon.com/512/2583/2583344.png", // Gold trophy
-  "https://cdn-icons-png.flaticon.com/512/2583/2583379.png", // Silver trophy
-  "https://cdn-icons-png.flaticon.com/512/2583/2583381.png", // Bronze trophy
-  "https://cdn-icons-png.flaticon.com/512/3135/3135715.png", // Star
-  "https://cdn-icons-png.flaticon.com/512/1828/1828884.png", // Medal
-  "https://cdn-icons-png.flaticon.com/512/2997/2997322.png", // Crown
+  "https://i.imgur.com/7EBESyS.png", // Star badge
 ];
 
 function resolveImageUrl(url: string | null | undefined): string | null {
