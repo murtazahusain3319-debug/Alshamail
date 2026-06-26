@@ -25,7 +25,11 @@ async function shapeCourses(rows: (typeof coursesTable.$inferSelect)[]) {
   const enrollCounts = await db
     .select({ courseId: enrollmentsTable.courseId, c: sql<number>`count(*)::int` })
     .from(enrollmentsTable)
-    .where(inArray(enrollmentsTable.courseId, ids))
+    .innerJoin(usersTable, eq(enrollmentsTable.userId, usersTable.id))
+    .where(and(
+      inArray(enrollmentsTable.courseId, ids),
+      eq(usersTable.isAdmin, false)
+    ))
     .groupBy(enrollmentsTable.courseId);
   const teachers =
     teacherIds.length > 0
