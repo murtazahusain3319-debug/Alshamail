@@ -881,7 +881,7 @@ export default function LessonView() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            zIndex: 1000,
+            zIndex: 9999,
             animation: "fadeIn 0.3s ease-out",
           }}
         >
