@@ -18,6 +18,26 @@ import { API_BASE } from "@/lib/api-base";
 const BADGE_COLORS = ["#C9A84C", "#1F3A5F", "#7C3AED", "#16A34A", "#DC2626", "#0EA5E9"];
 const BADGE_CRITERIA = ["manual", "xp", "lessons", "streak"] as const;
 
+function resolveImageUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+  const normalized = String(url).trim();
+  if (!normalized) return null;
+  if (normalized.startsWith("data:") || normalized.startsWith("blob:") || /^https?:\/\//i.test(normalized)) {
+    return normalized;
+  }
+  if (normalized.startsWith("/api/uploads/")) {
+    const baseUrl = API_BASE.replace(/\/api\/?$/, "");
+    const cleanPath = normalized.replace(/^\/api/, "");
+    return `${baseUrl}${cleanPath}`;
+  }
+  if (normalized.startsWith("/uploads/")) {
+    const baseUrl = API_BASE.replace(/\/api\/?$/, "");
+    return `${baseUrl}${normalized}`;
+  }
+  if (normalized.startsWith("/")) return `${API_BASE}${normalized}`;
+  return `${API_BASE}/${normalized}`;
+}
+
 export default function BadgesPage() {
   const qc = useQueryClient();
   const me = useGetCurrentUser();
@@ -228,7 +248,7 @@ export default function BadgesPage() {
                           }}
                         >
                           {b.imageUrl ? (
-                            <img src={b.imageUrl} alt={b.name} style={{ width: 32, height: 32, objectFit: "contain", margin: "0 auto 4px" }} />
+                            <img src={resolveImageUrl(b.imageUrl) || b.imageUrl} alt={b.name} style={{ width: 32, height: 32, objectFit: "contain", margin: "0 auto 4px" }} />
                           ) : (
                             <div style={{ fontSize: 24, marginBottom: 4 }}>🏆</div>
                           )}
@@ -300,18 +320,34 @@ export default function BadgesPage() {
                 </FormField>
                 <FormField label="Badge Image URL (optional)">
                   <div style={{ display: "grid", gap: 8 }}>
-                    <input
-                      value={bForm.imageUrl}
-                      onChange={(e) =>
-                        setBForm((f) => ({ ...f, imageUrl: e.target.value }))
-                      }
-                      placeholder="https://example.com/badge-image.png"
-                      style={inputStyle}
-                    />
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 8 }}>
+                      <input
+                        value={bForm.imageUrl}
+                        onChange={(e) =>
+                          setBForm((f) => ({ ...f, imageUrl: e.target.value }))
+                        }
+                        placeholder="https://example.com/badge-image.png"
+                        style={inputStyle}
+                      />
+                      <label style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "0 12px", borderRadius: 10, border: `1.5px solid ${B.light}`, cursor: "pointer", fontSize: 12, fontWeight: 700, color: B.navy, background: B.offW }}>
+                        Import
+                        <input type="file" accept="image/*" style={{ display: "none" }} onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          if (!file.type.startsWith("image/")) {
+                            setError("Please select an image file.");
+                            return;
+                          }
+                          const reader = new FileReader();
+                          reader.onload = () => setBForm((f) => ({ ...f, imageUrl: String(reader.result ?? "") }));
+                          reader.readAsDataURL(file);
+                        }} />
+                      </label>
+                    </div>
                     {bForm.imageUrl && (
                       <div style={{ display: "flex", justifyContent: "center", padding: 8, background: B.offW, borderRadius: 8 }}>
                         <img
-                          src={bForm.imageUrl}
+                          src={resolveImageUrl(bForm.imageUrl) || bForm.imageUrl}
                           alt="Badge preview"
                           style={{ width: 80, height: 80, objectFit: "contain" }}
                           onError={(e) => (e.currentTarget.style.display = "none")}
@@ -398,7 +434,7 @@ export default function BadgesPage() {
                 >
                   {u.badge.imageUrl ? (
                     <img
-                      src={u.badge.imageUrl}
+                      src={resolveImageUrl(u.badge.imageUrl) || u.badge.imageUrl}
                       alt={u.badge.name}
                       style={{ width: 48, height: 48, objectFit: "contain", margin: "0 auto 6px" }}
                     />
@@ -475,7 +511,7 @@ export default function BadgesPage() {
                   )}
                   {b.imageUrl ? (
                     <img
-                      src={b.imageUrl}
+                      src={resolveImageUrl(b.imageUrl) || b.imageUrl}
                       alt={b.name}
                       style={{ width: 56, height: 56, objectFit: "contain", marginBottom: 8 }}
                     />

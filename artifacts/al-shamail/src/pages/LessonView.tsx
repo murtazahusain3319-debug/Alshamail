@@ -14,6 +14,26 @@ import { B } from "@/lib/brand";
 import { API_BASE } from "@/lib/api-base";
 import { DashboardLayout, Card, Pill, GoldButton } from "@/components/DashboardLayout";
 
+function resolveImageUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+  const normalized = String(url).trim();
+  if (!normalized) return null;
+  if (normalized.startsWith("data:") || normalized.startsWith("blob:") || /^https?:\/\//i.test(normalized)) {
+    return normalized;
+  }
+  if (normalized.startsWith("/api/uploads/")) {
+    const baseUrl = API_BASE.replace(/\/api\/?$/, "");
+    const cleanPath = normalized.replace(/^\/api/, "");
+    return `${baseUrl}${cleanPath}`;
+  }
+  if (normalized.startsWith("/uploads/")) {
+    const baseUrl = API_BASE.replace(/\/api\/?$/, "");
+    return `${baseUrl}${normalized}`;
+  }
+  if (normalized.startsWith("/")) return `${API_BASE}${normalized}`;
+  return `${API_BASE}/${normalized}`;
+}
+
 /* ── Reading renderer ── */
 function ReadingContent({ content }: { content: string }) {
   const lines = (content ?? "").replace(/\r\n/g, "\n").split("\n");
@@ -855,7 +875,7 @@ export default function LessonView() {
             </div>
             {badgePopupBadge.imageUrl ? (
               <img
-                src={badgePopupBadge.imageUrl}
+                src={resolveImageUrl(badgePopupBadge.imageUrl) || badgePopupBadge.imageUrl}
                 alt={badgePopupBadge.name}
                 style={{ width: 120, height: 120, objectFit: "contain", margin: "0 auto 16px", animation: "bounce 1s ease-in-out infinite" }}
               />
