@@ -1,5 +1,5 @@
 import { Router, type IRouter, type Request } from "express";
-import { eq, and, asc, sql } from "drizzle-orm";
+import { eq, and, asc, sql, inArray } from "drizzle-orm";
 import multer, { type MulterError } from "multer";
 import path from "path";
 import fs from "fs";
@@ -13,6 +13,8 @@ import {
   quizAttemptsTable,
   usersTable,
   xpEventsTable,
+  badgesTable,
+  achievementsTable,
 } from "@workspace/db";
 import { requireAuth } from "../lib/auth";
 import { levelForXp } from "../lib/level";
@@ -228,6 +230,7 @@ router.post("/lessons/:id/complete", requireAuth, async (req, res): Promise<void
   let xpAwarded = 0;
   let leveledUp = false;
   let newLevel = u.level;
+  let newBadges: any[] = [];
   if (existing.length === 0) {
     await db.insert(lessonProgressTable).values({ userId: u.id, lessonId: id });
     xpAwarded = lesson.xpReward ?? 50;
@@ -240,8 +243,91 @@ router.post("/lessons/:id/complete", requireAuth, async (req, res): Promise<void
       .set({ xp: nextXp, level: lvl.level, lastActiveAt: new Date() })
       .where(eq(usersTable.id, u.id));
     await db.insert(xpEventsTable).values({ userId: u.id, amount: xpAwarded, reason: "Lesson complete" });
+
+    // Check for XP-based badges
+    const xpBadges = await db
+      .select()
+      .from(badgesTable)
+      .where(and(
+        eq(badgesTable.criteria, "xp"),
+        sql`${badgesTable.threshold} <= ${nextXp}`
+      ));
+    for (const badge of xpBadges) {
+      const alreadyEarned = await db
+        .select({ id: achievementsTable.id })
+        .from(achievementsTable)
+        .where(and(eq(achievementsTable.userId, u.id), eq(achievementsTable.badgeId, badge.id)))
+        .limit(1);
+      if (alreadyEarned.length === 0) {
+        await db.insert(achievementsTable).values({ userId: u.id, badgeId: badge.id });
+        newBadges.push(badge);
+      }
+    }
+
+    // Check for lesson-based badges
+    const completedLessons = await db
+      .select({ id: lessonProgressTable.id })
+      .from(lessonProgressTable)
+      .where(eq(lessonProgressTable.userId, u.id));
+    const lessonBadges = await db
+      .select()
+      .from(badgesTable)
+      .where(and(
+        eq(badgesTable.criteria, "lessons"),
+        sql`${badgesTable.threshold} <= ${completedLessons.length}`
+      ));
+    for (const badge of lessonBadges) {
+      const alreadyEarned = await db
+        .select({ id: achievementsTable.id })
+        .from(achievementsTable)
+        .where(and(eq(achievementsTable.userId, u.id), eq(achievementsTable.badgeId, badge.id)))
+        .limit(1);
+      if (alreadyEarned.length === 0) {
+        await db.insert(achievementsTable).values({ userId: u.id, badgeId: badge.id });
+        newBadges.push(badge);
+      }
+    }
+
+    // Check for course completion badges
+    if (lesson.courseId) {
+      const courseLessons = await db
+        .select({ id: lessonsTable.id })
+        .from(lessonsTable)
+        .where(eq(lessonsTable.courseId, lesson.courseId));
+      const completedCourseLessons = await db
+        .select({ id: lessonProgressTable.id })
+        .from(lessonProgressTable)
+        .where(and(
+          eq(lessonProgressTable.userId, u.id),
+          inArray(lessonProgressTable.lessonId, courseLessons.map((l) => l.id))
+        ));
+      const courseProgress = courseLessons.length > 0
+        ? (completedCourseLessons.length / courseLessons.length) * 100
+        : 0;
+
+      if (courseProgress >= 100) {
+        const courseBadges = await db
+          .select()
+          .from(badgesTable)
+          .where(and(
+            eq(badgesTable.criteria, "course"),
+            eq(badgesTable.threshold, lesson.courseId)
+          ));
+        for (const badge of courseBadges) {
+          const alreadyEarned = await db
+            .select({ id: achievementsTable.id })
+            .from(achievementsTable)
+            .where(and(eq(achievementsTable.userId, u.id), eq(achievementsTable.badgeId, badge.id)))
+            .limit(1);
+          if (alreadyEarned.length === 0) {
+            await db.insert(achievementsTable).values({ userId: u.id, badgeId: badge.id });
+            newBadges.push(badge);
+          }
+        }
+      }
+    }
   }
-  res.json({ lessonId: id, xpAwarded, leveledUp, level: newLevel });
+  res.json({ lessonId: id, xpAwarded, leveledUp, level: newLevel, newBadges });
 });
 
 router.get("/lessons/:id/quiz", async (req, res): Promise<void> => {
