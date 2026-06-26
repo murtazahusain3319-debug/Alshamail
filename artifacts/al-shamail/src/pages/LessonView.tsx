@@ -361,8 +361,11 @@ export default function LessonView() {
       console.log("New badges from response:", newBadges);
       setReward({ xpAwarded: (r as any).xpAwarded, leveledUp: (r as any).leveledUp, level: (r as any).level, newBadges });
       if (newBadges.length > 0) {
+        console.log("Badge earned, showing popup:", newBadges[0]);
         setShowBadgePopup(true);
         setBadgePopupBadge(newBadges[0]);
+      } else {
+        console.log("No new badges earned from lesson completion");
       }
       startConfetti();
       // Delay cache invalidation to allow UI to render badge popup/toast first
@@ -925,12 +928,16 @@ export default function LessonView() {
             </div>
             <button
               onClick={() => {
+                console.log("Awesome button clicked, badgePopupBadge:", badgePopupBadge);
                 setShowBadgePopup(false);
                 if (badgePopupBadge) {
+                  console.log("Calling toast with:", badgePopupBadge.name);
                   toast({
                     title: "Badge Earned!",
                     description: badgePopupBadge.name,
                   });
+                } else {
+                  console.log("No badgePopupBadge, skipping toast");
                 }
               }}
               style={{
