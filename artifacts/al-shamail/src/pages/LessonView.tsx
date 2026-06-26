@@ -165,6 +165,14 @@ export default function LessonView() {
   const progressIntervalRef = useRef<number | null>(null);
 
   useEffect(() => {
+    console.log("LessonView mounted");
+
+    return () => {
+      console.log("LessonView unmounted");
+    };
+  }, []);
+
+  useEffect(() => {
     setReward(null);
     setWatched(0);
     setVideoError(null);
