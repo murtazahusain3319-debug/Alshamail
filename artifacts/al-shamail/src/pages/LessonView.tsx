@@ -330,6 +330,7 @@ export default function LessonView() {
   const pageTitle = lesson?.course?.title ?? lesson?.course?.subject ?? lesson?.title ?? "Lesson";
 
   const onComplete = useCallback(async () => {
+    console.log("onComplete called");
     if (!isReading && watched < 80) {
       setErrorMessage("Watch at least 80% of the lesson before marking it complete.");
       return;
