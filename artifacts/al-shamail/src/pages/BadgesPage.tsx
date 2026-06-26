@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Trophy, Plus, CheckCircle2, Image as ImageIcon, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Trophy, Plus, CheckCircle2, Award, Image as ImageIcon, X } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   useListBadges,
@@ -13,7 +13,7 @@ import { DashboardLayout, Card, Pill, PrimaryButton, GoldButton } from "@/compon
 import { API_BASE } from "@/lib/api-base";
 
 const BADGE_COLORS = ["#C9A84C", "#1F3A5F", "#7C3AED", "#16A34A", "#DC2626", "#0EA5E9"];
-const BADGE_CRITERIA = ["manual", "xp", "lessons", "streak"] as const;
+const BADGE_CRITERIA = ["manual", "xp", "lessons", "course"] as const;
 
 const BADGE_IMAGES = [
   "https://i.imgur.com/7EBESyS.png", // Star badge
@@ -66,16 +66,34 @@ export default function BadgesPage() {
   };
 
   const [showCreate, setShowCreate] = useState<"badge" | null>(null);
+  const [courses, setCourses] = useState<any[]>([]);
   const [bForm, setBForm] = useState({
     name: "",
     description: "",
     imageUrl: "",
-    color: BADGE_COLORS[0],
     criteria: "manual" as (typeof BADGE_CRITERIA)[number],
-    xpThreshold: 0,
+    threshold: 0,
+    courseId: null as number | null,
   });
   const [error, setError] = useState<string | null>(null);
   const [okMsg, setOkMsg] = useState<string | null>(null);
+
+  // Fetch courses when component mounts
+  useEffect(() => {
+    fetch(`${API_BASE}/courses`, { credentials: "include" })
+      .then((res) => res.json())
+      .then((data) => {
+        const allCourses = data.items || [];
+        // Filter courses for teachers - only show courses they are assigned to
+        if (me.data?.user && !me.data.user.isAdmin && me.data.user.role === "teacher") {
+          const teacherCourses = allCourses.filter((c: any) => c.teacherId === me.data.user.id);
+          setCourses(teacherCourses);
+        } else {
+          setCourses(allCourses);
+        }
+      })
+      .catch(() => setCourses([]));
+  }, [me.data?.user]);
 
   const submitBadge = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,9 +110,9 @@ export default function BadgesPage() {
           description: bForm.description.trim(),
           icon: "trophy",
           imageUrl: bForm.imageUrl.trim() || null,
-          color: bForm.color,
+          color: "#C9A84C",
           criteria: bForm.criteria,
-          xpThreshold: Number(bForm.xpThreshold) || 0,
+          threshold: Number(bForm.threshold) || null,
         },
       });
       await qc.invalidateQueries({ queryKey: getListBadgesQueryKey() });
@@ -102,9 +120,9 @@ export default function BadgesPage() {
         name: "",
         description: "",
         imageUrl: "",
-        color: BADGE_COLORS[0],
         criteria: "manual",
-        xpThreshold: 0,
+        threshold: 0,
+        courseId: null,
       });
       setShowCreate(null);
       setOkMsg("Badge created!");
@@ -278,43 +296,59 @@ export default function BadgesPage() {
                     )}
                   </div>
                 </FormField>
-                <Row>
-                  <FormField label="Colour">
-                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                      {BADGE_COLORS.map((c) => (
-                        <button
-                          key={c}
-                          type="button"
-                          onClick={() => setBForm((f) => ({ ...f, color: c }))}
-                          style={{
-                            width: 28,
-                            height: 28,
-                            borderRadius: "50%",
-                            background: c,
-                            border:
-                              bForm.color === c ? `3px solid ${B.navy}` : "2px solid transparent",
-                            cursor: "pointer",
-                          }}
-                          aria-label={`Pick ${c}`}
-                        />
-                      ))}
-                    </div>
-                  </FormField>
-                  <FormField label="XP threshold (optional)">
+                {bForm.criteria === "xp" && (
+                  <FormField label="XP threshold">
                     <input
                       type="number"
                       min={0}
-                      value={bForm.xpThreshold}
+                      value={bForm.threshold}
                       onChange={(e) =>
                         setBForm((f) => ({
                           ...f,
-                          xpThreshold: parseInt(e.target.value, 10) || 0,
+                          threshold: parseInt(e.target.value, 10) || 0,
                         }))
                       }
                       style={inputStyle}
                     />
                   </FormField>
-                </Row>
+                )}
+                {bForm.criteria === "lessons" && (
+                  <FormField label="Lesson threshold">
+                    <input
+                      type="number"
+                      min={0}
+                      value={bForm.threshold}
+                      onChange={(e) =>
+                        setBForm((f) => ({
+                          ...f,
+                          threshold: parseInt(e.target.value, 10) || 0,
+                        }))
+                      }
+                      style={inputStyle}
+                    />
+                  </FormField>
+                )}
+                {bForm.criteria === "course" && (
+                  <FormField label="Select course">
+                    <select
+                      value={bForm.courseId ?? ""}
+                      onChange={(e) =>
+                        setBForm((f) => ({
+                          ...f,
+                          courseId: e.target.value ? parseInt(e.target.value, 10) : null,
+                        }))
+                      }
+                      style={inputStyle}
+                    >
+                      <option value="">Choose a course...</option>
+                      {courses.map((c: any) => (
+                        <option key={c.id} value={c.id}>
+                          {c.title} - {c.subject}
+                        </option>
+                      ))}
+                    </select>
+                  </FormField>
+                )}
                 <div style={{ display: "flex", gap: 8 }}>
                   <PrimaryButton type="submit" disabled={createBadge.isPending}>
                     {createBadge.isPending ? "Creating…" : "Create badge"}
