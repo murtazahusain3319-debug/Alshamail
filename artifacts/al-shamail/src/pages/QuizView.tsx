@@ -24,6 +24,15 @@ import {
   GoldButton,
 } from "@/components/DashboardLayout";
 
+function resolveImageUrl(url: string | null): string | undefined {
+  if (!url) return undefined;
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  const API_BASE = import.meta.env.VITE_API_BASE || "/api";
+  const normalized = url.startsWith("/") ? url.slice(1) : url;
+  const baseUrl = API_BASE.replace(/\/api\/?$/, "");
+  return `${baseUrl}${normalized}`;
+}
+
 export default function QuizView() {
   const [, params] = useRoute<{ id: string }>("/lessons/:id/quiz");
   const lessonId = parseInt(params?.id ?? "0", 10);
@@ -39,6 +48,9 @@ export default function QuizView() {
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [result, setResult] = useState<any | null>(null);
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
+  const [showBadgePopup, setShowBadgePopup] = useState(false);
+  const [badgePopupBadge, setBadgePopupBadge] = useState<any | null>(null);
+  const [badgeToast, setBadgeToast] = useState<any | null>(null);
 
   const allAnswered =
     quiz?.questions?.length &&
@@ -56,6 +68,12 @@ export default function QuizView() {
       },
     });
     setResult(r);
+    // Show badge popup/toast if any were earned
+    const newBadges = (r as any).newBadges ?? [];
+    if (newBadges.length > 0) {
+      setShowBadgePopup(true);
+      setBadgePopupBadge(newBadges[0]);
+    }
     if (r?.passed) {
       await qc.invalidateQueries({ queryKey: getGetLessonQueryKey(lessonId), exact: true, refetchType: "all" });
       if (lesson?.courseId) {
@@ -426,6 +444,156 @@ export default function QuizView() {
           />
         </div>
       )}
+      {showBadgePopup && badgePopupBadge && (
+        <div
+          onClick={() => setShowBadgePopup(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.7)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 9999,
+            animation: "fadeIn 0.3s ease-out",
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: B.white,
+              borderRadius: 24,
+              padding: 32,
+              textAlign: "center",
+              maxWidth: 400,
+              width: "90%",
+              boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+              animation: "scaleIn 0.4s ease-out",
+            }}
+          >
+            <div style={{ fontSize: 14, fontWeight: 700, color: B.gold, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>
+              🎉 Badge Earned!
+            </div>
+            {badgePopupBadge.imageUrl ? (
+              <img
+                src={resolveImageUrl(badgePopupBadge.imageUrl) || badgePopupBadge.imageUrl}
+                alt={badgePopupBadge.name}
+                style={{ width: 120, height: 120, objectFit: "contain", margin: "0 auto 16px", animation: "bounce 1s ease-in-out infinite" }}
+              />
+            ) : (
+              <div
+                style={{
+                  width: 120,
+                  height: 120,
+                  borderRadius: "50%",
+                  background: `linear-gradient(135deg, ${badgePopupBadge.color || B.gold} 0%, ${badgePopupBadge.color || B.gold}cc 100%)`,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 48,
+                  margin: "0 auto 16px",
+                  animation: "bounce 1s ease-in-out infinite",
+                }}
+              >
+                🏆
+              </div>
+            )}
+            <div style={{ fontSize: 24, fontWeight: 800, color: B.navy, marginBottom: 8 }}>
+              {badgePopupBadge.name}
+            </div>
+            <div style={{ fontSize: 14, color: B.muted, marginBottom: 24, lineHeight: 1.5 }}>
+              {badgePopupBadge.description}
+            </div>
+            <button
+              onClick={() => {
+                setShowBadgePopup(false);
+                setBadgeToast(badgePopupBadge);
+                setTimeout(() => setBadgeToast(null), 5000);
+              }}
+              style={{
+                background: B.gold,
+                color: B.white,
+                border: "none",
+                borderRadius: 12,
+                padding: "12px 24px",
+                fontSize: 14,
+                fontWeight: 700,
+                cursor: "pointer",
+              }}
+            >
+              Awesome!
+            </button>
+          </div>
+        </div>
+      )}
+      {badgeToast && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: 24,
+            right: 24,
+            background: B.white,
+            border: `2px solid ${B.gold}`,
+            borderRadius: 12,
+            padding: 16,
+            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            zIndex: 10001,
+            animation: "slideInRight 0.5s ease-out",
+          }}
+        >
+          {badgeToast.imageUrl ? (
+            <img
+              src={resolveImageUrl(badgeToast.imageUrl) || undefined}
+              alt={badgeToast.name}
+              style={{ width: 48, height: 48, objectFit: "contain" }}
+            />
+          ) : (
+            <div
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: "50%",
+                background: `linear-gradient(135deg, ${badgeToast.color || B.gold} 0%, ${badgeToast.color || B.gold}cc 100%)`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 24,
+              }}
+            >
+              🏆
+            </div>
+          )}
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 14, color: B.navy, marginBottom: 2 }}>
+              Badge Earned!
+            </div>
+            <div style={{ fontSize: 12, color: B.muted }}>
+              {badgeToast.name}
+            </div>
+          </div>
+        </div>
+      )}
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes scaleIn {
+          from { transform: scale(0.8); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+        }
+        @keyframes bounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
+        }
+        @keyframes slideInRight {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+      `}</style>
     </DashboardLayout>
   );
 }
