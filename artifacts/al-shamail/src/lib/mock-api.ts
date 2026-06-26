@@ -637,12 +637,6 @@ export function useCompleteLesson() {
       const res = await apiFetch<any>(`/lessons/${lessonId}/complete`, { method: "POST" });
       return res;
     },
-    onSuccess: (d) => {
-      qc.invalidateQueries({ queryKey: getGetLessonQueryKey(d.lessonId) });
-      qc.invalidateQueries({ queryKey: getListMyEnrollmentsQueryKey() });
-      qc.invalidateQueries({ queryKey: getGetCurrentUserQueryKey() });
-      qc.invalidateQueries({ queryKey: ["dash-student"] });
-    },
   });
 }
 

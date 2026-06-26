@@ -375,11 +375,13 @@ export default function LessonView() {
         }, 5000); // Hide after 5 seconds
       }
       startConfetti();
-      // Ensure caches reflect server state
-      await qc.invalidateQueries({ queryKey: getGetLessonQueryKey(id) });
-      if (lesson?.courseId) await qc.invalidateQueries({ queryKey: getGetCourseQueryKey(lesson.courseId) });
-      await qc.invalidateQueries({ queryKey: getGetCurrentUserQueryKey() });
-      await qc.invalidateQueries({ queryKey: getListMyEnrollmentsQueryKey() });
+      // Delay cache invalidation to allow UI to render badge popup/toast first
+      setTimeout(async () => {
+        await qc.invalidateQueries({ queryKey: getGetLessonQueryKey(id) });
+        if (lesson?.courseId) await qc.invalidateQueries({ queryKey: getGetCourseQueryKey(lesson.courseId) });
+        await qc.invalidateQueries({ queryKey: getGetCurrentUserQueryKey() });
+        await qc.invalidateQueries({ queryKey: getListMyEnrollmentsQueryKey() });
+      }, 1000);
       setErrorMessage(null);
     } catch (err: any) {
       setErrorMessage(err?.message ?? "Failed to complete lesson.");
