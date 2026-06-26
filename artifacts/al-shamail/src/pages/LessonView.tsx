@@ -14,10 +14,10 @@ import { B } from "@/lib/brand";
 import { API_BASE } from "@/lib/api-base";
 import { DashboardLayout, Card, Pill, GoldButton } from "@/components/DashboardLayout";
 
-function resolveImageUrl(url: string | null | undefined): string | null {
-  if (!url) return null;
+function resolveImageUrl(url: string | null | undefined): string | undefined {
+  if (!url) return undefined;
   const normalized = String(url).trim();
-  if (!normalized) return null;
+  if (!normalized) return undefined;
   if (normalized.startsWith("data:") || normalized.startsWith("blob:") || /^https?:\/\//i.test(normalized)) {
     return normalized;
   }
@@ -159,6 +159,7 @@ export default function LessonView() {
   const [youtubeEnded, setYoutubeEnded] = useState(false);
   const [showBadgePopup, setShowBadgePopup] = useState(false);
   const [badgePopupBadge, setBadgePopupBadge] = useState<any | null>(null);
+  const [badgeToast, setBadgeToast] = useState<{ badge: any; show: boolean } | null>(null);
   const youtubePlayerRef = useRef<any>(null);
   const progressIntervalRef = useRef<number | null>(null);
 
@@ -349,6 +350,9 @@ export default function LessonView() {
       if (newBadges.length > 0) {
         setShowBadgePopup(true);
         setBadgePopupBadge(newBadges[0]);
+        // Show toast notification
+        setBadgeToast({ badge: newBadges[0], show: true });
+        setTimeout(() => setBadgeToast(null), 5000); // Hide after 5 seconds
       }
       startConfetti();
       // Ensure caches reflect server state
@@ -921,6 +925,56 @@ export default function LessonView() {
           </div>
         </div>
       )}
+      {badgeToast && badgeToast.show && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: 24,
+            right: 24,
+            background: B.white,
+            border: `2px solid ${B.gold}`,
+            borderRadius: 12,
+            padding: 16,
+            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            zIndex: 1000,
+            animation: "slideInRight 0.5s ease-out",
+          }}
+        >
+          {badgeToast.badge.imageUrl ? (
+            <img
+              src={resolveImageUrl(badgeToast.badge.imageUrl) || undefined}
+              alt={badgeToast.badge.name}
+              style={{ width: 48, height: 48, objectFit: "contain" }}
+            />
+          ) : (
+            <div
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: "50%",
+                background: `linear-gradient(135deg, ${badgeToast.badge.color || B.gold} 0%, ${badgeToast.badge.color || B.gold}cc 100%)`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 24,
+              }}
+            >
+              🏆
+            </div>
+          )}
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 14, color: B.navy, marginBottom: 2 }}>
+              Badge Earned!
+            </div>
+            <div style={{ fontSize: 12, color: B.muted }}>
+              {badgeToast.badge.name}
+            </div>
+          </div>
+        </div>
+      )}
       <style>{`
         @keyframes fadeIn {
           from { opacity: 0; }
@@ -933,6 +987,10 @@ export default function LessonView() {
         @keyframes bounce {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-10px); }
+        }
+        @keyframes slideInRight {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
         }
       `}</style>
 
