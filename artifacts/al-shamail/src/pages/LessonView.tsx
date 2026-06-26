@@ -351,8 +351,12 @@ export default function LessonView() {
         setShowBadgePopup(true);
         setBadgePopupBadge(newBadges[0]);
         // Show toast notification
+        console.log("Showing badge toast for:", newBadges[0]);
         setBadgeToast({ badge: newBadges[0], show: true });
-        setTimeout(() => setBadgeToast(null), 5000); // Hide after 5 seconds
+        setTimeout(() => {
+          console.log("Hiding badge toast");
+          setBadgeToast(null);
+        }, 5000); // Hide after 5 seconds
       }
       startConfetti();
       // Ensure caches reflect server state
@@ -925,6 +929,7 @@ export default function LessonView() {
           </div>
         </div>
       )}
+      {badgeToast && badgeToast.show && console.log("Rendering badge toast:", badgeToast)}
       {badgeToast && badgeToast.show && (
         <div
           style={{
@@ -939,7 +944,7 @@ export default function LessonView() {
             display: "flex",
             alignItems: "center",
             gap: 12,
-            zIndex: 1000,
+            zIndex: 9999,
             animation: "slideInRight 0.5s ease-out",
           }}
         >
