@@ -767,7 +767,6 @@ export default function LessonView() {
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             {/* Complete card */}
             <Card title={lesson?.completed ? "Good job 👍" : "Complete to earn XP"}>
-              {console.log("Button state check:", { lessonCompleted: lesson?.completed, isReading, completionReady, isPending: complete.isPending })}
               {errorMessage ? (
                 <div style={{ color: B.error, fontWeight: 700, fontSize: 14, lineHeight: 1.6 }}>
                   {errorMessage}
