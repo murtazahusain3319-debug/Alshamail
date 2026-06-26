@@ -345,7 +345,9 @@ export default function LessonView() {
 
     try {
       const r = await complete.mutateAsync({ id });
+      console.log("Lesson complete response:", r);
       const newBadges = (r as any).newBadges ?? [];
+      console.log("New badges from response:", newBadges);
       setReward({ xpAwarded: (r as any).xpAwarded, leveledUp: (r as any).leveledUp, level: (r as any).level, newBadges });
       if (newBadges.length > 0) {
         setShowBadgePopup(true);
