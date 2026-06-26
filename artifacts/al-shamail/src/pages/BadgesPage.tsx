@@ -112,7 +112,7 @@ export default function BadgesPage() {
           imageUrl: bForm.imageUrl.trim() || null,
           color: "#C9A84C",
           criteria: bForm.criteria,
-          threshold: Number(bForm.threshold) || null,
+          threshold: bForm.criteria === "course" ? bForm.courseId : (Number(bForm.threshold) || null),
         },
       });
       await qc.invalidateQueries({ queryKey: getListBadgesQueryKey() });

@@ -409,8 +409,10 @@ export default function LessonView() {
 
   // Auto-complete video lesson when 80% watched
   useEffect(() => {
+    console.log("Auto-complete check:", { isReading, isStaff, lessonCompleted: lesson?.completed, hasAutoCompleted: hasAutoCompletedVideoRef.current, watched, isPending: complete.isPending, hasReward: !!reward });
     if (isReading || isStaff || lesson?.completed || hasAutoCompletedVideoRef.current) return;
     if (watched >= 80 && !complete.isPending && !reward) {
+      console.log("Auto-completing lesson");
       hasAutoCompletedVideoRef.current = true;
       onComplete();
     }
@@ -763,7 +765,7 @@ export default function LessonView() {
                   </div>
                 </>
               ) : (
-                <GoldButton onClick={onComplete} disabled={complete.isPending || (!isReading && !completionReady)} full>
+                <GoldButton onClick={() => { console.log("Complete button clicked"); onComplete(); }} disabled={complete.isPending || (!isReading && !completionReady)} full>
                   <CheckCircle2 size={15}/>
                   {completionReady ? `Complete (+${lesson?.xpReward ?? 50} XP)` : `Watch ${80 - watched}% more to unlock`}
                 </GoldButton>

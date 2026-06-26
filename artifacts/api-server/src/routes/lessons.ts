@@ -244,6 +244,8 @@ router.post("/lessons/:id/complete", requireAuth, async (req, res): Promise<void
       .where(eq(usersTable.id, u.id));
     await db.insert(xpEventsTable).values({ userId: u.id, amount: xpAwarded, reason: "Lesson complete" });
 
+    console.log("Checking for badges - User XP:", nextXp, "User ID:", u.id);
+
     // Check for XP-based badges
     const xpBadges = await db
       .select()
@@ -252,6 +254,7 @@ router.post("/lessons/:id/complete", requireAuth, async (req, res): Promise<void
         eq(badgesTable.criteria, "xp"),
         sql`${badgesTable.threshold} <= ${nextXp}`
       ));
+    console.log("XP badges found:", xpBadges);
     for (const badge of xpBadges) {
       const alreadyEarned = await db
         .select({ id: achievementsTable.id })
