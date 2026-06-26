@@ -1,15 +1,12 @@
 import { useState } from "react";
-import { Trophy, Plus, CheckCircle2, Award, Image as ImageIcon, X } from "lucide-react";
+import { Trophy, Plus, CheckCircle2, Image as ImageIcon, X } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   useListBadges,
   useGetMyGamification,
   useGetCurrentUser,
   useCreateBadge,
-  useListUsers,
-  useAwardBadgeToUser,
   getListBadgesQueryKey,
-  getListUsersQueryKey,
 } from "@workspace/api-client-react";
 import { B, formatDate } from "@/lib/brand";
 import { DashboardLayout, Card, Pill, PrimaryButton, GoldButton } from "@/components/DashboardLayout";
@@ -17,6 +14,15 @@ import { API_BASE } from "@/lib/api-base";
 
 const BADGE_COLORS = ["#C9A84C", "#1F3A5F", "#7C3AED", "#16A34A", "#DC2626", "#0EA5E9"];
 const BADGE_CRITERIA = ["manual", "xp", "lessons", "streak"] as const;
+
+const BADGE_IMAGES = [
+  "https://cdn-icons-png.flaticon.com/512/2583/2583344.png", // Gold trophy
+  "https://cdn-icons-png.flaticon.com/512/2583/2583379.png", // Silver trophy
+  "https://cdn-icons-png.flaticon.com/512/2583/2583381.png", // Bronze trophy
+  "https://cdn-icons-png.flaticon.com/512/3135/3135715.png", // Star
+  "https://cdn-icons-png.flaticon.com/512/1828/1828884.png", // Medal
+  "https://cdn-icons-png.flaticon.com/512/2997/2997322.png", // Crown
+];
 
 function resolveImageUrl(url: string | null | undefined): string | null {
   if (!url) return null;
@@ -52,21 +58,6 @@ export default function BadgesPage() {
   const earnedMap = new Map<number, any>(earned.map((b: any) => [b.badge.id, b]));
 
   const createBadge = useCreateBadge();
-  const awardBadge = useAwardBadgeToUser();
-  const usersQ = useListUsers({ role: "student" });
-  const students = usersQ.data?.items ?? [];
-
-  const removeBadge = async (userId: number, badgeId: number) => {
-    try {
-      await fetch(`${API_BASE}/badges/${userId}/${badgeId}`, { method: "DELETE" });
-      await qc.invalidateQueries({ queryKey: getListBadgesQueryKey() });
-      await qc.invalidateQueries({ queryKey: getListUsersQueryKey() });
-      setOkMsg("Badge removed successfully!");
-      setTimeout(() => setOkMsg(null), 2500);
-    } catch (err: any) {
-      setError(err?.message ?? "Failed to remove badge.");
-    }
-  };
 
   const deleteBadge = async (badgeId: number) => {
     try {
@@ -80,7 +71,6 @@ export default function BadgesPage() {
   };
 
   const [showCreate, setShowCreate] = useState<"badge" | null>(null);
-  const [showAssign, setShowAssign] = useState<number | null>(null);
   const [bForm, setBForm] = useState({
     name: "",
     description: "",
@@ -176,16 +166,6 @@ export default function BadgesPage() {
                   <Plus size={14} style={{ marginRight: 4 }} />
                   New badge
                 </GoldButton>
-                <GoldButton
-                  type="button"
-                  onClick={() => {
-                    setError(null);
-                    setShowAssign(showAssign === -1 ? null : -1);
-                  }}
-                >
-                  <Award size={14} style={{ marginRight: 4 }} />
-                  Assign badge
-                </GoldButton>
               </div>
             </div>
 
@@ -211,82 +191,6 @@ export default function BadgesPage() {
                 }}
               >
                 {error}
-              </div>
-            )}
-
-            {showAssign === -1 && (
-              <div
-                style={{
-                  marginTop: 14,
-                  padding: 14,
-                  background: B.offW,
-                  borderRadius: 12,
-                  display: "grid",
-                  gap: 10,
-                }}
-              >
-                <div style={{ fontWeight: 700, color: B.navy, fontSize: 14 }}>Assign Badge to Student</div>
-                <div style={{ display: "grid", gap: 8 }}>
-                  <label style={{ fontSize: 12, fontWeight: 700, color: B.muted }}>Select Student</label>
-                  <select
-                    onChange={(e) => setShowAssign(parseInt(e.target.value, 10))}
-                    style={inputStyle}
-                  >
-                    <option value="">Choose a student...</option>
-                    {students.map((s: any) => (
-                      <option key={s.id} value={s.id}>
-                        {s.firstName} {s.lastName} ({s.email})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                {showAssign !== null && showAssign !== -1 && (
-                  <div style={{ display: "grid", gap: 8 }}>
-                    <label style={{ fontSize: 12, fontWeight: 700, color: B.muted }}>Select Badge to Assign</label>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 8 }}>
-                      {badges.map((b: any) => (
-                        <button
-                          key={b.id}
-                          type="button"
-                          onClick={async () => {
-                            try {
-                              await awardBadge.mutateAsync({ userId: showAssign, data: { badgeId: b.id } });
-                              await qc.invalidateQueries({ queryKey: getListBadgesQueryKey() });
-                              await qc.invalidateQueries({ queryKey: getListUsersQueryKey() });
-                              setOkMsg(`Badge "${b.name}" assigned successfully!`);
-                              setTimeout(() => setOkMsg(null), 2500);
-                            } catch (err: any) {
-                              setError(err?.response?.data?.error ?? "Failed to assign badge.");
-                            }
-                          }}
-                          disabled={awardBadge.isPending}
-                          style={{
-                            padding: 10,
-                            borderRadius: 10,
-                            border: `1.5px solid ${B.light}`,
-                            background: B.white,
-                            cursor: awardBadge.isPending ? "wait" : "pointer",
-                            textAlign: "center",
-                          }}
-                        >
-                          {b.imageUrl ? (
-                            <img src={resolveImageUrl(b.imageUrl) || b.imageUrl} alt={b.name} style={{ width: 32, height: 32, objectFit: "contain", margin: "0 auto 4px" }} />
-                          ) : (
-                            <div style={{ fontSize: 24, marginBottom: 4 }}>🏆</div>
-                          )}
-                          <div style={{ fontSize: 12, fontWeight: 700, color: B.navy }}>{b.name}</div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                <button
-                  type="button"
-                  onClick={() => setShowAssign(null)}
-                  style={cancelBtn}
-                >
-                  Cancel
-                </button>
               </div>
             )}
 
@@ -340,31 +244,32 @@ export default function BadgesPage() {
                     style={inputStyle}
                   />
                 </FormField>
-                <FormField label="Badge Image URL (optional)">
+                <FormField label="Pick image">
                   <div style={{ display: "grid", gap: 8 }}>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 8 }}>
-                      <input
-                        value={bForm.imageUrl}
-                        onChange={(e) =>
-                          setBForm((f) => ({ ...f, imageUrl: e.target.value }))
-                        }
-                        placeholder="https://example.com/badge-image.png"
-                        style={inputStyle}
-                      />
-                      <label style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "0 12px", borderRadius: 10, border: `1.5px solid ${B.light}`, cursor: "pointer", fontSize: 12, fontWeight: 700, color: B.navy, background: B.offW }}>
-                        Import
-                        <input type="file" accept="image/*" style={{ display: "none" }} onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (!file) return;
-                          if (!file.type.startsWith("image/")) {
-                            setError("Please select an image file.");
-                            return;
-                          }
-                          const reader = new FileReader();
-                          reader.onload = () => setBForm((f) => ({ ...f, imageUrl: String(reader.result ?? "") }));
-                          reader.readAsDataURL(file);
-                        }} />
-                      </label>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(60px, 1fr))", gap: 8 }}>
+                      {BADGE_IMAGES.map((imgUrl, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => setBForm((f) => ({ ...f, imageUrl: imgUrl }))}
+                          style={{
+                            padding: 8,
+                            borderRadius: 10,
+                            border: bForm.imageUrl === imgUrl ? `2px solid ${B.gold}` : `1.5px solid ${B.light}`,
+                            background: bForm.imageUrl === imgUrl ? `${B.gold}11` : B.white,
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <img
+                            src={imgUrl}
+                            alt={`Badge option ${idx + 1}`}
+                            style={{ width: 40, height: 40, objectFit: "contain" }}
+                          />
+                        </button>
+                      ))}
                     </div>
                     {bForm.imageUrl && (
                       <div style={{ display: "flex", justifyContent: "center", padding: 8, background: B.offW, borderRadius: 8 }}>
