@@ -695,25 +695,25 @@ export default function GradesPage() {
         </div>
       )}
 
-      <div style={{ display: "flex", gap: 8, marginBottom: 18, flexWrap: "wrap" }}>
-        <button
-          type="button"
-          onClick={() => setActiveView("grades")}
-          style={{
-            padding: "8px 14px",
-            borderRadius: 999,
-            border: `1px solid ${activeView === "grades" ? B.gold : B.line}`,
-            background: activeView === "grades" ? `${B.gold}12` : B.white,
-            color: activeView === "grades" ? B.navy : B.muted,
-            fontWeight: 700,
-            fontSize: 13,
-            cursor: "pointer",
-            fontFamily: "inherit",
-          }}
-        >
-          Grades
-        </button>
-        {!isStudent && (
+      {!isStudent && (
+        <div style={{ display: "flex", gap: 8, marginBottom: 18, flexWrap: "wrap" }}>
+          <button
+            type="button"
+            onClick={() => setActiveView("grades")}
+            style={{
+              padding: "8px 14px",
+              borderRadius: 999,
+              border: `1px solid ${activeView === "grades" ? B.gold : B.line}`,
+              background: activeView === "grades" ? `${B.gold}12` : B.white,
+              color: activeView === "grades" ? B.navy : B.muted,
+              fontWeight: 700,
+              fontSize: 13,
+              cursor: "pointer",
+              fontFamily: "inherit",
+            }}
+          >
+            Grades
+          </button>
           <button
             type="button"
             onClick={() => setActiveView("report")}
@@ -731,8 +731,8 @@ export default function GradesPage() {
           >
             Printable report
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {loading ? (
         <div style={{ color: B.muted, padding: "40px 0", textAlign: "center" }}>Loading grades…</div>

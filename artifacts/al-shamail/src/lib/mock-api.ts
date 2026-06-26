@@ -1007,6 +1007,20 @@ export function useDeleteConversation() {
   });
 }
 
+export function useDeleteMessage() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (vars: { userId: number; messageId: number }) => {
+      await apiFetch(`/messages/${vars.userId}/${vars.messageId}`, { method: "DELETE" });
+      return { ok: true };
+    },
+    onSuccess: (_d, v) => {
+      qc.invalidateQueries({ queryKey: getListMessageContactsQueryKey() });
+      qc.invalidateQueries({ queryKey: getGetConversationQueryKey(v.userId) });
+    },
+  });
+}
+
 /* ──────────────────────────────────────────────────────────────────
  *  DASHBOARDS
  * ────────────────────────────────────────────────────────────────── */

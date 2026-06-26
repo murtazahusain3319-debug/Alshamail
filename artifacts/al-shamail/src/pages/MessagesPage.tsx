@@ -8,6 +8,7 @@ import {
   useSendMessage,
   useGetCurrentUser,
   useDeleteConversation,
+  useDeleteMessage,
   getListMessageContactsQueryKey,
   getGetConversationQueryKey,
 } from "@workspace/api-client-react";
@@ -87,6 +88,7 @@ export default function MessagesPage() {
 
   const sendMutation = useSendMessage();
   const deleteConv = useDeleteConversation();
+  const deleteMessage = useDeleteMessage();
   const [draft, setDraft] = useState("");
   const [showNew, setShowNew] = useState(false);
   const [newSearch, setNewSearch] = useState("");
@@ -164,42 +166,17 @@ export default function MessagesPage() {
     setImageError(null);
     setUploadingImage(true);
     try {
-      const preview = await new Promise<string>((resolve, reject) => {
+      const base64 = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => resolve(String(reader.result));
         reader.onerror = () => reject(reader.error);
         reader.readAsDataURL(file);
       });
-
-      const form = new FormData();
-      form.append("image", file);
       
-      console.log("Uploading image to:", `${API_BASE}/messages/upload-image`);
-      const res = await fetch(`${API_BASE}/messages/upload-image`, {
-        method: "POST",
-        credentials: "include",
-        body: form,
-      });
-      
-      console.log("Upload response status:", res.status);
-      
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        console.error("Upload error:", err);
-        throw new Error(err.error ?? `Upload failed with status ${res.status}`);
-      }
-      
-      const data = await res.json();
-      console.log("Upload success:", data);
-      
-      if (!data.url) {
-        throw new Error("Server did not return image URL");
-      }
-      
-      setPendingImage({ url: data.url, preview });
+      setPendingImage({ url: base64, preview: base64 });
     } catch (err: any) {
       console.error("Image upload error:", err);
-      setImageError(err?.message ?? "Could not upload image. Please try again.");
+      setImageError(err?.message ?? "Could not process image. Please try again.");
     } finally {
       setUploadingImage(false);
     }
@@ -539,8 +516,38 @@ export default function MessagesPage() {
                             fontSize: 14,
                             lineHeight: 1.45,
                             wordBreak: "break-word",
+                            position: "relative",
                           }}
                         >
+                        {mine && otherId && (
+                          <button
+                            onClick={() => {
+                              if (window.confirm("Delete this message?")) {
+                                deleteMessage.mutateAsync({ userId: otherId, messageId: m.id });
+                              }
+                            }}
+                            disabled={deleteMessage.isPending}
+                            style={{
+                              position: "absolute",
+                              top: -8,
+                              right: -8,
+                              width: 20,
+                              height: 20,
+                              borderRadius: 999,
+                              background: "rgba(220,38,38,.9)",
+                              border: "none",
+                              color: "#fff",
+                              cursor: "pointer",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              opacity: deleteMessage.isPending ? 0.6 : 1,
+                            }}
+                            title="Delete message"
+                          >
+                            <X size={10} />
+                          </button>
+                        )}
                         {parsed.imageUrl && (
                           <img
                             src={resolveMessageMediaUrl(parsed.imageUrl)}

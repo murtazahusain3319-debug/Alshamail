@@ -247,4 +247,33 @@ router.delete("/messages/:userId", requireAuth, async (req, res): Promise<void> 
   res.json({ ok: true });
 });
 
+router.delete("/messages/:userId/:messageId", requireAuth, async (req, res): Promise<void> => {
+  const messageId = parseInt(String(req.params.messageId), 10);
+  if (!Number.isFinite(messageId)) {
+    res.status(400).json({ error: "Invalid message id." });
+    return;
+  }
+  const me = req.user!.id;
+  
+  // Only allow deletion if the user is the sender of the message
+  const [message] = await db
+    .select()
+    .from(messagesTable)
+    .where(eq(messagesTable.id, messageId))
+    .limit(1);
+  
+  if (!message) {
+    res.status(404).json({ error: "Message not found." });
+    return;
+  }
+  
+  if (message.fromUserId !== me) {
+    res.status(403).json({ error: "You can only delete your own messages." });
+    return;
+  }
+  
+  await db.delete(messagesTable).where(eq(messagesTable.id, messageId));
+  res.json({ ok: true });
+});
+
 export default router;
