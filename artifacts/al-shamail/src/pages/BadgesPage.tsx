@@ -1,15 +1,19 @@
 import { useState } from "react";
-import { Trophy, Plus, CheckCircle2, Award } from "lucide-react";
+import { Trophy, Plus, CheckCircle2, Award, Image as ImageIcon, X } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   useListBadges,
   useGetMyGamification,
   useGetCurrentUser,
   useCreateBadge,
+  useListUsers,
+  useAwardBadgeToUser,
   getListBadgesQueryKey,
+  getListUsersQueryKey,
 } from "@workspace/api-client-react";
 import { B, formatDate } from "@/lib/brand";
 import { DashboardLayout, Card, Pill, PrimaryButton, GoldButton } from "@/components/DashboardLayout";
+import { API_BASE } from "@/lib/api-base";
 
 const BADGE_COLORS = ["#C9A84C", "#1F3A5F", "#7C3AED", "#16A34A", "#DC2626", "#0EA5E9"];
 const BADGE_CRITERIA = ["manual", "xp", "lessons", "streak"] as const;
@@ -28,11 +32,16 @@ export default function BadgesPage() {
   const earnedMap = new Map<number, any>(earned.map((b: any) => [b.badge.id, b]));
 
   const createBadge = useCreateBadge();
+  const awardBadge = useAwardBadgeToUser();
+  const usersQ = useListUsers({ role: "student" });
+  const students = usersQ.data?.items ?? [];
 
   const [showCreate, setShowCreate] = useState<"badge" | null>(null);
+  const [showAssign, setShowAssign] = useState<number | null>(null);
   const [bForm, setBForm] = useState({
     name: "",
     description: "",
+    imageUrl: "",
     color: BADGE_COLORS[0],
     criteria: "manual" as (typeof BADGE_CRITERIA)[number],
     xpThreshold: 0,
@@ -54,6 +63,7 @@ export default function BadgesPage() {
           name: bForm.name.trim(),
           description: bForm.description.trim(),
           icon: "trophy",
+          imageUrl: bForm.imageUrl.trim() || null,
           color: bForm.color,
           criteria: bForm.criteria,
           xpThreshold: Number(bForm.xpThreshold) || 0,
@@ -63,6 +73,7 @@ export default function BadgesPage() {
       setBForm({
         name: "",
         description: "",
+        imageUrl: "",
         color: BADGE_COLORS[0],
         criteria: "manual",
         xpThreshold: 0,
@@ -122,6 +133,16 @@ export default function BadgesPage() {
                   <Plus size={14} style={{ marginRight: 4 }} />
                   New badge
                 </GoldButton>
+                <GoldButton
+                  type="button"
+                  onClick={() => {
+                    setError(null);
+                    setShowAssign(showAssign === -1 ? null : -1);
+                  }}
+                >
+                  <Award size={14} style={{ marginRight: 4 }} />
+                  Assign badge
+                </GoldButton>
               </div>
             </div>
 
@@ -147,6 +168,83 @@ export default function BadgesPage() {
                 }}
               >
                 {error}
+              </div>
+            )}
+
+            {showAssign === -1 && (
+              <div
+                style={{
+                  marginTop: 14,
+                  padding: 14,
+                  background: B.offW,
+                  borderRadius: 12,
+                  display: "grid",
+                  gap: 10,
+                }}
+              >
+                <div style={{ fontWeight: 700, color: B.navy, fontSize: 14 }}>Assign Badge to Student</div>
+                <div style={{ display: "grid", gap: 8 }}>
+                  <label style={{ fontSize: 12, fontWeight: 700, color: B.muted }}>Select Student</label>
+                  <select
+                    onChange={(e) => setShowAssign(parseInt(e.target.value, 10))}
+                    style={inputStyle}
+                  >
+                    <option value="">Choose a student...</option>
+                    {students.map((s: any) => (
+                      <option key={s.id} value={s.id}>
+                        {s.firstName} {s.lastName} ({s.email})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {showAssign !== null && showAssign !== -1 && (
+                  <div style={{ display: "grid", gap: 8 }}>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: B.muted }}>Select Badge</label>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 8 }}>
+                      {badges.map((b: any) => (
+                        <button
+                          key={b.id}
+                          type="button"
+                          onClick={async () => {
+                            try {
+                              await awardBadge.mutateAsync({ userId: showAssign, data: { badgeId: b.id } });
+                              await qc.invalidateQueries({ queryKey: getListBadgesQueryKey() });
+                              await qc.invalidateQueries({ queryKey: getListUsersQueryKey() });
+                              setOkMsg(`Badge "${b.name}" assigned successfully!`);
+                              setShowAssign(null);
+                              setTimeout(() => setOkMsg(null), 2500);
+                            } catch (err: any) {
+                              setError(err?.response?.data?.error ?? "Failed to assign badge.");
+                            }
+                          }}
+                          disabled={awardBadge.isPending}
+                          style={{
+                            padding: 10,
+                            borderRadius: 10,
+                            border: `1.5px solid ${B.light}`,
+                            background: B.white,
+                            cursor: awardBadge.isPending ? "wait" : "pointer",
+                            textAlign: "center",
+                          }}
+                        >
+                          {b.imageUrl ? (
+                            <img src={b.imageUrl} alt={b.name} style={{ width: 32, height: 32, objectFit: "contain", margin: "0 auto 4px" }} />
+                          ) : (
+                            <div style={{ fontSize: 24, marginBottom: 4 }}>🏆</div>
+                          )}
+                          <div style={{ fontSize: 12, fontWeight: 700, color: B.navy }}>{b.name}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setShowAssign(null)}
+                  style={cancelBtn}
+                >
+                  Cancel
+                </button>
               </div>
             )}
 
@@ -199,6 +297,28 @@ export default function BadgesPage() {
                     placeholder="What does this badge represent?"
                     style={inputStyle}
                   />
+                </FormField>
+                <FormField label="Badge Image URL (optional)">
+                  <div style={{ display: "grid", gap: 8 }}>
+                    <input
+                      value={bForm.imageUrl}
+                      onChange={(e) =>
+                        setBForm((f) => ({ ...f, imageUrl: e.target.value }))
+                      }
+                      placeholder="https://example.com/badge-image.png"
+                      style={inputStyle}
+                    />
+                    {bForm.imageUrl && (
+                      <div style={{ display: "flex", justifyContent: "center", padding: 8, background: B.offW, borderRadius: 8 }}>
+                        <img
+                          src={bForm.imageUrl}
+                          alt="Badge preview"
+                          style={{ width: 80, height: 80, objectFit: "contain" }}
+                          onError={(e) => (e.currentTarget.style.display = "none")}
+                        />
+                      </div>
+                    )}
+                  </div>
                 </FormField>
                 <Row>
                   <FormField label="Colour">
@@ -276,11 +396,19 @@ export default function BadgesPage() {
                     textAlign: "center",
                   }}
                 >
-                  <Trophy
-                    size={28}
-                    color={u.badge.color}
-                    style={{ margin: "0 auto 6px" }}
-                  />
+                  {u.badge.imageUrl ? (
+                    <img
+                      src={u.badge.imageUrl}
+                      alt={u.badge.name}
+                      style={{ width: 48, height: 48, objectFit: "contain", margin: "0 auto 6px" }}
+                    />
+                  ) : (
+                    <Trophy
+                      size={28}
+                      color={u.badge.color}
+                      style={{ margin: "0 auto 6px" }}
+                    />
+                  )}
                   <div style={{ fontWeight: 800, color: B.navy, fontSize: 14 }}>
                     {u.badge.name}
                   </div>
@@ -345,11 +473,19 @@ export default function BadgesPage() {
                       <CheckCircle2 size={14} />
                     </span>
                   )}
-                  <Award
-                    size={32}
-                    color={owned ? b.color : B.muted}
-                    style={{ marginBottom: 8 }}
-                  />
+                  {b.imageUrl ? (
+                    <img
+                      src={b.imageUrl}
+                      alt={b.name}
+                      style={{ width: 56, height: 56, objectFit: "contain", marginBottom: 8 }}
+                    />
+                  ) : (
+                    <Award
+                      size={32}
+                      color={owned ? b.color : B.muted}
+                      style={{ marginBottom: 8 }}
+                    />
+                  )}
                   <div
                     style={{
                       fontWeight: 800,

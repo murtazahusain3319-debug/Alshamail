@@ -142,6 +142,7 @@ export const badgesTable = pgTable("badges", {
   name: text("name").notNull(),
   description: text("description").notNull().default(""),
   icon: text("icon").notNull().default("🏅"),
+  imageUrl: text("image_url"),
   color: text("color").notNull().default("#C9A84C"),
   criteria: text("criteria").notNull().default("manual"), // manual | xp | lessons | streak
   threshold: integer("threshold"),

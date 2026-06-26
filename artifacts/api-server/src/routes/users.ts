@@ -55,7 +55,17 @@ router.get("/users", requireAuth, async (req, res): Promise<void> => {
       quizAvg: quizMap.get(u.id) ?? null,
       badgeCount: badgeMap.get(u.id) ?? 0,
     }))
-    .sort((a, b) => b.xp - a.xp);
+    .sort((a, b) => {
+      const rolePriority = (user: any) => {
+        if (user.isAdmin) return 0;
+        if (user.role === "teacher") return 1;
+        return 2;
+      };
+      const priorityA = rolePriority(a);
+      const priorityB = rolePriority(b);
+      if (priorityA !== priorityB) return priorityA - priorityB;
+      return b.xp - a.xp;
+    });
   res.json({ items });
 });
 

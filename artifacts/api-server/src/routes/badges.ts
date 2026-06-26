@@ -22,6 +22,7 @@ router.post("/badges", requireAdmin, async (req, res): Promise<void> => {
       name: String(d.name),
       description: d.description ?? "",
       icon: d.icon ?? "🏅",
+      imageUrl: typeof d.imageUrl === "string" && d.imageUrl.trim() ? d.imageUrl.trim() : null,
       color: d.color ?? "#C9A84C",
       criteria: ["manual", "xp", "lessons", "streak"].includes(String(d.criteria)) ? d.criteria : "manual",
       threshold: typeof d.threshold === "number" ? d.threshold : null,
