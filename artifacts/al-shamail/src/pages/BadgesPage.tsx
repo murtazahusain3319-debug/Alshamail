@@ -70,7 +70,7 @@ export default function BadgesPage() {
 
   const deleteBadge = async (badgeId: number) => {
     try {
-      await fetch(`${API_BASE}/badges/${badgeId}`, { method: "DELETE" });
+      await fetch(`${API_BASE}/badges/${badgeId}`, { method: "DELETE", credentials: "include" });
       await qc.invalidateQueries({ queryKey: getListBadgesQueryKey() });
       setOkMsg("Badge deleted successfully!");
       setTimeout(() => setOkMsg(null), 2500);
