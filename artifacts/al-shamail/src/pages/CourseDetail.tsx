@@ -1869,7 +1869,7 @@ export default function CourseDetail() {
     : tab === "quiz"
     ? quizzes
     : [];
-  const shouldShowEmptyPlaceholder = tab !== "members" && visible.length === 0;
+  const shouldShowEmptyPlaceholder = tab !== "members" && tab !== "reading" && visible.length === 0;
 
   const onEnroll = async () => {
     await enroll.mutateAsync({ id });
