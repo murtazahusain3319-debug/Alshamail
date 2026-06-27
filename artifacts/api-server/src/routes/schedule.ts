@@ -82,6 +82,7 @@ router.get("/schedule", requireAuth, async (req, res): Promise<void> => {
   const itemsWithClassNames = items.map((item) => ({
     ...item,
     className: item.classId ? classMap.get(item.classId) ?? null : null,
+    meetingUrl: item.link,
   }));
 
   res.json({ items: itemsWithClassNames });

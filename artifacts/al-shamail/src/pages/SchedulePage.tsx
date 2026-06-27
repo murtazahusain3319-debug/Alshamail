@@ -316,7 +316,7 @@ export default function SchedulePage() {
                           <span style={{ fontWeight: 700, color: B.navy }}>{e.title}</span>
                           <Pill color={kindColor(e.kind)}>{e.kind}</Pill>
                           {e.audience !== "all" && (
-                            <Pill color={B.muted}>{e.audience}{e.className ? `: ${e.className}` : ""}</Pill>
+                            <Pill color={B.muted}>{e.audience === "class" && e.className ? e.className : e.audience}</Pill>
                           )}
                           {e.meetingUrl && (
                             <Pill color="#7c3aed">
