@@ -43,6 +43,18 @@ async function shapeCourse(c: typeof coursesTable.$inferSelect) {
 router.get("/dashboards/student", requireAuth, async (req, res): Promise<void> => {
   const u = req.user!;
   try {
+    // Fetch fresh user data from database to get latest XP and level
+    const [freshUser] = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.id, u.id))
+      .limit(1);
+    
+    if (!freshUser) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+
     const myEnrolls = await db
       .select()
       .from(enrollmentsTable)
@@ -96,7 +108,7 @@ router.get("/dashboards/student", requireAuth, async (req, res): Promise<void> =
       ? Math.round(myAttempts.reduce((s, a) => s + a.score, 0) / myAttempts.length)
       : 0;
 
-    const lvl = levelForXp(u.xp);
+    const lvl = levelForXp(freshUser.xp);
 
     const allStudents = await db
       .select()
@@ -145,7 +157,7 @@ router.get("/dashboards/student", requireAuth, async (req, res): Promise<void> =
       rank,
       currentLevelXp: lvl.currentLevelXp,
       nextLevelXp: lvl.nextLevelXp,
-      stats: { userId: u.id, xp: u.xp, level: lvl.level, streak: u.streak },
+      stats: { userId: freshUser.id, xp: freshUser.xp, level: lvl.level, streak: freshUser.streak },
       enrolledCount: myEnrolls.length,
       completedLessonCount: myProgress.length,
       completedQuizCount,

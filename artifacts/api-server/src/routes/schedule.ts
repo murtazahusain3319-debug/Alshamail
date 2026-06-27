@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { eq, asc, inArray, and, or } from "drizzle-orm";
+import { eq, desc, inArray, and, or } from "drizzle-orm";
 import { db, scheduleEventsTable, classesTable, classEnrollmentsTable, classTeachersTable } from "@workspace/db";
 import { requireAuth } from "../lib/auth";
 
@@ -13,7 +13,7 @@ router.get("/schedule", requireAuth, async (req, res): Promise<void> => {
   let itemsQuery = db
     .select()
     .from(scheduleEventsTable)
-    .orderBy(asc(scheduleEventsTable.startsAt));
+    .orderBy(desc(scheduleEventsTable.startsAt));
 
   // Filter events for students - only show events relevant to them
   if (isStudent) {
