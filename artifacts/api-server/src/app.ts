@@ -126,7 +126,13 @@ app.use(
     }
     next();
   },
-  attachUser,
+  (req, res, next) => {
+    // Skip authentication for POST /api/applications (registration endpoint)
+    if (req.path === "/applications" && req.method === "POST") {
+      return next();
+    }
+    return attachUser(req, res, next);
+  },
   router,
 );
 
