@@ -307,3 +307,82 @@
 }
 
 .font-display { font-family: 'Playfair Display', Georgia, serif; }
+
+/* Mobile-specific sizing adjustments */
+@media (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+  
+  body {
+    font-size: 14px;
+  }
+  
+  /* Scale down headings */
+  h1 {
+    font-size: 1.5rem !important;
+  }
+  
+  h2 {
+    font-size: 1.25rem !important;
+  }
+  
+  h3 {
+    font-size: 1.1rem !important;
+  }
+  
+  /* Reduce padding on cards and containers */
+  .dl-content,
+  .card,
+  section {
+    padding: 16px !important;
+  }
+  
+  /* Scale down buttons */
+  button {
+    font-size: 13px !important;
+    padding: 10px 16px !important;
+  }
+  
+  /* Scale down inputs */
+  input,
+  textarea,
+  select {
+    font-size: 14px !important;
+    padding: 10px 12px !important;
+  }
+  
+  /* Reduce gaps and margins */
+  div[style*="gap"] {
+    gap: 8px !important;
+  }
+  
+  /* Make touch targets larger */
+  button,
+  a,
+  input,
+  select {
+    min-height: 44px !important;
+  }
+  
+  /* Scale down sidebar on mobile */
+  .dl-sidebar {
+    width: 100% !important;
+  }
+  
+  /* Adjust topbar for mobile */
+  .dl-topbar {
+    padding: 12px 16px !important;
+  }
+  
+  /* Scale down stat cards */
+  .dl-statcard {
+    padding: 16px !important;
+  }
+  
+  /* Adjust XP bar for mobile */
+  .dl-xpbar {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+}

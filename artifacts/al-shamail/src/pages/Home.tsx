@@ -522,6 +522,13 @@ export default function Home() {
           .als-mobile-menu-btn { display:flex !important; }
           .als-mobile-menu { display:flex !important; }
         }
+        @media (max-width:768px) {
+          .als-hero-title { font-size:28px !important; }
+          .als-hero-subtitle { font-size:16px !important; }
+          .als-section-title { font-size:22px !important; }
+          .als-card { padding:20px !important; }
+          .als-btn { padding:12px 20px !important; font-size:14px !important; }
+        }
         @media (min-width:901px) {
           .als-mobile-menu-btn { display:none !important; }
           .als-mobile-menu { display:none !important; }
@@ -941,6 +948,16 @@ export default function Home() {
                   @media (max-width:900px) {
                     .als-brand-cols { padding:clamp(64px, 9vh, 92px) 20px 56px !important; }
                     .als-brand-title-row { flex-direction:column !important; align-items:center !important; }
+                  }
+                  @media (max-width:768px) {
+                    .als-brand-eyebrow { font-size:10px !important; }
+                    .als-brand-title { font-size:28px !important; }
+                    .als-brand-academy { font-size:14px !important; }
+                    .als-brand-tagline { font-size:11px !important; }
+                    .als-brand-body { font-size:13px !important; }
+                    .als-orbit-1 { width:280px !important; height:280px !important; margin:-140px 0 0 -140px !important; }
+                    .als-orbit-2 { width:380px !important; height:380px !important; margin:-190px 0 0 -190px !important; }
+                    .als-brand-logo-wrap { width:clamp(48px, 10vw, 64px) !important; height:clamp(48px, 10vw, 64px) !important; }
                   }
                 `}</style>
                 <div

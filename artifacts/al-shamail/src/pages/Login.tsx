@@ -88,6 +88,24 @@ export default function Login() {
         color: B.text,
       }}
     >
+      <style>{`
+        @media (max-width: 768px) {
+          .login-card {
+            padding: 20px 16px !important;
+          }
+          .login-title {
+            font-size: 24px !important;
+          }
+          .login-input {
+            font-size: 14px !important;
+            padding: 12px 12px 12px 40px !important;
+          }
+          .login-btn {
+            padding: 12px 16px !important;
+            font-size: 14px !important;
+          }
+        }
+      `}</style>
       <div style={{ width: "100%", maxWidth: 460 }}>
         <button
           onClick={() => navigate("/")}
@@ -112,6 +130,7 @@ export default function Login() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
+          className="login-card"
           style={{
             background: B.white,
             borderRadius: 22,
@@ -128,6 +147,7 @@ export default function Login() {
             />
             <div>
               <div
+                className="login-title"
                 style={{
                   fontSize: 20,
                   fontWeight: 900,
@@ -177,6 +197,7 @@ export default function Login() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
                   autoComplete="email"
+                  className="login-input"
                   style={{
                     width: "100%",
                     padding: "12px 14px 12px 40px",
@@ -208,6 +229,7 @@ export default function Login() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
                   autoComplete="current-password"
+                  className="login-input"
                   style={{
                     width: "100%",
                     padding: "12px 44px 12px 40px",
@@ -263,6 +285,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={submitting}
+              className="login-btn"
               style={{
                 marginTop: 6,
                 padding: "13px 20px",
