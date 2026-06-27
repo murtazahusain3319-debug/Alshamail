@@ -547,8 +547,10 @@ export default function Home() {
           .als-btn-outline { padding:6px 12px !important; font-size:10px !important; }
           .als-mobile-menu-btn { display:none !important; }
           .als-mobile-menu { display:none !important; }
-          .hero-slide-subtitle { margin-top:60px !important; }
-          header img { width:32px !important; height:32px !important; }
+          .hero-slide-subtitle { margin-top:100px !important; }
+          header img { width:35px !important; height:35px !important; }
+          header > div > div > div:first-child { font-size:12px !important; }
+          header > div > div > div:nth-child(2) { font-size:7px !important; }
         }
         @media (min-width:901px) {
           .als-mobile-menu-btn { display:none !important; }
