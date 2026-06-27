@@ -46,7 +46,21 @@ router.get("/applications", requireAdmin, async (_req, res): Promise<void> => {
   res.json({ applications: rows });
 });
 
-router.post("/applications", cvUpload.single("cvFile"), async (req, res): Promise<void> => {
+router.post("/applications", (req, res, next) => {
+  cvUpload.single("cvFile")(req, res, (err) => {
+    if (err) {
+      logger.error({ err }, "Multer error during file upload");
+      if (err instanceof multer.MulterError) {
+        if (err.code === "LIMIT_FILE_SIZE") {
+          return res.status(400).json({ error: "File too large. Maximum size is 5MB." });
+        }
+        return res.status(400).json({ error: err.message });
+      }
+      return res.status(500).json({ error: "File upload failed", requestId: req.id });
+    }
+    next();
+  });
+}, async (req, res): Promise<void> => {
   try {
     let d = req.body?.data ?? req.body ?? {};
     if (typeof d === "string") {
