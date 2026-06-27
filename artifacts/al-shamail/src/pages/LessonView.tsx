@@ -353,19 +353,13 @@ export default function LessonView() {
     try {
       const r = await complete.mutateAsync({ id });
       console.log("Lesson complete response:", r);
-      // Use newBadges directly from the server response — no before/after comparison needed
       const newBadges = (r as any).newBadges ?? [];
       console.log("New badges from server:", newBadges.length, newBadges);
+      // Setting reward triggers the useEffect below which fires the toasts
       setReward({ xpAwarded: (r as any).xpAwarded, leveledUp: (r as any).leveledUp, level: (r as any).level, newBadges });
-      // Refresh gamification cache in the background (don't await — we already have the badges)
       qc.invalidateQueries({ queryKey: ["my-gamification"] });
-      toast.success("Lesson Completed!", { description: lesson?.title });
-      if (newBadges.length > 0) {
-        newBadges.forEach((badge: any) => {
-          toast.success("Badge Earned!", { description: badge.name });
-        });
-      }
-      
+      qc.invalidateQueries({ queryKey: getGetLessonQueryKey(id) });
+      if (lesson?.courseId) qc.invalidateQueries({ queryKey: getGetCourseQueryKey(lesson.courseId) });
       startConfetti();
       setErrorMessage(null);
     } catch (err: any) {
@@ -377,6 +371,19 @@ export default function LessonView() {
       completingRef.current = false;
     }
   }, [id, qc, complete, lesson?.courseId, lesson?.title, isReading, watched]);
+
+  // Show toasts after reward state is committed — more reliable than calling toast inside async mutate
+  const rewardRef = useRef<typeof reward>(null);
+  useEffect(() => {
+    if (!reward || reward === rewardRef.current) return;
+    rewardRef.current = reward;
+    toast.success("Lesson Completed! 🎉", { description: lesson?.title ?? "" });
+    reward.newBadges.forEach((badge: any, i: number) => {
+      setTimeout(() => {
+        toast.success(`🏅 Badge Earned!`, { description: badge.name, duration: 6000 });
+      }, (i + 1) * 500);
+    });
+  }, [reward, lesson?.title]);
 
   const onVideoEnded = () => {
     if (lesson && !lesson?.completed && !complete.isPending) {
@@ -710,18 +717,6 @@ export default function LessonView() {
                     </div>
                   </div>
 
-                <canvas
-                  ref={confettiCanvasRef}
-                  style={{
-                    position: "fixed",
-                    inset: 0,
-                    width: "100%",
-                    height: "100%",
-                    pointerEvents: "none",
-                    zIndex: 9999,
-                  }}
-                />
-
                 {/* Progress bar */}
                 <div style={{ marginBottom: 16 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: B.muted, fontWeight: 700, marginBottom: 5 }}>
@@ -876,6 +871,19 @@ export default function LessonView() {
         }
       `}</style>
 
+      {/* Confetti canvas — always mounted, invisible until activated */}
+      <canvas
+        ref={confettiCanvasRef}
+        style={{
+          position: "fixed",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          pointerEvents: "none",
+          zIndex: 9999,
+          display: confettiActive ? "block" : "none",
+        }}
+      />
     </DashboardLayout>
   );
 
