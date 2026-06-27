@@ -67,6 +67,7 @@ export type Application = {
   qualification?: string | null;
   experience?: string | null;
   subjects?: string | null;
+  cvUrl?: string | null;
   createdAt: string;
 };
 
@@ -198,6 +199,7 @@ function normalizeServerApplication(a: any): Application {
     qualification: a.qualification ?? null,
     experience: a.experience ?? null,
     subjects: a.subjects ?? null,
+    cvUrl: a.cvUrl ?? null,
     createdAt: a.createdAt ?? new Date().toISOString(),
   };
 }
