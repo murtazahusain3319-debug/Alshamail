@@ -534,8 +534,10 @@ export default function Home() {
           .whatsapp-float-btn img { width:48px !important; height:48px !important; }
           .slide-indicators { display:none !important; }
           .hero-slide-indicators { display:none !important; }
+          .hero-logo-mobile-hide { display:none !important; }
           .slide-nav-btn svg { width:24px !important; height:24px !important; }
           .hero-slide-nav-btn svg { width:24px !important; height:24px !important; }
+          .slide-nav-btn, .hero-slide-nav-btn { top:45% !important; }
           .slide-cta-buttons { position:absolute !important; bottom:200px !important; left:20px !important; right:20px !important; order:unset !important; margin-bottom:unset !important; }
           .slide-trust-badges { position:absolute !important; bottom:60px !important; left:20px !important; right:20px !important; order:unset !important; padding-top:unset !important; }
         }
@@ -1025,7 +1027,7 @@ export default function Home() {
                       }}
                     >
                       <div
-                        className="als-brand-logo-wrap"
+                        className="als-brand-logo-wrap hero-logo-mobile-hide"
                         style={{ flexShrink: 0, animation: "als-slideInL 0.8s cubic-bezier(0.34,1.56,0.64,1) 0.08s both" }}
                       >
                         <div style={{ position: "relative" }}>
@@ -1284,60 +1286,61 @@ export default function Home() {
                       {slide.sub}
                     </p>
                   </>
-                <div
-                  className="slide-cta-buttons"
-                  style={{
-                    display: "flex",
-                    gap: 14,
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <button type="button" className="als-btn-gold" onClick={goApply} style={{ fontSize: 15, padding: "14px 32px" }}>
-                    {slide.cta} <ArrowRight size={16} />
-                  </button>
-                  <button type="button" className="als-btn-outline" onClick={goLogin} style={{ fontSize: 15, padding: "14px 28px" }}>
-                    Sign In
-                  </button>
-                </div>
-
-                {/* marginTop auto eats spare height so trust row never collides with CTAs */}
-                <div
-                  className="slide-trust-badges"
-                  style={{
-                    marginTop: "auto",
-                    flexShrink: 0,
-                    display: "flex",
-                    gap: 10,
-                    flexWrap: "wrap",
-                    paddingTop: "clamp(16px, 2.5vh, 28px)",
-                    width: "100%",
-                  }}
-                >
-                  {["10K+ Happy Students", "300+ Expert Teachers", "97% Parent Satisfaction"].map((label) => (
-                    <div
-                      key={label}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 8,
-                        fontSize: 13,
-                        fontWeight: 700,
-                        color: "rgba(255,255,255,.96)",
-                        padding: "8px 14px",
-                        borderRadius: 10,
-                        background: "rgba(15,26,60,0.55)",
-                        border: "1px solid rgba(255,255,255,.15)",
-                        boxShadow: "0 4px 18px rgba(0,0,0,.25)",
-                        textShadow: "0 1px 2px rgba(0,0,0,.35)",
-                        backdropFilter: "blur(6px)",
-                      }}
-                    >
-                      <CircleCheckBig size={14} color={t.goldL} strokeWidth={2.25} /> {label}
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
+                </motion.div>
             </AnimatePresence>
+
+            <div
+              className="slide-cta-buttons"
+              style={{
+                display: "flex",
+                gap: 14,
+                flexWrap: "wrap",
+              }}
+            >
+              <button type="button" className="als-btn-gold" onClick={goApply} style={{ fontSize: 15, padding: "14px 32px" }}>
+                {slide.cta} <ArrowRight size={16} />
+              </button>
+              <button type="button" className="als-btn-outline" onClick={goLogin} style={{ fontSize: 15, padding: "14px 28px" }}>
+                Sign In
+              </button>
+            </div>
+
+            {/* marginTop auto eats spare height so trust row never collides with CTAs */}
+            <div
+              className="slide-trust-badges"
+              style={{
+                marginTop: "auto",
+                flexShrink: 0,
+                display: "flex",
+                gap: 10,
+                flexWrap: "wrap",
+                paddingTop: "clamp(16px, 2.5vh, 28px)",
+                width: "100%",
+              }}
+            >
+              {["10K+ Happy Students", "300+ Expert Teachers", "97% Parent Satisfaction"].map((label) => (
+                <div
+                  key={label}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: "rgba(255,255,255,.96)",
+                    padding: "8px 14px",
+                    borderRadius: 10,
+                    background: "rgba(15,26,60,0.55)",
+                    border: "1px solid rgba(255,255,255,.15)",
+                    boxShadow: "0 4px 18px rgba(0,0,0,.25)",
+                    textShadow: "0 1px 2px rgba(0,0,0,.35)",
+                    backdropFilter: "blur(6px)",
+                  }}
+                >
+                  <CircleCheckBig size={14} color={t.goldL} strokeWidth={2.25} /> {label}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
         ) : null}
