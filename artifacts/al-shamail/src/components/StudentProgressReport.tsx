@@ -109,6 +109,14 @@ export function StudentProgressReport({
         paddingBottom: "20px",
         borderBottom: `3px solid ${B.navy}`,
       }}>
+        <img
+          src="/logo-full.jpeg"
+          alt="Al-Shamail Logo"
+          style={{
+            height: "60px",
+            marginBottom: "16px",
+          }}
+        />
         <h1 style={{
           fontSize: "28px",
           fontWeight: 700,

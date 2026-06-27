@@ -13,6 +13,7 @@ import {
 import { B } from "@/lib/brand";
 import { toast } from "@/hooks/use-toast";
 import { DashboardLayout, Card, GoldButton, inputStyle } from "@/components/DashboardLayout";
+import { StudentProgressReport } from "@/components/StudentProgressReport";
 import {
   GraduationCap, Plus, ChevronDown, ChevronUp, Pencil, Trash2,
 } from "lucide-react";
@@ -833,100 +834,23 @@ export default function GradesPage() {
               </div>
             </div>
           ) : (
-            <div style={{ background: B.white, borderRadius: 16, border: `1px solid ${B.line}`, padding: "32px", maxWidth: 800, margin: "0 auto" }}>
-              <div style={{ textAlign: "center", marginBottom: 32, paddingBottom: 20, borderBottom: `2px solid ${B.gold}` }}>
-                <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: 28, color: B.navy, marginBottom: 8 }}>Al Shamail School</div>
-                <div style={{ fontSize: 14, color: B.muted, fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase" }}>Student Grade Report</div>
-                {reportStudentId && (
-                  <div style={{ fontSize: 16, fontWeight: 700, color: B.navy, marginTop: 8 }}>
-                    {filteredStudentsForReport.find((s) => s.id === reportStudentId)?.firstName} {filteredStudentsForReport.find((s) => s.id === reportStudentId)?.lastName}
-                  </div>
-                )}
-                <div style={{ fontSize: 12, color: B.muted, marginTop: 8 }}>{new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</div>
-              </div>
-              
-              {reportGradeGroups.map((grade) => (
-                <div key={`${grade.gradeKey}-report`} style={{ marginBottom: 24 }}>
-                  <div style={{ 
-                    background: `linear-gradient(135deg, ${B.navy}, ${B.navyL})`, 
-                    color: B.white, 
-                    padding: "12px 16px", 
-                    borderRadius: 8, 
-                    marginBottom: 16,
-                    fontWeight: 800, 
-                    fontSize: 16 
-                  }}>
-                    {grade.gradeName}
-                  </div>
-                  
-                  {grade.subjects.map((subject) => (
-                    <div key={`${grade.gradeKey}-${subject.subjectKey}`} style={{ marginBottom: 16 }}>
-                      <div style={{ 
-                        fontWeight: 700, 
-                        color: B.navy, 
-                        fontSize: 14, 
-                        marginBottom: 12,
-                        paddingBottom: 8,
-                        borderBottom: `1px solid ${B.light}`,
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center"
-                      }}>
-                        <span>{subject.subjectName}</span>
-                        <span style={{ 
-                          fontSize: 12, 
-                          background: `${B.gold}20`, 
-                          color: B.navy, 
-                          padding: "4px 10px", 
-                          borderRadius: 12, 
-                          fontWeight: 700 
-                        }}>
-                          {subject.items.length} {subject.items.length === 1 ? "entry" : "entries"}
-                        </span>
-                      </div>
-                      
-                      {subject.items.length === 0 ? (
-                        <div style={{ color: B.muted, fontSize: 12, fontStyle: "italic", padding: "12px 0" }}>No scores recorded</div>
-                      ) : (
-                        <div style={{ background: B.offW, borderRadius: 8, overflow: "hidden" }}>
-                          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
-                            <thead>
-                              <tr style={{ background: `${B.navy}08`, borderBottom: `2px solid ${B.light}` }}>
-                                <th style={{ padding: "10px 14px", textAlign: "left", fontWeight: 700, color: B.navy, fontSize: 12 }}>Assessment</th>
-                                {!reportStudentId && (
-                                  <th style={{ padding: "10px 14px", textAlign: "left", fontWeight: 700, color: B.navy, fontSize: 12 }}>Student</th>
-                                )}
-                                <th style={{ padding: "10px 14px", textAlign: "right", fontWeight: 700, color: B.navy, fontSize: 12 }}>Score</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {subject.items.map((entry, idx) => (
-                                <tr key={entry.id} style={{ borderBottom: idx < subject.items.length - 1 ? `1px solid ${B.light}` : "none" }}>
-                                  <td style={{ padding: "10px 14px", color: B.text }}>{entry.title}</td>
-                                  {!reportStudentId && (
-                                    <td style={{ padding: "10px 14px", color: B.text }}>
-                                      {entry.student?.firstName ?? "Student"} {entry.student?.lastName ?? ""}
-                                    </td>
-                                  )}
-                                  <td style={{ padding: "10px 14px", textAlign: "right", fontWeight: 700, color: scoreColor(entry.score, entry.maxScore) }}>
-                                    {entry.score}/{entry.maxScore}
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ))}
-              
-              <div style={{ marginTop: 32, paddingTop: 20, borderTop: `2px solid ${B.light}`, textAlign: "center", fontSize: 11, color: B.muted }}>
-                <div style={{ fontWeight: 700, marginBottom: 4 }}>Official Grade Report</div>
-                <div>Generated by Al Shamail School Management System</div>
-              </div>
-            </div>
+            <StudentProgressReport
+              studentName={filteredStudentsForReport.find((s) => s.id === reportStudentId)?.firstName + " " + filteredStudentsForReport.find((s) => s.id === reportStudentId)?.lastName || "Student"}
+              studentId={filteredStudentsForReport.find((s) => s.id === reportStudentId)?.email || "N/A"}
+              courseName={classOptions.find((c) => c.id === reportClassId)?.name || "Course"}
+              reportDate={new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+              lessons={reportGradeGroups.flatMap((grade) =>
+                grade.subjects.flatMap((subject) =>
+                  subject.items.map((entry) => ({
+                    id: entry.id,
+                    title: entry.title,
+                    status: "completed" as const,
+                    score: Math.round((entry.score / entry.maxScore) * 100),
+                    dateCompleted: entry.createdAt ? new Date(entry.createdAt).toLocaleDateString() : undefined,
+                  }))
+                )
+              )}
+            />
           )}
         </div>
       ) : gradeGroups.length === 0 ? (
