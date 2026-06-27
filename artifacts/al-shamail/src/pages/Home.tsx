@@ -529,12 +529,12 @@ export default function Home() {
           .als-section-title { font-size:22px !important; }
           .als-card { padding:20px !important; }
           .als-btn { padding:12px 20px !important; font-size:14px !important; }
-          .whatsapp-float-btn { right:12px !important; bottom:12px !important; width:56px !important; height:56px !important; }
-          .whatsapp-float-btn img { width:56px !important; height:56px !important; }
-          .slide-nav-btn { width:40px !important; height:40px !important; left:12px !important; right:12px !important; }
-          .slide-nav-btn svg { width:18px !important; height:18px !important; }
-          .slide-cta-buttons { order: 1 !important; margin-bottom: 16px !important; }
-          .slide-trust-badges { order: 2 !important; }
+          .whatsapp-float-btn { left:12px !important; right:auto !important; bottom:20px !important; width:48px !important; height:48px !important; }
+          .whatsapp-float-btn img { width:48px !important; height:48px !important; }
+          .slide-nav-btn { width:28px !important; height:28px !important; left:6px !important; right:6px !important; }
+          .slide-nav-btn svg { width:12px !important; height:12px !important; }
+          .slide-cta-buttons { order: 1 !important; margin-bottom: 0 !important; }
+          .slide-trust-badges { order: 2 !important; padding-top: 8px !important; }
         }
         @media (min-width:901px) {
           .als-mobile-menu-btn { display:none !important; }
