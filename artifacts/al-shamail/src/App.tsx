@@ -336,7 +336,7 @@ function App() {
               <Router />
             </Suspense>
           </WouterRouter>
-          <Toaster richColors theme="light" position="top-right" />
+          <Toaster position="bottom-right" richColors />
         </TooltipProvider>
       </QueryClientProvider>
     </AppErrorBoundary>

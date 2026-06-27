@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { useRoute, Link, useLocation } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import {
   ArrowLeft, CheckCircle2, Sparkles, Trophy, ClipboardList,
   BookOpen, Play, Clock, ChevronLeft, ChevronRight,
@@ -361,16 +362,26 @@ export default function LessonView() {
       console.log("New badges from server:", newBadges.length, newBadges);
       // Setting reward triggers the useEffect below which fires the toasts
       setReward({ xpAwarded: (r as any).xpAwarded, leveledUp: (r as any).leveledUp, level: (r as any).level, newBadges });
-      const baseId = `notif-${Date.now()}`;
-      setNotifications(prev => [...prev, { id: baseId, title: "Lesson Completed! 🎉", description: lesson?.title ?? "" }]);
-      setTimeout(() => setNotifications(prev => prev.filter(n => n.id !== baseId)), 5000);
-      newBadges.forEach((badge: any, i: number) => {
-        const bId = `${baseId}-${i}`;
-        setTimeout(() => {
-          setNotifications(prev => [...prev, { id: bId, title: "🏅 Badge Earned!", description: badge.name }]);
-          setTimeout(() => setNotifications(prev => prev.filter(n => n.id !== bId)), 5000);
-        }, (i + 1) * 600);
+      
+      toast.success("Lesson completed! 🎉", {
+        description: lesson?.title,
+        duration: 4000,
       });
+
+      newBadges.forEach((badge: any, i: number) => {
+        setTimeout(() => {
+          toast("🏅 Badge Earned!", {
+            description: badge.name,
+            duration: 6000,
+            style: {
+              background: "#1b2b5e",
+              color: "#fff",
+              border: "1.5px solid rgba(218,165,32,.5)",
+            },
+          });
+        }, (i + 1) * 700);
+      });
+      
       qc.invalidateQueries({ queryKey: ["my-gamification"] });
       qc.invalidateQueries({ queryKey: getGetLessonQueryKey(id) });
       if (lesson?.courseId) qc.invalidateQueries({ queryKey: getGetCourseQueryKey(lesson.courseId) });
@@ -505,22 +516,16 @@ export default function LessonView() {
 
   useEffect(() => {
     if (!isReading || isStaff || lesson?.completed || hasAutoCompletedRef.current === id) return;
-    const el = readingEndRef.current;
-    if (!el) return;
-    const obs = new IntersectionObserver((entries) => {
-      for (const e of entries) {
-        if (e.isIntersecting) {
-          // Only auto-complete for non-staff students on first view
-          if (!lesson?.completed && !complete.isPending && !reward) {
-            hasAutoCompletedRef.current = id;
-            onComplete();
-          }
-        }
-      }
-    }, { threshold: 0 });
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [id, isReading, isStaff, lesson?.completed, onComplete]);
+
+    const minMs = Math.max(4000, (lesson?.durationMinutes ?? 1) * 60 * 1000 * 0.25);
+    const t = setTimeout(() => {
+      if (hasAutoCompletedRef.current === id) return;
+      hasAutoCompletedRef.current = id;
+      onComplete();
+    }, minMs);
+
+    return () => clearTimeout(t);
+  }, [id, isReading, isStaff, lesson?.completed, lesson?.durationMinutes, onComplete]);
 
   return (
     <>
