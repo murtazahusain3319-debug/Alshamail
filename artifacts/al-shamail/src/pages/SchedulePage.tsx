@@ -41,7 +41,6 @@ export default function SchedulePage() {
     startsAt: defaultStart(),
     endsAt: defaultEnd(),
     kind: "class",
-    location: "",
     meetingUrl: "",
     audience: "all",
     classId: null as number | null,
@@ -67,7 +66,6 @@ export default function SchedulePage() {
         startsAt: new Date(form.startsAt).toISOString(),
         endsAt: new Date(form.endsAt).toISOString(),
         kind: form.kind as any,
-        location: form.location || undefined,
         meetingUrl: form.meetingUrl || undefined,
         audience: form.audience as any,
         classId: form.audience === "class" ? form.classId : undefined,
@@ -81,7 +79,6 @@ export default function SchedulePage() {
       startsAt: defaultStart(),
       endsAt: defaultEnd(),
       kind: "class",
-      location: "",
       meetingUrl: "",
       audience: "all",
       classId: null,
@@ -174,20 +171,12 @@ export default function SchedulePage() {
                 </select>
               </label>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-              <input
-                placeholder="Location (optional)"
-                value={form.location}
-                onChange={(e) => setForm({ ...form, location: e.target.value })}
-                style={inp}
-              />
-              <input
-                placeholder="Meeting URL (optional)"
-                value={form.meetingUrl}
-                onChange={(e) => setForm({ ...form, meetingUrl: e.target.value })}
-                style={inp}
-              />
-            </div>
+            <input
+              placeholder="Meeting URL (optional)"
+              value={form.meetingUrl}
+              onChange={(e) => setForm({ ...form, meetingUrl: e.target.value })}
+              style={inp}
+            />
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
               <label style={{ display: "grid", gap: 4 }}>
                 <span style={lbl}>Audience</span>
