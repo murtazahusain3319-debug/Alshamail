@@ -312,6 +312,7 @@ function ActivitiesGallery() {
                 type="button"
                 aria-label={dir === "prev" ? "Previous photo" : "Next photo"}
                 onClick={dir === "prev" ? prev : next}
+                className="slide-nav-btn"
                 style={{
                   position: "absolute",
                   top: "50%",
@@ -528,6 +529,12 @@ export default function Home() {
           .als-section-title { font-size:22px !important; }
           .als-card { padding:20px !important; }
           .als-btn { padding:12px 20px !important; font-size:14px !important; }
+          .whatsapp-float-btn { right:12px !important; bottom:12px !important; width:56px !important; height:56px !important; }
+          .whatsapp-float-btn img { width:56px !important; height:56px !important; }
+          .slide-nav-btn { width:40px !important; height:40px !important; left:12px !important; right:12px !important; }
+          .slide-nav-btn svg { width:18px !important; height:18px !important; }
+          .slide-cta-buttons { order: 1 !important; margin-bottom: 16px !important; }
+          .slide-trust-badges { order: 2 !important; }
         }
         @media (min-width:901px) {
           .als-mobile-menu-btn { display:none !important; }
@@ -1275,6 +1282,7 @@ export default function Home() {
                     </p>
                   </>
                 <div
+                  className="slide-cta-buttons"
                   style={{
                     display: "flex",
                     gap: 14,
@@ -1291,6 +1299,7 @@ export default function Home() {
 
                 {/* marginTop auto eats spare height so trust row never collides with CTAs */}
                 <div
+                  className="slide-trust-badges"
                   style={{
                     marginTop: "auto",
                     flexShrink: 0,
@@ -1849,6 +1858,7 @@ export default function Home() {
         onClick={openWhatsApp}
         aria-label="Chat on WhatsApp"
         title="Chat on WhatsApp"
+        className="whatsapp-float-btn"
         style={{
           position: "fixed",
           right: 20,
