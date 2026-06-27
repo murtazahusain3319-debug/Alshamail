@@ -12,7 +12,6 @@ import {
   useGetLesson,
   useGetLessonQuiz,
   useSubmitQuiz,
-  useGetMyGamification,
   getGetLessonQueryKey,
   getGetCourseQueryKey,
   getGetCurrentUserQueryKey,
@@ -42,7 +41,6 @@ export default function QuizView() {
   const lessonQ = useGetLesson(lessonId, { query: { enabled: lessonId > 0 } });
   const quizQ = useGetLessonQuiz(lessonId, { query: { enabled: lessonId > 0 } });
   const submit = useSubmitQuiz();
-  const gamificationQ = useGetMyGamification();
 
   const lesson: any = lessonQ.data;
 
@@ -61,10 +59,6 @@ export default function QuizView() {
   const onSubmit = async () => {
     if (!quiz || !allAnswered) return;
     
-    // Store badges before submission
-    const beforeBadges = (gamificationQ.data as any)?.badges ?? [];
-    const beforeBadgeIds = new Set(beforeBadges.map((b: any) => b.id));
-    
     const r = await submit.mutateAsync({
       id: quiz.id,
       data: {
@@ -76,14 +70,9 @@ export default function QuizView() {
     });
     setResult(r);
     
-    // Invalidate gamification to get updated badges
-    await qc.invalidateQueries({ queryKey: ["my-gamification"] });
-    const updatedGamification = await qc.fetchQuery({ queryKey: ["my-gamification"] });
-    
-    const afterBadges = (updatedGamification as any)?.badges ?? [];
-    const newBadges = afterBadges.filter((b: any) => !beforeBadgeIds.has(b.id));
-    
-    console.log("Quiz - Badges before:", beforeBadgeIds.size, "after:", afterBadges.length, "new:", newBadges.length);
+    // Use newBadges directly from the server response — no before/after comparison needed
+    const newBadges = (r as any).newBadges ?? [];
+    console.log("Quiz - New badges from server:", newBadges.length, newBadges);
     
     // Show quiz completion toast
     toast.success("Quiz Submitted!", { description: r?.passed ? "You passed!" : "Keep practicing!" });
@@ -94,6 +83,9 @@ export default function QuizView() {
         toast.success("Badge Earned!", { description: badge.name });
       });
     }
+    
+    // Refresh gamification cache in the background
+    qc.invalidateQueries({ queryKey: ["my-gamification"] });
     
     if (r?.passed) {
       await qc.invalidateQueries({ queryKey: getGetLessonQueryKey(lessonId), exact: true, refetchType: "all" });
