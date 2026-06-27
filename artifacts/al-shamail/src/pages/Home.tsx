@@ -537,7 +537,7 @@ export default function Home() {
           .hero-logo-mobile-hide { display:none !important; }
           .slide-nav-btn svg { width:24px !important; height:24px !important; }
           .hero-slide-nav-btn svg { width:24px !important; height:24px !important; }
-          .slide-nav-btn, .hero-slide-nav-btn { top:45% !important; }
+          .slide-nav-btn, .hero-slide-nav-btn { top:50% !important; }
           .slide-cta-buttons { position:absolute !important; bottom:200px !important; left:20px !important; right:20px !important; order:unset !important; margin-bottom:unset !important; }
           .slide-trust-badges { position:absolute !important; bottom:60px !important; left:20px !important; right:20px !important; order:unset !important; padding-top:unset !important; }
         }
@@ -1255,6 +1255,7 @@ export default function Home() {
               display: "flex",
               flexDirection: "column",
               alignItems: "flex-start",
+              marginTop: slide.id === 2 || slide.id === 3 ? 40 : 0,
             }}
           >
                   <>
