@@ -13,9 +13,10 @@ export function levelForXp(xp: number): {
     level += 1;
     needed = 500 + (level - 1) * 100;
   }
+  const nextLevelXp = cumulative + needed;
   return {
     level,
-    currentLevelXp: xp - cumulative,
-    nextLevelXp: needed,
+    currentLevelXp: cumulative,
+    nextLevelXp: nextLevelXp,
   };
 }
