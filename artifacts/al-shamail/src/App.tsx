@@ -2,7 +2,7 @@ import { Component, Suspense, lazy, type ReactNode } from "react";
 import { SkeletonGrid } from "@/lib/smooth";
 import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { B } from "@/lib/brand";
 const Home = lazy(() => import("@/pages/Home"));
@@ -336,7 +336,7 @@ function App() {
               <Router />
             </Suspense>
           </WouterRouter>
-          <Toaster />
+          <Toaster richColors theme="light" position="top-right" />
         </TooltipProvider>
       </QueryClientProvider>
     </AppErrorBoundary>

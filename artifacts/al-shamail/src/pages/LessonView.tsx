@@ -13,7 +13,7 @@ import {
 import { B } from "@/lib/brand";
 import { API_BASE } from "@/lib/api-base";
 import { DashboardLayout, Card, Pill, GoldButton } from "@/components/DashboardLayout";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 function resolveImageUrl(url: string | null | undefined): string | undefined {
   if (!url) return undefined;
@@ -359,10 +359,7 @@ export default function LessonView() {
       if (newBadges.length > 0) {
         console.log("Badge earned, showing toast:", newBadges[0]);
         newBadges.forEach((badge: any) => {
-          toast({
-            title: "Badge Earned!",
-            description: badge.name,
-          });
+          toast.success("Badge Earned!", { description: badge.name });
         });
       } else {
         console.log("No new badges earned from lesson completion");

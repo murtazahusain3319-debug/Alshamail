@@ -23,7 +23,7 @@ import {
   Pill,
   GoldButton,
 } from "@/components/DashboardLayout";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 function resolveImageUrl(url: string | null): string | undefined {
   if (!url) return undefined;
@@ -508,10 +508,7 @@ export default function QuizView() {
               onClick={() => {
                 setShowBadgePopup(false);
                 if (badgePopupBadge) {
-                  toast({
-                    title: "Badge Earned!",
-                    description: badgePopupBadge.name,
-                  });
+                  toast.success("Badge Earned!", { description: badgePopupBadge.name });
                 }
               }}
               style={{
