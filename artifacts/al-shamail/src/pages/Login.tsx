@@ -54,7 +54,11 @@ export default function Login() {
       return;
     }
     try {
-      await login.mutateAsync({ data: { email, password } });
+      const result = await login.mutateAsync({ data: { email, password } });
+      // Store token in localStorage as fallback for browsers that block cookies
+      if ((result as any).token) {
+        localStorage.setItem("alshamail_token", (result as any).token);
+      }
       await qc.invalidateQueries({ queryKey: getGetCurrentUserQueryKey() });
       navigate("/dashboard");
     } catch (err: any) {

@@ -358,6 +358,18 @@ export async function customFetch<T = unknown>(
     }
   }
 
+  // Fallback: check localStorage for token (for browsers that block cookies)
+  if (!headers.has("authorization") && typeof window !== "undefined" && window.localStorage) {
+    try {
+      const storedToken = window.localStorage.getItem("alshamail_token");
+      if (storedToken) {
+        headers.set("authorization", `Bearer ${storedToken}`);
+      }
+    } catch {
+      // localStorage access might be blocked in some contexts
+    }
+  }
+
   const requestInfo = { method, url: resolveUrl(input) };
 
   const response = await fetch(input, { ...init, method, headers, credentials: "include" });

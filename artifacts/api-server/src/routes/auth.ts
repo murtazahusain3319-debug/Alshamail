@@ -61,7 +61,7 @@ router.post("/auth/login", async (req, res): Promise<void> => {
       .where(eq(usersTable.id, user.id));
     const token = await createSession(user.id);
     setSessionCookie(res, token);
-    res.json({ user: publicUser(user) });
+    res.json({ user: publicUser(user), token });
   } catch (err) {
     const safeBody = sanitizeBody(req.body);
     try {

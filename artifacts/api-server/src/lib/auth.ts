@@ -61,14 +61,19 @@ export function clearSessionCookie(res: Response): void {
 }
 
 /**
- * Resolves req.user from the session cookie. Never errors — auth-required
+ * Resolves req.user from the session cookie or Authorization header. Never errors — auth-required
  * routes should check `req.user` themselves.
  */
 export async function attachUser(req: Request, _res: Response, next: NextFunction): Promise<void> {
   const token = (req.cookies && req.cookies[SESSION_COOKIE]) as string | undefined;
-  if (token) {
+  const authHeader = req.headers.authorization as string | undefined;
+  const bearerToken = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : undefined;
+  
+  const sessionToken = token || bearerToken;
+  
+  if (sessionToken) {
     try {
-      const user = await findSessionUser(token);
+      const user = await findSessionUser(sessionToken);
       if (user) req.user = user;
     } catch (err) {
       req.log.error({ err }, "session lookup failed");

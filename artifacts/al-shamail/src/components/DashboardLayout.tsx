@@ -236,6 +236,8 @@ export function DashboardLayout({
 
   const onLogout = async () => {
     try { await logout.mutateAsync(); } catch {}
+    // Clear localStorage token as well
+    try { localStorage.removeItem("alshamail_token"); } catch {}
     await qc.invalidateQueries({ queryKey: getGetCurrentUserQueryKey() });
     qc.clear();
     navigate("/");
