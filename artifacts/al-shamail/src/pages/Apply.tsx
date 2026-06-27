@@ -321,6 +321,8 @@ export default function Apply() {
         @keyframes als-spin { to { transform: rotate(360deg); } }
         @media (max-width: 900px) {
           .als-apply-left { display: none !important; }
+          .als-apply-right { padding: 16px !important; }
+          .als-apply-form-card { padding: 20px 16px !important; }
         }
       `}</style>
 
@@ -508,6 +510,7 @@ export default function Apply() {
 
         {/* ── RIGHT: FORM AREA ── */}
         <div
+          className="als-apply-right"
           style={{
             flex: 1,
             display: "flex",
@@ -518,7 +521,7 @@ export default function Apply() {
           }}
         >
           {/* Back button */}
-          <div style={{ width: "100%", maxWidth: 580, marginBottom: 28 }}>
+          <div style={{ width: "100%", maxWidth: 580, marginBottom: 20 }}>
             <button
               onClick={() =>
                 step === 2 ? setStep(1) : step === 3 ? navigate("/") : navigate("/")
@@ -563,7 +566,7 @@ export default function Apply() {
                 transition={{ duration: 0.4 }}
                 style={{ width: "100%", maxWidth: 580 }}
               >
-                <div style={{ marginBottom: 40 }}>
+                <div style={{ marginBottom: 24 }}>
                   <div
                     style={{
                       fontSize: 11,
@@ -778,8 +781,9 @@ export default function Apply() {
                 )}
 
                 <form onSubmit={handleRegister}>
+                  <div className="als-apply-form-card" style={{ background: B.white, border: `2px solid ${B.light}`, borderRadius: 20, padding: "28px 24px", marginBottom: 24 }}>
                   {/* Section: Account Details */}
-                  <div style={{ marginBottom: 28 }}>
+                  <div style={{ marginBottom: 20 }}>
                     <div
                       style={{
                         fontSize: 11,
@@ -1060,6 +1064,7 @@ export default function Apply() {
                         </div>
                       </Field>
                     </div>
+                  </div>
                   </div>
 
                   <button

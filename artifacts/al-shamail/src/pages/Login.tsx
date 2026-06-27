@@ -79,7 +79,7 @@ export default function Login() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        padding: "40px 20px",
+        padding: "20px",
         fontFamily: "'DM Sans', sans-serif",
         color: B.text,
       }}
@@ -111,7 +111,7 @@ export default function Login() {
           style={{
             background: B.white,
             borderRadius: 22,
-            padding: "36px 32px",
+            padding: "28px 24px",
             boxShadow: "0 24px 60px rgba(0,0,0,.35)",
           }}
         >

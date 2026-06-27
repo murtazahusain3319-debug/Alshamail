@@ -406,6 +406,7 @@ export default function Home() {
   const [scrolled, setScrolled] = useState(false);
   const [testimonialIdx, setTestimonialIdx] = useState(0);
   const [navOpen, setNavOpen] = useState<null | "enrollment">(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const autoplayRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const navRef = useRef<HTMLElement | null>(null);
@@ -518,7 +519,19 @@ export default function Home() {
           .als-nav-links { display:none !important; }
           .als-gamif-grid { grid-template-columns:1fr !important; gap:32px !important; }
           .als-footer-grid { grid-template-columns:1fr !important; gap:28px !important; }
+          .als-mobile-menu-btn { display:flex !important; }
+          .als-mobile-menu { display:flex !important; }
         }
+        @media (min-width:901px) {
+          .als-mobile-menu-btn { display:none !important; }
+          .als-mobile-menu { display:none !important; }
+        }
+        .als-mobile-menu-btn { display:none; align-items:center; justify-content:center; width:40px; height:40px; border:none; background:${t.offW}; border-radius:8px; cursor:pointer; }
+        .als-mobile-menu { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:${t.white}; z-index:200; flex-direction:column; padding:24px; }
+        .als-mobile-menu-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
+        .als-mobile-menu-nav { display:flex; flex-direction:column; gap:8px; }
+        .als-mobile-menu-nav button { font-size:16px; font-weight:600; color:${t.navy}; text-align:left; padding:16px; border:none; background:${t.offW}; border-radius:8px; cursor:pointer; }
+        .als-mobile-menu-nav button:hover { background:${t.light}; }
       `}</style>
 
       <header
@@ -669,6 +682,17 @@ export default function Home() {
           </nav>
 
           <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+            <button 
+              className="als-mobile-menu-btn"
+              onClick={() => setMobileMenuOpen(true)}
+              aria-label="Open menu"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={t.navy} strokeWidth="2">
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+            </button>
             <motion.button
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
@@ -719,6 +743,88 @@ export default function Home() {
           </div>
         </div>
       </header>
+
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <div className="als-mobile-menu">
+          <div className="als-mobile-menu-header">
+            <img
+              src={publicUrl("logo.jpeg")}
+              alt="Al Shamail Logo"
+              style={{ height: 48, width: "auto", objectFit: "contain" }}
+            />
+            <button
+              onClick={() => setMobileMenuOpen(false)}
+              style={{
+                width: 40,
+                height: 40,
+                border: "none",
+                background: t.offW,
+                borderRadius: 8,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              aria-label="Close menu"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={t.navy} strokeWidth="2">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
+          <div className="als-mobile-menu-nav">
+            <button onClick={() => { setMobileMenuOpen(false); scrollToFaq(); }}>FAQ</button>
+            <button onClick={() => { setMobileMenuOpen(false); goTo("/courses-info"); }}>Courses</button>
+            <button onClick={() => { setMobileMenuOpen(false); goTo("/enrollment/rules"); }}>Rules & Regulations</button>
+            <button onClick={() => { setMobileMenuOpen(false); goTo("/enrollment/fees"); }}>Fee Details</button>
+            <button onClick={() => { setMobileMenuOpen(false); goTo("/enrollment/documents"); }}>Documents Required</button>
+            <button onClick={() => { setMobileMenuOpen(false); goTo("/teachers"); }}>Our Teachers</button>
+            <button onClick={() => { setMobileMenuOpen(false); goApply(); }}>Enroll Now</button>
+            <button onClick={() => { setMobileMenuOpen(false); goTo("/about"); }}>About</button>
+            <button onClick={() => { setMobileMenuOpen(false); goTo("/contact"); }}>Contact</button>
+          </div>
+          <div style={{ marginTop: "auto", paddingTop: 24, borderTop: `1px solid ${t.light}` }}>
+            <button
+              onClick={() => { setMobileMenuOpen(false); goLogin(); }}
+              style={{
+                width: "100%",
+                padding: "14px",
+                border: `2px solid ${t.navy}`,
+                background: "transparent",
+                color: t.navy,
+                fontWeight: 700,
+                fontSize: 15,
+                borderRadius: 10,
+                cursor: "pointer",
+                fontFamily: "inherit",
+              }}
+            >
+              Sign In
+            </button>
+            <button
+              onClick={() => { setMobileMenuOpen(false); goApply(); }}
+              style={{
+                width: "100%",
+                padding: "14px",
+                border: "none",
+                background: `linear-gradient(135deg, ${t.gold}, ${t.goldD})`,
+                color: "#fff",
+                fontWeight: 800,
+                fontSize: 15,
+                borderRadius: 10,
+                cursor: "pointer",
+                fontFamily: "inherit",
+                marginTop: 12,
+                boxShadow: "0 4px 16px rgba(201,168,76,.35)",
+              }}
+            >
+              Get Started
+            </button>
+          </div>
+        </div>
+      )}
 
       <section style={{ position: "relative", height: "100vh", minHeight: 640, overflow: "hidden", paddingTop: 92 }}>
         <AnimatePresence mode="wait">

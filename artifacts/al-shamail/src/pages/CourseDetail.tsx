@@ -1987,6 +1987,23 @@ export default function CourseDetail() {
       title={course?.title ?? "Course"}
       subtitle={course ? `${course.subject} · ${course.level}` : ""}
     >
+      <style>{`
+        @media (max-width: 980px) {
+          .course-detail-header {
+            flex-direction: column !important;
+            gap: 16px !important;
+          }
+          .course-detail-tabs {
+            flex-wrap: wrap !important;
+          }
+          .course-detail-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .lesson-card {
+            padding: 16px !important;
+          }
+        }
+      `}</style>
       <div style={{ marginBottom: 18 }}>
         <Link
           href="/courses"
@@ -2056,7 +2073,7 @@ export default function CourseDetail() {
             </div>
 
             {/* Info bar */}
-            <div style={{ background: B.white, padding: "16px 28px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
+            <div className="course-detail-header" style={{ background: B.white, padding: "16px 28px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
               <div style={{ display: "flex", gap: 20, fontSize: 13, color: B.muted, fontWeight: 600 }}>
                 <span style={{ display: "flex", alignItems: "center", gap: 5 }}><Video size={14}/> {videos.length} videos</span>
                 <span style={{ display: "flex", alignItems: "center", gap: 5 }}><FileText size={14}/> {readings.length} readings</span>
@@ -2152,7 +2169,7 @@ export default function CourseDetail() {
 
           {/* ── Lessons ── */}
           {/* Tab row */}
-          <div style={{ display: "flex", gap: 4, marginBottom: 14, borderBottom: `1.5px solid ${B.light}` }}>
+          <div className="course-detail-tabs" style={{ display: "flex", gap: 4, marginBottom: 14, borderBottom: `1.5px solid ${B.light}` }}>
             {([["video", "Videos", videos.length], ["reading", "Reading", readings.length], ["quiz", "Quiz", quizzes.length], ["members", "Members", (members.admins?.length ?? 0) + (members.teachers?.length ?? 0) + (members.students?.length ?? 0)]] as const).map(([k, label, count]) => (
               <button key={k} onClick={() => {
                 setTab(k as LessonKind);
@@ -2558,7 +2575,7 @@ export default function CourseDetail() {
                   return (
                     <div
                       key={l.id}
-                      className="lesson-row"
+                      className="lesson-row lesson-card"
                       style={{
                         display: "grid",
                         gridTemplateColumns: "44px 1fr auto auto",
