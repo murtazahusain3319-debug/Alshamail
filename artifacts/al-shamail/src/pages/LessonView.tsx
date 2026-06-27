@@ -162,6 +162,8 @@ export default function LessonView() {
   const youtubePlayerRef = useRef<any>(null);
   const progressIntervalRef = useRef<number | null>(null);
   const completingRef = useRef(false);
+  const isReadingRef = useRef(false);
+  const watchedRef = useRef(0);
 
   useEffect(() => {
     console.log("LessonView mounted");
@@ -343,13 +345,21 @@ export default function LessonView() {
 
   console.log("LessonView render check:", { lessonId: id, lessonCompleted: lesson?.completed, isReading, watched, reward: !!reward });
 
+  useEffect(() => {
+    isReadingRef.current = isReading;
+  }, [isReading]);
+
+  useEffect(() => {
+    watchedRef.current = watched;
+  }, [watched]);
+
   const onComplete = useCallback(async () => {
     if (completingRef.current) return;
 
     completingRef.current = true;
 
     console.log("onComplete called");
-    if (!isReading && watched < 80) {
+    if (!isReadingRef.current && watchedRef.current < 80) {
       setErrorMessage("Watch at least 80% of the lesson before marking it complete.");
       completingRef.current = false;
       return;
@@ -395,7 +405,7 @@ export default function LessonView() {
     } finally {
       completingRef.current = false;
     }
-  }, [id, qc, complete, lesson?.courseId, lesson?.title, isReading, watched]);
+  }, [id, qc, complete, lesson?.courseId, lesson?.title]);
 
   const onVideoEnded = () => {
     if (lesson && !lesson?.completed && !complete.isPending) {
