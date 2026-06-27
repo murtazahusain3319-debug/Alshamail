@@ -52,10 +52,11 @@ export async function awardBadges(userId: number, nextXp: number, courseId?: num
         ));
 
       if (completedInCourse.length >= courseLessons.length) {
+        // Award all course-completion badges (threshold is ignored for course criteria)
         const courseBadges = await db
           .select()
           .from(badgesTable)
-          .where(and(eq(badgesTable.criteria, "course"), eq(badgesTable.threshold, courseId)));
+          .where(eq(badgesTable.criteria, "course"));
         for (const b of courseBadges) await grant(b);
       }
     }
