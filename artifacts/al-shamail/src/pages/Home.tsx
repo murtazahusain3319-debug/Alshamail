@@ -533,6 +533,7 @@ export default function Home() {
           .whatsapp-float-btn { width:48px !important; height:48px !important; }
           .whatsapp-float-btn img { width:48px !important; height:48px !important; }
           .slide-indicators { display:none !important; }
+          .hero-slide-indicators { display:none !important; }
           .slide-nav-btn svg { width:24px !important; height:24px !important; }
           .hero-slide-nav-btn svg { width:24px !important; height:24px !important; }
           .slide-cta-buttons { position:absolute !important; bottom:200px !important; left:20px !important; right:20px !important; order:unset !important; margin-bottom:unset !important; }
@@ -1397,6 +1398,7 @@ export default function Home() {
         </button>
 
         <div
+          className="hero-slide-indicators"
           style={{
             position: "absolute",
             bottom: "clamp(18px, 2.8vh, 30px)",
