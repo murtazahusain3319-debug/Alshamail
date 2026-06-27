@@ -3,22 +3,58 @@ import { StaticPageShell } from "@/pages/StaticPage";
 export default function AboutPublic() {
   return (
     <StaticPageShell title="About Al Shamail" tag="Academy">
-      <div style={{ display: "grid", gap: 18 }}>
+      <div style={{ display: "grid", gap: 24 }}>
         <p style={{ margin: 0, fontSize: 15, lineHeight: 1.8, color: "#64748b" }}>
-          Al Shamail International Academy Online was founded to make exceptional education accessible to every child, regardless of location.
-          We combine a structured curriculum with a nurturing online environment, so learners can build confidence and achieve strong outcomes.
+          Welcome to Al Shamail Academy, a dedicated early learning institution committed to providing a safe, caring, and high-quality educational environment for young learners. We believe that early childhood education plays a vital role in shaping a child's future. Our goal is to build a strong foundation that supports lifelong learning, confidence, and personal growth.
         </p>
-        <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
-          {[
-            ["Structured learning", "Every student follows a clear learning path with guided lessons, assessments, and feedback."],
-            ["Qualified educators", "Our teachers are experienced, supportive, and committed to each learner’s growth."],
-            ["Family-focused", "Parents receive a transparent view of progress, achievements, and next steps."],
-          ].map(([title, body]) => (
-            <div key={title} style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 16, padding: 18 }}>
-              <div style={{ fontWeight: 800, color: "#1e293b", marginBottom: 6 }}>{title}</div>
-              <div style={{ fontSize: 14, lineHeight: 1.7, color: "#64748b" }}>{body}</div>
+
+        <div style={{ display: "grid", gap: 20 }}>
+          <div>
+            <h3 style={{ margin: "0 0 8px 0", fontSize: 18, fontWeight: 700, color: "#1e293b" }}>Our Vision</h3>
+            <p style={{ margin: 0, fontSize: 15, lineHeight: 1.7, color: "#64748b" }}>
+              To be a trusted early education center that nurtures confident, responsible, and well-rounded learners prepared for future academic success.
+            </p>
+          </div>
+
+          <div>
+            <h3 style={{ margin: "0 0 8px 0", fontSize: 18, fontWeight: 700, color: "#1e293b" }}>Our Mission</h3>
+            <p style={{ margin: 0, fontSize: 15, lineHeight: 1.7, color: "#64748b" }}>
+              To provide a safe, supportive, and stimulating learning environment where every child receives quality education, care, and individual attention.
+            </p>
+          </div>
+
+          <div>
+            <h3 style={{ margin: "0 0 12px 0", fontSize: 18, fontWeight: 700, color: "#1e293b" }}>What We Offer</h3>
+            <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
+              {[
+                "Safe, clean, and child-friendly environment",
+                "Qualified and caring teaching staff",
+                "Strong foundation in early literacy and numeracy",
+                "Focus on behavior, manners, and discipline",
+                "Creative and interactive learning activities",
+                "Individual attention for each child",
+              ].map((item) => (
+                <div key={item} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, color: "#64748b" }}>
+                  <span style={{ color: "#c9a84c", fontSize: 18 }}>✓</span>
+                  {item}
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
+
+          <div>
+            <h3 style={{ margin: "0 0 8px 0", fontSize: 18, fontWeight: 700, color: "#1e293b" }}>Our Approach</h3>
+            <p style={{ margin: 0, fontSize: 15, lineHeight: 1.7, color: "#64748b" }}>
+              We follow a balanced learning approach that combines structured academics with play-based learning. This helps children develop curiosity, independence, and confidence while enjoying their learning journey.
+            </p>
+          </div>
+
+          <div>
+            <h3 style={{ margin: "0 0 8px 0", fontSize: 18, fontWeight: 700, color: "#1e293b" }}>Our Commitment</h3>
+            <p style={{ margin: 0, fontSize: 15, lineHeight: 1.7, color: "#64748b" }}>
+              We are committed to working closely with parents to ensure each child receives the support they need to reach their full potential in a positive and encouraging environment.
+            </p>
+          </div>
         </div>
       </div>
     </StaticPageShell>
