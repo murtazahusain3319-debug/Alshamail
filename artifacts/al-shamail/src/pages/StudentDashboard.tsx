@@ -379,7 +379,7 @@ export default function StudentDashboard() {
                       borderRadius: 14, padding: "16px 14px", textAlign: "center",
                     }}>
                       <div style={{ fontSize: 32, marginBottom: 8 }}>
-                        {b.badge.icon ?? <Star size={24} color={b.badge.color}/>}
+                        <Star size={24} color={b.badge.color}/>
                       </div>
                       <div style={{ fontWeight: 800, color: B.navy, fontSize: 13, marginBottom: 4 }}>
                         {b.badge.name}
