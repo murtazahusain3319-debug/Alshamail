@@ -514,12 +514,13 @@ export default function LessonView() {
           }
         }
       }
-    }, { threshold: 0.6 });
+    }, { threshold: 0 });
     obs.observe(el);
     return () => obs.disconnect();
   }, [id, isReading, isStaff, lesson?.completed, onComplete]);
 
   return (
+    <>
     <DashboardLayout
       title={pageTitle}
     >
@@ -589,7 +590,7 @@ export default function LessonView() {
                   ) : (
                     <p style={{ color: B.muted, fontStyle: "italic" }}>No reading content has been added to this lesson yet.</p>
                   )}
-                  <div ref={readingEndRef} />
+                  <div ref={readingEndRef} style={{ height: 1 }} />
 
                   {/* Reading lesson navigation */}
                   <div style={{
@@ -869,36 +870,6 @@ export default function LessonView() {
         }
       `}</style>
 
-      {/* Inline notifications — guaranteed to show regardless of toast library issues */}
-      {notifications.length > 0 && (
-        <div style={{
-          position: "fixed",
-          bottom: 28,
-          right: 28,
-          zIndex: 99998,
-          display: "flex",
-          flexDirection: "column",
-          gap: 10,
-          pointerEvents: "none",
-        }}>
-          {notifications.map(n => (
-            <div key={n.id} style={{
-              background: "#1b2b5e",
-              color: "#fff",
-              borderRadius: 16,
-              padding: "16px 22px",
-              boxShadow: "0 10px 40px rgba(27,43,94,.35)",
-              minWidth: 280,
-              maxWidth: 380,
-              border: "1.5px solid rgba(218,165,32,.35)",
-            }}>
-              <div style={{ fontWeight: 800, fontSize: 15 }}>{n.title}</div>
-              {n.description && <div style={{ fontSize: 13, opacity: 0.75, marginTop: 4 }}>{n.description}</div>}
-            </div>
-          ))}
-        </div>
-      )}
-
       {/* Confetti canvas — always mounted, invisible until activated */}
       <canvas
         ref={confettiCanvasRef}
@@ -913,6 +884,19 @@ export default function LessonView() {
         }}
       />
     </DashboardLayout>
+
+    {/* Inline notifications — guaranteed to show regardless of toast library issues */}
+    {notifications.length > 0 && (
+      <div style={{ position: "fixed", bottom: 28, right: 28, zIndex: 99999, display: "flex", flexDirection: "column", gap: 10, pointerEvents: "none" }}>
+        {notifications.map(n => (
+          <div key={n.id} style={{ background: "#1b2b5e", color: "#fff", borderRadius: 16, padding: "16px 22px", boxShadow: "0 10px 40px rgba(27,43,94,.35)", minWidth: 280, maxWidth: 380, border: "1.5px solid rgba(218,165,32,.4)" }}>
+            <div style={{ fontWeight: 800, fontSize: 15 }}>{n.title}</div>
+            {n.description && <div style={{ fontSize: 13, opacity: 0.75, marginTop: 4 }}>{n.description}</div>}
+          </div>
+        ))}
+      </div>
+    )}
+    </>
   );
 
 }
