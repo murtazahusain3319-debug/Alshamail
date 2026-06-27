@@ -359,39 +359,6 @@ export default function StudentDashboard() {
                 </div>
               </Card>
             </div>
-
-            {/* ── Recent badges ── */}
-            {data.recentBadges.length > 0 && (
-              <Card title="Recent Achievements" action={
-                <Link href="/badges" style={{ fontSize: 12, fontWeight: 700, color: B.navy, textDecoration: "none" }}>
-                  View all →
-                </Link>
-              }>
-                <div style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-                  gap: 12,
-                }}>
-                  {data.recentBadges.map((b: any) => (
-                    <div key={b.id} style={{
-                      background: `linear-gradient(135deg, ${b.badge.color}0e 0%, ${b.badge.color}28 100%)`,
-                      border: `1.5px solid ${b.badge.color}44`,
-                      borderRadius: 14, padding: "16px 14px", textAlign: "center",
-                    }}>
-                      <div style={{ fontSize: 32, marginBottom: 8 }}>
-                        <Star size={24} color={b.badge.color}/>
-                      </div>
-                      <div style={{ fontWeight: 800, color: B.navy, fontSize: 13, marginBottom: 4 }}>
-                        {b.badge.name}
-                      </div>
-                      <div style={{ fontSize: 11, color: B.muted, lineHeight: 1.4 }}>
-                        {b.badge.description}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            )}
           </>
         );
       })()}

@@ -46,7 +46,7 @@ export default function SyllabusBookList() {
             <div style={{ width: 1, height: 40, background: B.light }} />
             <div>
               <div style={{ fontSize: 18, fontWeight: 900, color: B.navy, fontFamily: "'Playfair Display', Georgia, serif", lineHeight: 1.1 }}>Al Shamail</div>
-              <div style={{ fontSize: 9, fontWeight: 700, color: B.gold, textTransform: "uppercase", letterSpacing: ".18em", marginTop: 3 }}>International Academy</div>
+              <div style={{ fontSize: 9, fontWeight: 700, color: B.gold, textTransform: "uppercase", letterSpacing: ".18em", marginTop: 3 }}>Learning Center</div>
             </div>
           </div>
 

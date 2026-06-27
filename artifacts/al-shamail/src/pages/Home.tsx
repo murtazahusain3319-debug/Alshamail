@@ -596,7 +596,7 @@ export default function Home() {
                   transition: "font-size .3s",
                 }}
               >
-                International Academy
+                Learning Center
               </div>
               <div
                 style={{
@@ -926,7 +926,7 @@ export default function Home() {
                             />
                             <img
                               src={publicUrl("logo.jpeg")}
-                              alt="Al Shamail International Academy"
+                              alt="Al Shamail Learning Center"
                               style={{
                                 width: "100%",
                                 height: "100%",
@@ -966,7 +966,7 @@ export default function Home() {
                         animation: "als-fadeUp 0.6s ease 0.55s both",
                       }}
                     >
-                      International Academy
+                      Learning Center
                     </div>
                     <div
                       className="als-brand-tagline"
@@ -1707,7 +1707,7 @@ export default function Home() {
             Ready to Give Your Child the Best Start?
           </h2>
           <p style={{ fontSize: 16, color: "rgba(255,255,255,.7)", marginBottom: 40, lineHeight: 1.7 }}>
-            Join thousands of families already learning with Al Shamail International Academy. Enroll today and watch your child&apos;s confidence and ability grow.
+            Join thousands of families already learning with Al Shamail Learning Center. Enroll today and watch your child&apos;s confidence and ability grow.
           </p>
           <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
             <button type="button" className="als-btn-gold" onClick={goApply} style={{ fontSize: 15, padding: "15px 36px" }}>
@@ -1755,7 +1755,7 @@ export default function Home() {
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 <img
                   src={publicUrl("logo-full.jpeg")}
-                  alt="Al Shamail International Academy"
+                  alt="Al Shamail Learning Center"
                   style={{ width: 70, height: 70, objectFit: "contain", display: "block", flexShrink: 0 }}
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = "none";
@@ -1785,7 +1785,7 @@ export default function Home() {
                       marginTop: 4,
                     }}
                   >
-                    International Academy
+                    Learning Center
                   </div>
                 </div>
               </div>
@@ -1851,7 +1851,7 @@ export default function Home() {
               gap: 12,
             }}
           >
-            <p style={{ fontSize: 12 }}>© {new Date().getFullYear()} Al Shamail International Academy. All rights reserved.</p>
+            <p style={{ fontSize: 12 }}>© {new Date().getFullYear()} Al Shamail Learning Center. All rights reserved.</p>
             <p style={{ fontSize: 12, color: t.gold }}>Learn · Grow · Excel</p>
           </div>
         </div>

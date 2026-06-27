@@ -321,7 +321,7 @@ export default function Login() {
             fontSize: 12,
           }}
         >
-          <Shield size={14} /> Secured by Al Shamail International Academy
+          <Shield size={14} /> Secured by Al Shamail Learning Center
         </div>
       </div>
     </div>

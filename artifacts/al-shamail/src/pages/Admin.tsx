@@ -480,7 +480,7 @@ export default function Admin() {
           <div style={{ display: "flex", alignItems: "center", gap: 22, marginBottom: 12 }}>
             <img
               src={LOGO_SRC}
-              alt="Al Shamail International Academy"
+              alt="Al Shamail Learning Center"
               style={{ height: 110, width: "auto", objectFit: "contain", flexShrink: 0 }}
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = "none";

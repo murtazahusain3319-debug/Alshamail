@@ -409,7 +409,7 @@ export default function Apply() {
                     marginTop: 3,
                   }}
                 >
-                  International Academy
+                  Learning Center
                 </div>
                 <div
                   style={{

@@ -21,7 +21,7 @@ export const B = {
 
 export const LOGO_SRC = `${import.meta.env.BASE_URL}logo.jpeg`;
 export const BRAND_NAME = "Al Shamail";
-export const BRAND_WORDMARK = "International Academy";
+export const BRAND_WORDMARK = "Learning Center";
 export const BRAND_TAGLINE = "Online";
 
 export function formatDateTime(iso: string): string {

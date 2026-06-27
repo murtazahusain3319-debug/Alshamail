@@ -425,7 +425,7 @@ export default function EnrollmentRules() {
           margin: "0 auto 40px",
         }}
       >
-        By enrolling at Al Shamail International Academy, students and their families agree to uphold the
+        By enrolling at Al Shamail Learning Center, students and their families agree to uphold the
         following standards. These rules exist to ensure a safe, focused, and respectful learning environment
         for everyone.
       </p>
@@ -500,7 +500,7 @@ export default function EnrollmentRules() {
           lineHeight: 1.75,
         }}
       >
-        <strong style={{ color: B.navy }}>Policy Updates:</strong> Al Shamail International Academy reserves
+        <strong style={{ color: B.navy }}>Policy Updates:</strong> Al Shamail Learning Center reserves
         the right to amend these rules at any time. Enrolled families will be notified of significant changes
         via email at least 7 days before they take effect. Continued enrollment constitutes acceptance of the
         current rules and regulations.
