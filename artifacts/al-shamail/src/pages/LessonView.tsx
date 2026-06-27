@@ -177,6 +177,9 @@ export default function LessonView() {
     setYoutubeEnded(false);
     setNotifications([]);
     stopConfetti();
+    // Reset auto-completion refs when lesson changes
+    hasAutoCompletedRef.current = null;
+    hasAutoCompletedVideoRef.current = false;
   }, [id]);
 
   const resizeConfettiCanvas = () => {
