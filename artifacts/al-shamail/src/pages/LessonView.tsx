@@ -158,8 +158,6 @@ export default function LessonView() {
   const [videoError, setVideoError] = useState<string | null>(null);
   const [confettiActive, setConfettiActive] = useState(false);
   const [youtubeEnded, setYoutubeEnded] = useState(false);
-  const [showBadgePopup, setShowBadgePopup] = useState(false);
-  const [badgePopupBadge, setBadgePopupBadge] = useState<any | null>(null);
   const youtubePlayerRef = useRef<any>(null);
   const progressIntervalRef = useRef<number | null>(null);
   const completingRef = useRef(false);
@@ -178,8 +176,6 @@ export default function LessonView() {
     setVideoError(null);
     setYoutubeEnded(false);
     stopConfetti();
-    setShowBadgePopup(false);
-    setBadgePopupBadge(null);
   }, [id]);
 
   const resizeConfettiCanvas = () => {
@@ -361,9 +357,13 @@ export default function LessonView() {
       console.log("New badges from response:", newBadges);
       setReward({ xpAwarded: (r as any).xpAwarded, leveledUp: (r as any).leveledUp, level: (r as any).level, newBadges });
       if (newBadges.length > 0) {
-        console.log("Badge earned, showing popup:", newBadges[0]);
-        setShowBadgePopup(true);
-        setBadgePopupBadge(newBadges[0]);
+        console.log("Badge earned, showing toast:", newBadges[0]);
+        newBadges.forEach((badge: any) => {
+          toast({
+            title: "Badge Earned!",
+            description: badge.name,
+          });
+        });
       } else {
         console.log("No new badges earned from lesson completion");
       }
@@ -857,98 +857,6 @@ export default function LessonView() {
                 </button>
               </>
             )}
-          </div>
-        </div>
-      )}
-
-      {console.log("Badge popup render check:", { showBadgePopup, badgePopupBadge })}
-      {showBadgePopup && badgePopupBadge && (
-        <div
-          onClick={() => setShowBadgePopup(false)}
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.7)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 9999,
-            animation: "fadeIn 0.3s ease-out",
-          }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              background: B.white,
-              borderRadius: 24,
-              padding: 32,
-              textAlign: "center",
-              maxWidth: 400,
-              width: "90%",
-              boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
-              animation: "scaleIn 0.4s ease-out",
-            }}
-          >
-            <div style={{ fontSize: 14, fontWeight: 700, color: B.gold, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>
-              🎉 Badge Earned!
-            </div>
-            {badgePopupBadge.imageUrl ? (
-              <img
-                src={resolveImageUrl(badgePopupBadge.imageUrl) || badgePopupBadge.imageUrl}
-                alt={badgePopupBadge.name}
-                style={{ width: 120, height: 120, objectFit: "contain", margin: "0 auto 16px", animation: "bounce 1s ease-in-out infinite" }}
-              />
-            ) : (
-              <div
-                style={{
-                  width: 120,
-                  height: 120,
-                  borderRadius: "50%",
-                  background: `linear-gradient(135deg, ${badgePopupBadge.color || B.gold} 0%, ${badgePopupBadge.color || B.gold}cc 100%)`,
-                  margin: "0 auto 16px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 48,
-                  animation: "bounce 1s ease-in-out infinite",
-                }}
-              >
-                🏆
-              </div>
-            )}
-            <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 800, fontSize: 24, color: B.navy, marginBottom: 8 }}>
-              {badgePopupBadge.name}
-            </div>
-            <div style={{ fontSize: 14, color: B.muted, marginBottom: 20 }}>
-              {badgePopupBadge.description}
-            </div>
-            <button
-              onClick={() => {
-                console.log("Awesome button clicked, badgePopupBadge:", badgePopupBadge);
-                setShowBadgePopup(false);
-                if (badgePopupBadge) {
-                  console.log("Calling toast with:", badgePopupBadge.name);
-                  toast({
-                    title: "Badge Earned!",
-                    description: badgePopupBadge.name,
-                  });
-                } else {
-                  console.log("No badgePopupBadge, skipping toast");
-                }
-              }}
-              style={{
-                background: B.gold,
-                color: B.white,
-                border: "none",
-                borderRadius: 12,
-                padding: "12px 24px",
-                fontSize: 14,
-                fontWeight: 700,
-                cursor: "pointer",
-              }}
-            >
-              Awesome!
-            </button>
           </div>
         </div>
       )}
