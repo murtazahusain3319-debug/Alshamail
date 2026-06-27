@@ -15,7 +15,7 @@ export const usersTable = pgTable(
   {
     id: serial("id").primaryKey(),
     firstName: text("first_name").notNull(),
-    lastName: text("last_name").notNull(),
+    lastName: text("last_name"),
     email: text("email").notNull(),
     role: text("role").notNull(), // student | teacher | admin
     isAdmin: boolean("is_admin").notNull().default(false),
@@ -57,7 +57,7 @@ export const sessionsTable = pgTable(
 export const applicationsTable = pgTable("applications", {
   id: serial("id").primaryKey(),
   firstName: text("first_name").notNull(),
-  lastName: text("last_name").notNull(),
+  lastName: text("last_name"),
   email: text("email").notNull(),
   passwordHash: text("password_hash"),
   phone: text("phone"),
@@ -72,6 +72,7 @@ export const applicationsTable = pgTable("applications", {
   qualification: text("qualification"),
   experience: text("experience"),
   subjects: text("subjects"),
+  cvUrl: text("cv_url"),
   notes: text("notes"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });

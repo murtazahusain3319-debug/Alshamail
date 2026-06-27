@@ -18,6 +18,7 @@ import {
   Sparkles,
   Shield,
   Star,
+  FileText,
 } from "lucide-react";
 
 /* ─── BRAND TOKENS (matches Home.tsx) ─────────────────────────────── */
@@ -147,6 +148,7 @@ type FormData = {
   qualification: string;
   phone: string;
   address: string;
+  cvFile: File | null;
 };
 
 type FieldErrors = Partial<Record<keyof FormData, string>>;
@@ -170,6 +172,7 @@ export default function Apply() {
     qualification: "",
     phone: "",
     address: "",
+    cvFile: null,
   });
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
@@ -181,7 +184,11 @@ export default function Apply() {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === "cvFile" && (e.target as HTMLInputElement).files && (e.target as HTMLInputElement).files![0]) {
+      setFormData((prev) => ({ ...prev, [name]: (e.target as HTMLInputElement).files![0] }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
     if (fieldErrors[name as keyof FormData]) {
       setFieldErrors((prev) => ({ ...prev, [name]: undefined }));
     }
@@ -231,28 +238,42 @@ export default function Apply() {
     const city = formData.address.trim() || undefined;
 
     try {
-      await createApplication.mutateAsync({
-        data: {
-          role: userType,
-          firstName,
-          lastName,
-          email: formData.email.trim(),
-          password: formData.password,
-          phone: formData.phone.trim(),
-          city,
-          grade: userType === "student" ? formData.grade || undefined : undefined,
-          school: userType === "student" ? formData.school || undefined : undefined,
-          parentName:
-            userType === "student" ? formData.parentName || undefined : undefined,
-          parentPhone:
-            userType === "student" ? formData.parentPhone || undefined : undefined,
-          experience: userType === "teacher" ? formData.experience || undefined : undefined,
-          department: userType === "teacher" ? formData.department || undefined : undefined,
-          qualification:
-            userType === "teacher" ? formData.qualification || undefined : undefined,
-          subjects: userType === "teacher" ? formData.subjects || undefined : undefined,
-        },
+      const formDataToSend = new FormData();
+      formDataToSend.append("data", JSON.stringify({
+        role: userType,
+        firstName,
+        lastName,
+        email: formData.email.trim(),
+        password: formData.password,
+        phone: formData.phone.trim(),
+        city,
+        grade: userType === "student" ? formData.grade || undefined : undefined,
+        school: userType === "student" ? formData.school || undefined : undefined,
+        parentName:
+          userType === "student" ? formData.parentName || undefined : undefined,
+        parentPhone:
+          userType === "student" ? formData.parentPhone || undefined : undefined,
+        experience: userType === "teacher" ? formData.experience || undefined : undefined,
+        department: userType === "teacher" ? formData.department || undefined : undefined,
+        qualification:
+          userType === "teacher" ? formData.qualification || undefined : undefined,
+        subjects: userType === "teacher" ? formData.subjects || undefined : undefined,
+      }));
+      
+      if (formData.cvFile) {
+        formDataToSend.append("cvFile", formData.cvFile);
+      }
+
+      const response = await fetch("https://alshamail.onrender.com/api/applications", {
+        method: "POST",
+        body: formDataToSend,
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to submit application");
+      }
+
       setStep(3);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
@@ -265,15 +286,23 @@ export default function Apply() {
     }
   };
 
-  const inp = (name: keyof FormData, extraStyle: React.CSSProperties = {}) => ({
-    name,
-    value: formData[name],
-    onChange: handleChange,
-    onFocus: focusStyle,
-    onBlur: (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) =>
-      blurStyle(e, !!fieldErrors[name]),
-    style: { ...inputStyle(!!fieldErrors[name]), ...extraStyle },
-  });
+  const inp = (name: keyof FormData, extraStyle: React.CSSProperties = {}) => {
+    if (name === "cvFile") {
+      return {
+        name,
+        onChange: handleChange,
+      };
+    }
+    return {
+      name,
+      value: formData[name] as string,
+      onChange: handleChange,
+      onFocus: focusStyle,
+      onBlur: (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) =>
+        blurStyle(e, !!fieldErrors[name]),
+      style: { ...inputStyle(!!fieldErrors[name]), ...extraStyle },
+    };
+  };
 
   return (
     <div
@@ -945,6 +974,44 @@ export default function Apply() {
                             />
                           </Field>
                         </div>
+                        <Field label="Upload CV (PDF)">
+                          <div style={{
+                            border: `1.5px dashed ${B.light}`,
+                            borderRadius: 12,
+                            padding: "20px",
+                            textAlign: "center",
+                            cursor: "pointer",
+                            background: formData.cvFile ? `${B.gold}10` : B.white,
+                            borderColor: formData.cvFile ? B.gold : B.light,
+                          }}>
+                            <input
+                              type="file"
+                              name="cvFile"
+                              accept=".pdf,.doc,.docx"
+                              onChange={handleChange}
+                              style={{ display: "none" }}
+                              id="cv-upload"
+                            />
+                            <label
+                              htmlFor="cv-upload"
+                              style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                gap: 8,
+                                cursor: "pointer",
+                              }}
+                            >
+                              <FileText size={24} style={{ color: formData.cvFile ? B.gold : B.muted }} />
+                              <div style={{ fontSize: 13, color: B.text }}>
+                                {formData.cvFile ? formData.cvFile.name : "Click to upload CV"}
+                              </div>
+                              <div style={{ fontSize: 11, color: B.muted }}>
+                                PDF, DOC, DOCX (Max 5MB)
+                              </div>
+                            </label>
+                          </div>
+                        </Field>
                       </div>
                     )}
                   </div>

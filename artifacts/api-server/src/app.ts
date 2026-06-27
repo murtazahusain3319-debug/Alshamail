@@ -102,16 +102,21 @@ app.use(express.urlencoded({ extended: true }));
 
 const uploadsRoot = path.resolve(process.cwd(), "../uploads/videos");
 const messageUploadsRoot = path.resolve(process.cwd(), "../uploads/messages");
+const cvUploadsRoot = path.resolve(process.cwd(), "../uploads/cvs");
 if (!fs.existsSync(uploadsRoot)) {
   fs.mkdirSync(uploadsRoot, { recursive: true });
 }
 if (!fs.existsSync(messageUploadsRoot)) {
   fs.mkdirSync(messageUploadsRoot, { recursive: true });
 }
+if (!fs.existsSync(cvUploadsRoot)) {
+  fs.mkdirSync(cvUploadsRoot, { recursive: true });
+}
 
 // Serve uploaded videos
 app.use("/uploads/videos", express.static(uploadsRoot));
 app.use("/uploads/messages", express.static(messageUploadsRoot));
+app.use("/uploads/cvs", express.static(cvUploadsRoot));
 
 app.use(
   "/api",

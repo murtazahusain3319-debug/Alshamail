@@ -11,6 +11,8 @@ import {
   Loader2,
   GraduationCap,
   BookOpen,
+  FileText,
+  Download,
 } from "lucide-react";
 import {
   useListApplications,
@@ -329,6 +331,47 @@ function ApplicationCard({
               <Detail label="Qualification" value={app.qualification} />
               <Detail label="Experience" value={app.experience} />
               <Detail label="Subjects" value={app.subjects} />
+              {app.cvUrl && (
+                <div>
+                  <div
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 800,
+                      color: B.muted,
+                      textTransform: "uppercase",
+                      letterSpacing: ".1em",
+                      marginBottom: 4,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 4,
+                    }}
+                  >
+                    <FileText size={11} />
+                    CV / Resume
+                  </div>
+                  <a
+                    href={`https://alshamail.onrender.com${app.cvUrl}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: B.navy,
+                      textDecoration: "none",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 6,
+                      padding: "6px 12px",
+                      background: `${B.navy}10`,
+                      borderRadius: 6,
+                      border: `1px solid ${B.navy}30`,
+                    }}
+                  >
+                    <Download size={12} />
+                    Download CV
+                  </a>
+                </div>
+              )}
             </>
           )}
         </div>
