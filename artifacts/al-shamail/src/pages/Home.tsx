@@ -529,8 +529,8 @@ export default function Home() {
           .als-section-title { font-size:22px !important; }
           .als-card { padding:20px !important; }
           .als-btn { padding:12px 20px !important; font-size:14px !important; }
-          .whatsapp-float-btn { width:48px !important; height:48px !important; background:#25D366 !important; }
-          .whatsapp-float-btn img { width:48px !important; height:48px !important; }
+          .whatsapp-float-btn { width:60px !important; height:60px !important; background:#25D366 !important; }
+          .whatsapp-float-btn img { width:60px !important; height:60px !important; }
           .slide-indicators { display:none !important; }
           .hero-slide-indicators { display:none !important; }
           .hero-logo-mobile-hide { display:none !important; }
@@ -548,9 +548,9 @@ export default function Home() {
           .als-mobile-menu-btn { display:none !important; }
           .als-mobile-menu { display:none !important; }
           .hero-slide-subtitle { margin-top:100px !important; }
-          header img { width:28px !important; height:28px !important; }
-          header > div > div > div:first-child { font-size:10px !important; }
-          header > div > div > div:nth-child(2) { font-size:6px !important; }
+          header img { width:38px !important; height:38px !important; }
+          header > div > div > div:first-child { font-size:8px !important; }
+          header > div > div > div:nth-child(2) { font-size:5px !important; }
         }
         @media (max-width:768px) and (orientation: landscape) {
           .als-nav-links { display:flex !important; gap:8px !important; }
@@ -560,7 +560,8 @@ export default function Home() {
           .als-btn-outline { padding:10px 20px !important; font-size:12px !important; }
           .als-mobile-menu-btn { display:none !important; }
           .als-mobile-menu { display:none !important; }
-          .whatsapp-float-btn { background:#25D366 !important; }
+          .whatsapp-float-btn { width:60px !important; height:60px !important; background:#25D366 !important; }
+          .whatsapp-float-btn img { width:60px !important; height:60px !important; }
           header img { width:45px !important; height:45px !important; }
           header > div > div > div:first-child { font-size:14px !important; }
           header > div > div > div:nth-child(2) { font-size:8px !important; }
