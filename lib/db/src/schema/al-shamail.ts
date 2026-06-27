@@ -292,6 +292,8 @@ export const scheduleEventsTable = pgTable("schedule_events", {
   location: text("location"),
   link: text("link"),
   notes: text("notes"),
+  audience: text("audience").notNull().default("all"),
+  classId: integer("class_id").references(() => classesTable.id, { onDelete: "set null" }),
   createdBy: integer("created_by").references(() => usersTable.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });

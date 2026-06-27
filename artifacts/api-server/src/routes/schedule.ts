@@ -1,16 +1,90 @@
 import { Router, type IRouter } from "express";
-import { eq, asc } from "drizzle-orm";
-import { db, scheduleEventsTable } from "@workspace/db";
+import { eq, asc, inArray, and, or } from "drizzle-orm";
+import { db, scheduleEventsTable, classesTable, classEnrollmentsTable, classTeachersTable } from "@workspace/db";
 import { requireAuth } from "../lib/auth";
 
 const router: IRouter = Router();
 
-router.get("/schedule", async (_req, res): Promise<void> => {
-  const items = await db
+router.get("/schedule", requireAuth, async (req, res): Promise<void> => {
+  const user = req.user!;
+  const isStudent = user.role === "student" && !user.isAdmin;
+  const isTeacher = user.role === "teacher" && !user.isAdmin;
+
+  let itemsQuery = db
     .select()
     .from(scheduleEventsTable)
     .orderBy(asc(scheduleEventsTable.startsAt));
-  res.json({ items });
+
+  // Filter events for students - only show events relevant to them
+  if (isStudent) {
+    const enrolledClasses = await db
+      .select({ classId: classEnrollmentsTable.classId })
+      .from(classEnrollmentsTable)
+      .where(eq(classEnrollmentsTable.userId, user.id));
+    
+    const enrolledClassIds = enrolledClasses.map((e) => e.classId);
+    
+    itemsQuery = itemsQuery.where(
+      or(
+        eq(scheduleEventsTable.audience, "all"),
+        eq(scheduleEventsTable.audience, "students"),
+        and(
+          eq(scheduleEventsTable.audience, "class"),
+          enrolledClassIds.length > 0 ? inArray(scheduleEventsTable.classId, enrolledClassIds) : eq(scheduleEventsTable.classId, 0)
+        )
+      )
+    );
+  }
+
+  // Filter events for teachers - only show events relevant to them
+  if (isTeacher) {
+    const teacherClasses = await db
+      .select({ classId: classTeachersTable.classId })
+      .from(classTeachersTable)
+      .where(eq(classTeachersTable.teacherId, user.id));
+    
+    // Also check legacy teacherId on classes table
+    const legacyClasses = await db
+      .select({ id: classesTable.id })
+      .from(classesTable)
+      .where(eq(classesTable.teacherId, user.id));
+    
+    const teacherClassIds = [...new Set([
+      ...teacherClasses.map((e) => e.classId),
+      ...legacyClasses.map((c) => c.id)
+    ])];
+    
+    itemsQuery = itemsQuery.where(
+      or(
+        eq(scheduleEventsTable.audience, "all"),
+        eq(scheduleEventsTable.audience, "teachers"),
+        and(
+          eq(scheduleEventsTable.audience, "class"),
+          teacherClassIds.length > 0 ? inArray(scheduleEventsTable.classId, teacherClassIds) : eq(scheduleEventsTable.classId, 0)
+        )
+      )
+    );
+  }
+
+  const items = await itemsQuery;
+
+  // Fetch class names for events with classId
+  const classIds = items.map((e) => e.classId).filter((id): id is number => id !== null);
+  const classes = classIds.length > 0
+    ? await db
+        .select({ id: classesTable.id, name: classesTable.name })
+        .from(classesTable)
+        .where(inArray(classesTable.id, classIds))
+    : [];
+  
+  const classMap = new Map(classes.map((c) => [c.id, c.name]));
+
+  const itemsWithClassNames = items.map((item) => ({
+    ...item,
+    className: item.classId ? classMap.get(item.classId) ?? null : null,
+  }));
+
+  res.json({ items: itemsWithClassNames });
 });
 
 router.post("/schedule", requireAuth, async (req, res): Promise<void> => {
@@ -29,6 +103,8 @@ router.post("/schedule", requireAuth, async (req, res): Promise<void> => {
       location: d.location ?? null,
       link: d.link ?? null,
       notes: d.notes ?? null,
+      audience: typeof d.audience === "string" ? d.audience : "all",
+      classId: typeof d.classId === "number" ? d.classId : null,
       createdBy: req.user!.id,
     })
     .returning();

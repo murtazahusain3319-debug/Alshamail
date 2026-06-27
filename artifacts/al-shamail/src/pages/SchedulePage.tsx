@@ -12,6 +12,7 @@ import {
   useCreateScheduleEvent,
   useDeleteScheduleEvent,
   useGetCurrentUser,
+  useListClasses,
   getListScheduleEventsQueryKey,
 } from "@workspace/api-client-react";
 import { B, formatDate, formatTime, relativeDay } from "@/lib/brand";
@@ -31,6 +32,8 @@ export default function SchedulePage() {
   const items: any[] = list.data?.items ?? [];
   const create = useCreateScheduleEvent();
   const del = useDeleteScheduleEvent();
+  const classes = useListClasses();
+  const classItems: any[] = classes.data?.items ?? [];
   const [showNew, setShowNew] = useState(false);
   const [form, setForm] = useState({
     title: "",
@@ -41,7 +44,7 @@ export default function SchedulePage() {
     location: "",
     meetingUrl: "",
     audience: "all",
-    gradeFilter: "",
+    classId: null as number | null,
   });
 
   const grouped = useMemo(() => {
@@ -67,7 +70,7 @@ export default function SchedulePage() {
         location: form.location || undefined,
         meetingUrl: form.meetingUrl || undefined,
         audience: form.audience as any,
-        gradeFilter: form.audience === "grade" ? form.gradeFilter : undefined,
+        classId: form.audience === "class" ? form.classId : undefined,
       },
     });
     await qc.invalidateQueries({ queryKey: getListScheduleEventsQueryKey() });
@@ -81,7 +84,7 @@ export default function SchedulePage() {
       location: "",
       meetingUrl: "",
       audience: "all",
-      gradeFilter: "",
+      classId: null,
     });
   };
 
@@ -196,18 +199,22 @@ export default function SchedulePage() {
                   <option value="all">Everyone</option>
                   <option value="students">Students only</option>
                   <option value="teachers">Teachers / staff</option>
-                  <option value="grade">Specific grade</option>
+                  <option value="class">Specific class</option>
                 </select>
               </label>
-              {form.audience === "grade" && (
+              {form.audience === "class" && (
                 <label style={{ display: "grid", gap: 4 }}>
-                  <span style={lbl}>Grade</span>
-                  <input
-                    placeholder="e.g. Grade 6"
-                    value={form.gradeFilter}
-                    onChange={(e) => setForm({ ...form, gradeFilter: e.target.value })}
+                  <span style={lbl}>Class</span>
+                  <select
+                    value={form.classId ?? ""}
+                    onChange={(e) => setForm({ ...form, classId: e.target.value ? Number(e.target.value) : null })}
                     style={inp}
-                  />
+                  >
+                    <option value="">Select a class</option>
+                    {classItems.map((c) => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                  </select>
                 </label>
               )}
             </div>
@@ -274,6 +281,25 @@ export default function SchedulePage() {
                         gridTemplateColumns: "100px 1fr auto",
                         gap: 14,
                         alignItems: "center",
+                        cursor: e.meetingUrl ? "pointer" : "default",
+                        transition: e.meetingUrl ? "all 0.2s" : "none",
+                      }}
+                      onClick={(evt) => {
+                        if (e.meetingUrl) {
+                          window.open(e.meetingUrl, "_blank", "noopener,noreferrer");
+                        }
+                      }}
+                      onMouseEnter={(evt) => {
+                        if (e.meetingUrl) {
+                          evt.currentTarget.style.borderColor = B.gold;
+                          evt.currentTarget.style.background = "#f8fafc";
+                        }
+                      }}
+                      onMouseLeave={(evt) => {
+                        if (e.meetingUrl) {
+                          evt.currentTarget.style.borderColor = B.light;
+                          evt.currentTarget.style.background = B.offW;
+                        }
                       }}
                     >
                       <div
@@ -301,7 +327,13 @@ export default function SchedulePage() {
                           <span style={{ fontWeight: 700, color: B.navy }}>{e.title}</span>
                           <Pill color={kindColor(e.kind)}>{e.kind}</Pill>
                           {e.audience !== "all" && (
-                            <Pill color={B.muted}>{e.audience}{e.gradeFilter ? `: ${e.gradeFilter}` : ""}</Pill>
+                            <Pill color={B.muted}>{e.audience}{e.className ? `: ${e.className}` : ""}</Pill>
+                          )}
+                          {e.meetingUrl && (
+                            <Pill color="#7c3aed">
+                              <LinkIcon size={11} style={{ marginRight: 4 }} />
+                              Click to join
+                            </Pill>
                           )}
                         </div>
                         {e.description && (
@@ -324,29 +356,15 @@ export default function SchedulePage() {
                               <MapPin size={11} /> {e.location}
                             </span>
                           )}
-                          {e.meetingUrl && (
-                            <a
-                              href={e.meetingUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              style={{
-                                display: "inline-flex",
-                                alignItems: "center",
-                                gap: 4,
-                                color: B.navy,
-                                fontWeight: 700,
-                                textDecoration: "none",
-                              }}
-                            >
-                              <LinkIcon size={11} /> Join online
-                            </a>
-                          )}
                           {e.teacherName && <span>{e.teacherName}</span>}
                         </div>
                       </div>
                       {isStaff && (
                         <button
-                          onClick={() => onDelete(e.id)}
+                          onClick={(evt) => {
+                            evt.stopPropagation();
+                            onDelete(e.id);
+                          }}
                           style={{
                             background: "transparent",
                             border: `1px solid ${B.light}`,

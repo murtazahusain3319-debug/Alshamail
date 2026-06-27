@@ -14,8 +14,13 @@ import { publicUser, requireAdmin, requireAuth } from "../lib/auth";
 const router: IRouter = Router();
 
 // List all classes with student counts and teacher assignments
+// Teachers only see classes they're assigned to
 router.get("/classes", requireAuth, async (req, res): Promise<void> => {
-  const classes = await db
+  const user = req.user!;
+  const isTeacher = user.role === "teacher";
+  const isAdmin = user.isAdmin;
+
+  let classesQuery = db
     .select({
       id: classesTable.id,
       name: classesTable.name,
@@ -25,6 +30,33 @@ router.get("/classes", requireAuth, async (req, res): Promise<void> => {
     })
     .from(classesTable)
     .orderBy(asc(classesTable.name));
+
+  // Filter classes for teachers - only show classes they're assigned to
+  if (isTeacher && !isAdmin) {
+    const teacherClassIds = await db
+      .select({ classId: classTeachersTable.classId })
+      .from(classTeachersTable)
+      .where(eq(classTeachersTable.teacherId, user.id));
+    
+    const legacyClassIds = await db
+      .select({ id: classesTable.id })
+      .from(classesTable)
+      .where(eq(classesTable.teacherId, user.id));
+    
+    const allClassIds = [...new Set([
+      ...teacherClassIds.map((r) => r.classId),
+      ...legacyClassIds.map((r) => r.id)
+    ])];
+    
+    if (allClassIds.length === 0) {
+      res.json({ items: [] });
+      return;
+    }
+    
+    classesQuery = classesQuery.where(inArray(classesTable.id, allClassIds));
+  }
+
+  const classes = await classesQuery;
 
   const classIds = classes.map((c) => c.id);
   const classTeacherRows = classIds.length

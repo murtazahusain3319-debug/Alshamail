@@ -89,6 +89,7 @@ export const getListMessageContactsQueryKey = () => ["message-contacts"] as cons
 export const getGetConversationQueryKey = (userId: number) =>
   ["conversation", userId] as const;
 export const getListScheduleEventsQueryKey = () => ["schedule-events"] as const;
+export const getListClassesQueryKey = () => ["classes"] as const;
 export const getListGradeSubjectsQueryKey = (params?: { classId?: number }) =>
   ["grade-subjects", params ?? {}] as const;
 export const getListGradesQueryKey = (params?: { classId?: number; subjectId?: string }) =>
@@ -780,6 +781,16 @@ export function useCreateBadge() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: getListBadgesQueryKey() });
     },
+  });
+}
+
+/* ──────────────────────────────────────────────────────────────────
+ *  CLASSES
+ * ────────────────────────────────────────────────────────────────── */
+export function useListClasses() {
+  return useQuery({
+    queryKey: getListClassesQueryKey(),
+    queryFn: async () => apiFetch<{ items: any[] }>("/classes"),
   });
 }
 
