@@ -254,16 +254,18 @@ router.post("/lessons/:id/complete", requireAuth, async (req, res): Promise<void
         eq(badgesTable.criteria, "xp"),
         sql`${badgesTable.threshold} <= ${nextXp}`
       ));
-    console.log("XP badges found:", xpBadges);
+    console.log("XP badges found:", xpBadges.length, xpBadges);
     for (const badge of xpBadges) {
       const alreadyEarned = await db
         .select({ id: achievementsTable.id })
         .from(achievementsTable)
         .where(and(eq(achievementsTable.userId, u.id), eq(achievementsTable.badgeId, badge.id)))
         .limit(1);
+      console.log("XP badge", badge.name, "already earned?", alreadyEarned.length > 0);
       if (alreadyEarned.length === 0) {
         await db.insert(achievementsTable).values({ userId: u.id, badgeId: badge.id });
         newBadges.push(badge);
+        console.log("Awarded XP badge:", badge.name);
       }
     }
 
@@ -272,6 +274,7 @@ router.post("/lessons/:id/complete", requireAuth, async (req, res): Promise<void
       .select({ id: lessonProgressTable.id })
       .from(lessonProgressTable)
       .where(eq(lessonProgressTable.userId, u.id));
+    console.log("Completed lessons count:", completedLessons.length);
     const lessonBadges = await db
       .select()
       .from(badgesTable)
@@ -279,15 +282,18 @@ router.post("/lessons/:id/complete", requireAuth, async (req, res): Promise<void
         eq(badgesTable.criteria, "lessons"),
         sql`${badgesTable.threshold} <= ${completedLessons.length}`
       ));
+    console.log("Lesson badges found:", lessonBadges.length, lessonBadges);
     for (const badge of lessonBadges) {
       const alreadyEarned = await db
         .select({ id: achievementsTable.id })
         .from(achievementsTable)
         .where(and(eq(achievementsTable.userId, u.id), eq(achievementsTable.badgeId, badge.id)))
         .limit(1);
+      console.log("Lesson badge", badge.name, "already earned?", alreadyEarned.length > 0);
       if (alreadyEarned.length === 0) {
         await db.insert(achievementsTable).values({ userId: u.id, badgeId: badge.id });
         newBadges.push(badge);
+        console.log("Awarded lesson badge:", badge.name);
       }
     }
 
@@ -307,6 +313,7 @@ router.post("/lessons/:id/complete", requireAuth, async (req, res): Promise<void
       const courseProgress = courseLessons.length > 0
         ? (completedCourseLessons.length / courseLessons.length) * 100
         : 0;
+      console.log("Course progress:", courseProgress, "Course ID:", lesson.courseId);
 
       if (courseProgress >= 100) {
         const courseBadges = await db
@@ -316,15 +323,18 @@ router.post("/lessons/:id/complete", requireAuth, async (req, res): Promise<void
             eq(badgesTable.criteria, "course"),
             eq(badgesTable.threshold, lesson.courseId)
           ));
+        console.log("Course badges found:", courseBadges.length, courseBadges);
         for (const badge of courseBadges) {
           const alreadyEarned = await db
             .select({ id: achievementsTable.id })
             .from(achievementsTable)
             .where(and(eq(achievementsTable.userId, u.id), eq(achievementsTable.badgeId, badge.id)))
             .limit(1);
+          console.log("Course badge", badge.name, "already earned?", alreadyEarned.length > 0);
           if (alreadyEarned.length === 0) {
             await db.insert(achievementsTable).values({ userId: u.id, badgeId: badge.id });
             newBadges.push(badge);
+            console.log("Awarded course badge:", badge.name);
           }
         }
       }
@@ -454,6 +464,7 @@ router.post("/lessons/:id/quiz/submit", requireAuth, async (req, res): Promise<v
   }
 
   // --- add badge checking ---
+  console.log("Quiz submit - Checking for badges, User ID:", req.user!.id, "XP:", nextXp);
   let newBadges: any[] = [];
   if (xpAwarded > 0) {
     // XP-based badges
@@ -461,15 +472,18 @@ router.post("/lessons/:id/quiz/submit", requireAuth, async (req, res): Promise<v
       .select()
       .from(badgesTable)
       .where(and(eq(badgesTable.criteria, "xp"), sql`${badgesTable.threshold} <= ${nextXp}`));
+    console.log("Quiz - XP badges found:", xpBadges.length, xpBadges);
     for (const badge of xpBadges) {
       const already = await db
         .select({ id: achievementsTable.id })
         .from(achievementsTable)
         .where(and(eq(achievementsTable.userId, req.user!.id), eq(achievementsTable.badgeId, badge.id)))
         .limit(1);
+      console.log("Quiz - XP badge", badge.name, "already earned?", already.length > 0);
       if (already.length === 0) {
         await db.insert(achievementsTable).values({ userId: req.user!.id, badgeId: badge.id });
         newBadges.push(badge);
+        console.log("Quiz - Awarded XP badge:", badge.name);
       }
     }
   }
@@ -478,19 +492,23 @@ router.post("/lessons/:id/quiz/submit", requireAuth, async (req, res): Promise<v
     .select({ id: lessonProgressTable.id })
     .from(lessonProgressTable)
     .where(eq(lessonProgressTable.userId, req.user!.id));
+  console.log("Quiz - Completed lessons count:", completedLessons.length);
   const lessonBadges = await db
     .select()
     .from(badgesTable)
     .where(and(eq(badgesTable.criteria, "lessons"), sql`${badgesTable.threshold} <= ${completedLessons.length}`));
+  console.log("Quiz - Lesson badges found:", lessonBadges.length, lessonBadges);
   for (const badge of lessonBadges) {
     const already = await db
       .select({ id: achievementsTable.id })
       .from(achievementsTable)
       .where(and(eq(achievementsTable.userId, req.user!.id), eq(achievementsTable.badgeId, badge.id)))
       .limit(1);
+    console.log("Quiz - Lesson badge", badge.name, "already earned?", already.length > 0);
     if (already.length === 0) {
       await db.insert(achievementsTable).values({ userId: req.user!.id, badgeId: badge.id });
       newBadges.push(badge);
+      console.log("Quiz - Awarded lesson badge:", badge.name);
     }
   }
   // Course-completion badges (if this quiz lesson was the last one)
@@ -506,24 +524,29 @@ router.post("/lessons/:id/quiz/submit", requireAuth, async (req, res): Promise<v
         eq(lessonProgressTable.userId, req.user!.id),
         inArray(lessonProgressTable.lessonId, courseLessons.map((l) => l.id))
       ));
+    console.log("Quiz - Course lessons:", courseLessons.length, "Completed:", completedCourseLessons.length);
     if (courseLessons.length > 0 && completedCourseLessons.length >= courseLessons.length) {
       const courseBadges = await db
         .select()
         .from(badgesTable)
         .where(and(eq(badgesTable.criteria, "course"), eq(badgesTable.threshold, lesson.courseId)));
+      console.log("Quiz - Course badges found:", courseBadges.length, courseBadges);
       for (const badge of courseBadges) {
         const already = await db
           .select({ id: achievementsTable.id })
           .from(achievementsTable)
           .where(and(eq(achievementsTable.userId, req.user!.id), eq(achievementsTable.badgeId, badge.id)))
           .limit(1);
+        console.log("Quiz - Course badge", badge.name, "already earned?", already.length > 0);
         if (already.length === 0) {
           await db.insert(achievementsTable).values({ userId: req.user!.id, badgeId: badge.id });
           newBadges.push(badge);
+          console.log("Quiz - Awarded course badge:", badge.name);
         }
       }
     }
   }
+  console.log("Quiz submit - Final newBadges:", newBadges);
   // --- end badge block ---
 
   res.json({
