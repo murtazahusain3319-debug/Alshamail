@@ -13,7 +13,7 @@ import {
 import { B } from "@/lib/brand";
 import { API_BASE } from "@/lib/api-base";
 import { DashboardLayout, Card, Pill, GoldButton } from "@/components/DashboardLayout";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 function resolveImageUrl(url: string | null | undefined): string | undefined {
   if (!url) return undefined;
@@ -375,12 +375,13 @@ export default function LessonView() {
   // Show toasts after reward state is committed — more reliable than calling toast inside async mutate
   const rewardRef = useRef<typeof reward>(null);
   useEffect(() => {
+    console.log("reward effect triggered:", reward);
     if (!reward || reward === rewardRef.current) return;
     rewardRef.current = reward;
-    toast({ title: "Lesson Completed! 🎉", description: lesson?.title ?? "" });
+    toast.success("Lesson Completed! 🎉", { description: lesson?.title ?? "" });
     reward.newBadges.forEach((badge: any, i: number) => {
       setTimeout(() => {
-        toast({ title: "🏅 Badge Earned!", description: badge.name });
+        toast.success("🏅 Badge Earned!", { description: badge.name });
       }, (i + 1) * 500);
     });
   }, [reward, lesson?.title]);

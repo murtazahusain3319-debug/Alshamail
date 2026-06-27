@@ -3,7 +3,6 @@ import { SkeletonGrid } from "@/lib/smooth";
 import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
-import { Toaster as ShadcnToaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { B } from "@/lib/brand";
 const Home = lazy(() => import("@/pages/Home"));
@@ -338,7 +337,6 @@ function App() {
             </Suspense>
           </WouterRouter>
           <Toaster richColors theme="light" position="top-right" />
-          <ShadcnToaster />
         </TooltipProvider>
       </QueryClientProvider>
     </AppErrorBoundary>
