@@ -529,12 +529,12 @@ export default function Home() {
           .als-section-title { font-size:22px !important; }
           .als-card { padding:20px !important; }
           .als-btn { padding:12px 20px !important; font-size:14px !important; }
-          .whatsapp-float-btn { right:16px !important; bottom:16px !important; width:48px !important; height:48px !important; }
+          .whatsapp-float-btn { right:16px !important; bottom:100px !important; width:48px !important; height:48px !important; }
           .whatsapp-float-btn img { width:48px !important; height:48px !important; }
-          .slide-nav-btn { width:28px !important; height:28px !important; left:6px !important; right:6px !important; }
-          .slide-nav-btn svg { width:12px !important; height:12px !important; }
-          .slide-cta-buttons { position:absolute !important; bottom:70px !important; left:20px !important; right:20px !important; order:unset !important; margin-bottom:unset !important; }
-          .slide-trust-badges { position:absolute !important; bottom:16px !important; left:20px !important; right:20px !important; order:unset !important; padding-top:unset !important; }
+          .slide-nav-btn { width:24px !important; height:24px !important; left:8px !important; right:8px !important; }
+          .slide-nav-btn svg { width:10px !important; height:10px !important; }
+          .slide-cta-buttons { position:absolute !important; bottom:160px !important; left:20px !important; right:20px !important; order:unset !important; margin-bottom:unset !important; }
+          .slide-trust-badges { position:absolute !important; bottom:60px !important; left:20px !important; right:20px !important; order:unset !important; padding-top:unset !important; }
         }
         @media (min-width:901px) {
           .als-mobile-menu-btn { display:none !important; }
