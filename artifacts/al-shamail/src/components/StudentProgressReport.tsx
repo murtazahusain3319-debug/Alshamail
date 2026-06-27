@@ -1,5 +1,4 @@
 import { B } from "@/lib/brand";
-import { Printer } from "lucide-react";
 
 interface LessonData {
   id: number;
@@ -31,19 +30,6 @@ export function StudentProgressReport({
     : 0;
   const overallProgress = Math.round((completedLessons.length / totalLessons) * 100);
 
-  const handlePrint = () => {
-    const printContent = document.getElementById("student-progress-report");
-    if (!printContent) return;
-
-    const originalContents = document.body.innerHTML;
-    const printContents = printContent.innerHTML;
-
-    document.body.innerHTML = printContents;
-    window.print();
-    document.body.innerHTML = originalContents;
-    window.location.reload();
-  };
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case "completed": return B.success;
@@ -63,45 +49,17 @@ export function StudentProgressReport({
   };
 
   return (
-    <>
-      {/* Print Button */}
-      <button
-        onClick={handlePrint}
-        style={{
-          position: "fixed",
-          top: "20px",
-          right: "20px",
-          background: B.navy,
-          color: "#fff",
-          border: "none",
-          borderRadius: "8px",
-          padding: "12px 20px",
-          fontSize: "14px",
-          fontWeight: 600,
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-          zIndex: 1000,
-        }}
-      >
-        <Printer size={16} />
-        Print Report
-      </button>
-
-      {/* Report Content */}
-      <div
-        id="student-progress-report"
-        style={{
-          fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-          color: "#1f2937",
-          lineHeight: 1.6,
-          padding: "40px",
-          maxWidth: "800px",
-          margin: "0 auto",
-          background: "#fff",
-        }}>
+    <div
+      id="student-progress-report"
+      style={{
+        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+        color: "#1f2937",
+        lineHeight: 1.6,
+        padding: "40px",
+        maxWidth: "800px",
+        margin: "0 auto",
+        background: "#fff",
+      }}>
       {/* Header */}
       <div style={{
         textAlign: "center",
@@ -476,6 +434,5 @@ export function StudentProgressReport({
         }
       `}</style>
     </div>
-    </>
   );
 }

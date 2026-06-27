@@ -746,7 +746,18 @@ export default function GradesPage() {
             </div>
             <button
               type="button"
-              onClick={() => window.print()}
+              onClick={() => {
+                const printContent = document.getElementById("student-progress-report");
+                if (!printContent) return;
+
+                const originalContents = document.body.innerHTML;
+                const printContents = printContent.innerHTML;
+
+                document.body.innerHTML = printContents;
+                window.print();
+                document.body.innerHTML = originalContents;
+                window.location.reload();
+              }}
               style={{
                 padding: "10px 14px",
                 borderRadius: 10,
@@ -846,7 +857,7 @@ export default function GradesPage() {
                     title: entry.title,
                     status: "completed" as const,
                     score: Math.round((entry.score / entry.maxScore) * 100),
-                    dateCompleted: entry.createdAt ? new Date(entry.createdAt).toLocaleDateString() : undefined,
+                    dateCompleted: undefined,
                   }))
                 )
               )}
