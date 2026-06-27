@@ -531,8 +531,7 @@ export default function Home() {
           .als-btn { padding:12px 20px !important; font-size:14px !important; }
           .whatsapp-float-btn { width:48px !important; height:48px !important; }
           .whatsapp-float-btn img { width:48px !important; height:48px !important; }
-          .slide-nav-btn { width:36px !important; height:18px !important; left:10px !important; right:10px !important; border-radius:12px !important; }
-          .slide-nav-btn svg { width:10px !important; height:10px !important; }
+          .slide-nav-btn { display:none !important; }
           .slide-cta-buttons { position:absolute !important; bottom:200px !important; left:20px !important; right:20px !important; order:unset !important; margin-bottom:unset !important; }
           .slide-trust-badges { position:absolute !important; bottom:60px !important; left:20px !important; right:20px !important; order:unset !important; padding-top:unset !important; }
         }
