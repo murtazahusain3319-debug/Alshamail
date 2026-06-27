@@ -548,9 +548,9 @@ export default function Home() {
           .als-mobile-menu-btn { display:none !important; }
           .als-mobile-menu { display:none !important; }
           .hero-slide-subtitle { margin-top:100px !important; }
-          header img { width:38px !important; height:38px !important; }
-          header > div > div > div:first-child { font-size:8px !important; }
-          header > div > div > div:nth-child(2) { font-size:5px !important; }
+          header img { width:27px !important; height:27px !important; }
+          header > div > div > div:first-child { font-size:6px !important; }
+          header > div > div > div:nth-child(2) { font-size:4px !important; }
         }
         @media (max-width:768px) and (orientation: landscape) {
           .als-nav-links { display:flex !important; gap:8px !important; }
