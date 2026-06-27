@@ -23,7 +23,7 @@ import {
   Pill,
   GoldButton,
 } from "@/components/DashboardLayout";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 
 function resolveImageUrl(url: string | null): string | undefined {
   if (!url) return undefined;
@@ -75,12 +75,12 @@ export default function QuizView() {
     console.log("Quiz - New badges from server:", newBadges.length, newBadges);
     
     // Show quiz completion toast
-    toast.success("Quiz Submitted!", { description: r?.passed ? "You passed!" : "Keep practicing!" });
+    toast({ title: "Quiz Submitted!", description: r?.passed ? "You passed!" : "Keep practicing!" });
     
     // Show badge toasts for new badges
     if (newBadges.length > 0) {
       newBadges.forEach((badge: any) => {
-        toast.success("Badge Earned!", { description: badge.name });
+        toast({ title: "Badge Earned!", description: badge.name });
       });
     }
     
@@ -521,7 +521,7 @@ export default function QuizView() {
               onClick={() => {
                 setShowBadgePopup(false);
                 if (badgePopupBadge) {
-                  toast.success("Badge Earned!", { description: badgePopupBadge.name });
+                  toast({ title: "Badge Earned!", description: badgePopupBadge.name });
                 }
               }}
               style={{

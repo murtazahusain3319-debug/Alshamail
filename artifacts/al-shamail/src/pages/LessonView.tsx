@@ -13,7 +13,7 @@ import {
 import { B } from "@/lib/brand";
 import { API_BASE } from "@/lib/api-base";
 import { DashboardLayout, Card, Pill, GoldButton } from "@/components/DashboardLayout";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 
 function resolveImageUrl(url: string | null | undefined): string | undefined {
   if (!url) return undefined;
@@ -377,10 +377,10 @@ export default function LessonView() {
   useEffect(() => {
     if (!reward || reward === rewardRef.current) return;
     rewardRef.current = reward;
-    toast.success("Lesson Completed! 🎉", { description: lesson?.title ?? "" });
+    toast({ title: "Lesson Completed! 🎉", description: lesson?.title ?? "" });
     reward.newBadges.forEach((badge: any, i: number) => {
       setTimeout(() => {
-        toast.success(`🏅 Badge Earned!`, { description: badge.name, duration: 6000 });
+        toast({ title: "🏅 Badge Earned!", description: badge.name });
       }, (i + 1) * 500);
     });
   }, [reward, lesson?.title]);
