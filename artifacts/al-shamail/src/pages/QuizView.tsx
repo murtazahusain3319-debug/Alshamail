@@ -12,6 +12,7 @@ import {
   useGetLesson,
   useGetLessonQuiz,
   useSubmitQuiz,
+  useGetMyGamification,
   getGetLessonQueryKey,
   getGetCourseQueryKey,
   getGetCurrentUserQueryKey,
@@ -41,6 +42,7 @@ export default function QuizView() {
   const lessonQ = useGetLesson(lessonId, { query: { enabled: lessonId > 0 } });
   const quizQ = useGetLessonQuiz(lessonId, { query: { enabled: lessonId > 0 } });
   const submit = useSubmitQuiz();
+  const gamificationQ = useGetMyGamification();
 
   const lesson: any = lessonQ.data;
 
@@ -58,6 +60,11 @@ export default function QuizView() {
 
   const onSubmit = async () => {
     if (!quiz || !allAnswered) return;
+    
+    // Store badges before submission
+    const beforeBadges = (gamificationQ.data as any)?.badges ?? [];
+    const beforeBadgeIds = new Set(beforeBadges.map((b: any) => b.id));
+    
     const r = await submit.mutateAsync({
       id: quiz.id,
       data: {
@@ -68,12 +75,26 @@ export default function QuizView() {
       },
     });
     setResult(r);
-    // Show badge popup/toast if any were earned
-    const newBadges = (r as any).newBadges ?? [];
+    
+    // Invalidate gamification to get updated badges
+    await qc.invalidateQueries({ queryKey: ["my-gamification"] });
+    const updatedGamification = await qc.fetchQuery({ queryKey: ["my-gamification"] });
+    
+    const afterBadges = (updatedGamification as any)?.badges ?? [];
+    const newBadges = afterBadges.filter((b: any) => !beforeBadgeIds.has(b.id));
+    
+    console.log("Quiz - Badges before:", beforeBadgeIds.size, "after:", afterBadges.length, "new:", newBadges.length);
+    
+    // Show quiz completion toast
+    toast.success("Quiz Submitted!", { description: r?.passed ? "You passed!" : "Keep practicing!" });
+    
+    // Show badge toasts for new badges
     if (newBadges.length > 0) {
-      setShowBadgePopup(true);
-      setBadgePopupBadge(newBadges[0]);
+      newBadges.forEach((badge: any) => {
+        toast.success("Badge Earned!", { description: badge.name });
+      });
     }
+    
     if (r?.passed) {
       await qc.invalidateQueries({ queryKey: getGetLessonQueryKey(lessonId), exact: true, refetchType: "all" });
       if (lesson?.courseId) {

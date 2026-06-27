@@ -6,7 +6,7 @@ import {
   BookOpen, Play, Clock, ChevronLeft, ChevronRight,
 } from "lucide-react";
 import {
-  useGetLesson, useCompleteLesson, useGetLessonQuiz, useGetCurrentUser,
+  useGetLesson, useCompleteLesson, useGetLessonQuiz, useGetCurrentUser, useGetMyGamification,
   getGetLessonQueryKey, getGetCourseQueryKey, getGetCurrentUserQueryKey,
   getListMyEnrollmentsQueryKey,
 } from "@workspace/api-client-react";
@@ -144,6 +144,7 @@ export default function LessonView() {
   const lessonQ = useGetLesson(id, { query: { enabled: id > 0 } });
   const quizQ = useGetLessonQuiz(id, { query: { enabled: id > 0, retry: false } });
   const complete = useCompleteLesson();
+  const gamificationQ = useGetMyGamification();
 
   const lesson: any = lessonQ.data;
   const quiz: any = (quizQ as any).data;
@@ -350,12 +351,29 @@ export default function LessonView() {
       return;
     }
 
+    // Store badges before completion
+    const beforeBadges = (gamificationQ.data as any)?.badges ?? [];
+    const beforeBadgeIds = new Set(beforeBadges.map((b: any) => b.id));
+
     try {
       const r = await complete.mutateAsync({ id });
       console.log("Lesson complete response:", r);
-      const newBadges = (r as any).newBadges ?? [];
-      console.log("New badges from response:", newBadges);
+      
+      // Invalidate gamification to get updated badges
+      await qc.invalidateQueries({ queryKey: ["my-gamification"] });
+      const updatedGamification = await qc.fetchQuery({ queryKey: ["my-gamification"] });
+      
+      const afterBadges = (updatedGamification as any)?.badges ?? [];
+      const newBadges = afterBadges.filter((b: any) => !beforeBadgeIds.has(b.id));
+      
+      console.log("Badges before:", beforeBadgeIds.size, "after:", afterBadges.length, "new:", newBadges.length);
+      
       setReward({ xpAwarded: (r as any).xpAwarded, leveledUp: (r as any).leveledUp, level: (r as any).level, newBadges });
+      
+      // Show lesson completion toast
+      toast.success("Lesson Completed!", { description: lesson?.title });
+      
+      // Show badge toasts for new badges
       if (newBadges.length > 0) {
         console.log("Badge earned, showing toast:", newBadges[0]);
         newBadges.forEach((badge: any) => {
@@ -364,9 +382,8 @@ export default function LessonView() {
       } else {
         console.log("No new badges earned from lesson completion");
       }
+      
       startConfetti();
-      // Don't invalidate cache immediately - let the badge popup show first
-      // Cache will be refreshed on next navigation or manual refresh
       setErrorMessage(null);
     } catch (err: any) {
       setErrorMessage(err?.message ?? "Failed to complete lesson.");
@@ -376,7 +393,7 @@ export default function LessonView() {
     } finally {
       completingRef.current = false;
     }
-  }, [id, qc, complete, lesson?.courseId, isReading, watched]);
+  }, [id, qc, complete, lesson?.courseId, lesson?.title, isReading, watched, gamificationQ.data]);
 
   const onVideoEnded = () => {
     if (lesson && !lesson?.completed && !complete.isPending) {
