@@ -13,7 +13,6 @@ import {
 import { B } from "@/lib/brand";
 import { API_BASE } from "@/lib/api-base";
 import { DashboardLayout, Card, Pill, GoldButton } from "@/components/DashboardLayout";
-import { toast } from "sonner";
 
 function resolveImageUrl(url: string | null | undefined): string | undefined {
   if (!url) return undefined;
@@ -158,6 +157,7 @@ export default function LessonView() {
   const [videoError, setVideoError] = useState<string | null>(null);
   const [confettiActive, setConfettiActive] = useState(false);
   const [youtubeEnded, setYoutubeEnded] = useState(false);
+  const [notifications, setNotifications] = useState<{id: string; title: string; description: string}[]>([]);
   const youtubePlayerRef = useRef<any>(null);
   const progressIntervalRef = useRef<number | null>(null);
   const completingRef = useRef(false);
@@ -175,6 +175,7 @@ export default function LessonView() {
     setWatched(0);
     setVideoError(null);
     setYoutubeEnded(false);
+    setNotifications([]);
     stopConfetti();
   }, [id]);
 
@@ -357,11 +358,15 @@ export default function LessonView() {
       console.log("New badges from server:", newBadges.length, newBadges);
       // Setting reward triggers the useEffect below which fires the toasts
       setReward({ xpAwarded: (r as any).xpAwarded, leveledUp: (r as any).leveledUp, level: (r as any).level, newBadges });
-      toast.success("Lesson Completed! 🎉", { description: lesson?.title ?? "" });
+      const baseId = `notif-${Date.now()}`;
+      setNotifications(prev => [...prev, { id: baseId, title: "Lesson Completed! 🎉", description: lesson?.title ?? "" }]);
+      setTimeout(() => setNotifications(prev => prev.filter(n => n.id !== baseId)), 5000);
       newBadges.forEach((badge: any, i: number) => {
+        const bId = `${baseId}-${i}`;
         setTimeout(() => {
-          toast.success("🏅 Badge Earned!", { description: badge.name });
-        }, (i + 1) * 500);
+          setNotifications(prev => [...prev, { id: bId, title: "🏅 Badge Earned!", description: badge.name }]);
+          setTimeout(() => setNotifications(prev => prev.filter(n => n.id !== bId)), 5000);
+        }, (i + 1) * 600);
       });
       qc.invalidateQueries({ queryKey: ["my-gamification"] });
       qc.invalidateQueries({ queryKey: getGetLessonQueryKey(id) });
@@ -863,6 +868,36 @@ export default function LessonView() {
           to { transform: translateX(0); opacity: 1; }
         }
       `}</style>
+
+      {/* Inline notifications — guaranteed to show regardless of toast library issues */}
+      {notifications.length > 0 && (
+        <div style={{
+          position: "fixed",
+          bottom: 28,
+          right: 28,
+          zIndex: 99998,
+          display: "flex",
+          flexDirection: "column",
+          gap: 10,
+          pointerEvents: "none",
+        }}>
+          {notifications.map(n => (
+            <div key={n.id} style={{
+              background: "#1b2b5e",
+              color: "#fff",
+              borderRadius: 16,
+              padding: "16px 22px",
+              boxShadow: "0 10px 40px rgba(27,43,94,.35)",
+              minWidth: 280,
+              maxWidth: 380,
+              border: "1.5px solid rgba(218,165,32,.35)",
+            }}>
+              <div style={{ fontWeight: 800, fontSize: 15 }}>{n.title}</div>
+              {n.description && <div style={{ fontSize: 13, opacity: 0.75, marginTop: 4 }}>{n.description}</div>}
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Confetti canvas — always mounted, invisible until activated */}
       <canvas

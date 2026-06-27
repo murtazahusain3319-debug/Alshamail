@@ -23,7 +23,6 @@ import {
   Pill,
   GoldButton,
 } from "@/components/DashboardLayout";
-import { toast } from "sonner";
 
 function resolveImageUrl(url: string | null): string | undefined {
   if (!url) return undefined;
@@ -51,6 +50,7 @@ export default function QuizView() {
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
   const [showBadgePopup, setShowBadgePopup] = useState(false);
   const [badgePopupBadge, setBadgePopupBadge] = useState<any | null>(null);
+  const [notifications, setNotifications] = useState<{id: string; title: string; description: string}[]>([]);
 
   const allAnswered =
     quiz?.questions?.length &&
@@ -74,13 +74,19 @@ export default function QuizView() {
     const newBadges = (r as any).newBadges ?? [];
     console.log("Quiz - New badges from server:", newBadges.length, newBadges);
     
-    // Show quiz completion toast
-    toast.success("Quiz Submitted!", { description: r?.passed ? "You passed!" : "Keep practicing!" });
+    // Show quiz completion notification
+    const baseId = `notif-${Date.now()}`;
+    setNotifications(prev => [...prev, { id: baseId, title: "Quiz Submitted!", description: r?.passed ? "You passed!" : "Keep practicing!" }]);
+    setTimeout(() => setNotifications(prev => prev.filter(n => n.id !== baseId)), 5000);
     
-    // Show badge toasts for new badges
+    // Show badge notifications for new badges
     if (newBadges.length > 0) {
-      newBadges.forEach((badge: any) => {
-        toast.success("Badge Earned!", { description: badge.name });
+      newBadges.forEach((badge: any, i: number) => {
+        const bId = `${baseId}-${i}`;
+        setTimeout(() => {
+          setNotifications(prev => [...prev, { id: bId, title: "🏅 Badge Earned!", description: badge.name }]);
+          setTimeout(() => setNotifications(prev => prev.filter(n => n.id !== bId)), 5000);
+        }, (i + 1) * 600);
       });
     }
     
@@ -521,7 +527,9 @@ export default function QuizView() {
               onClick={() => {
                 setShowBadgePopup(false);
                 if (badgePopupBadge) {
-                  toast.success("Badge Earned!", { description: badgePopupBadge.name });
+                  const bId = `notif-${Date.now()}`;
+                  setNotifications(prev => [...prev, { id: bId, title: "🏅 Badge Earned!", description: badgePopupBadge.name }]);
+                  setTimeout(() => setNotifications(prev => prev.filter(n => n.id !== bId)), 5000);
                 }
               }}
               style={{
@@ -558,6 +566,36 @@ export default function QuizView() {
           to { transform: translateX(0); opacity: 1; }
         }
       `}</style>
+
+      {/* Inline notifications — guaranteed to show regardless of toast library issues */}
+      {notifications.length > 0 && (
+        <div style={{
+          position: "fixed",
+          bottom: 28,
+          right: 28,
+          zIndex: 99998,
+          display: "flex",
+          flexDirection: "column",
+          gap: 10,
+          pointerEvents: "none",
+        }}>
+          {notifications.map(n => (
+            <div key={n.id} style={{
+              background: "#1b2b5e",
+              color: "#fff",
+              borderRadius: 16,
+              padding: "16px 22px",
+              boxShadow: "0 10px 40px rgba(27,43,94,.35)",
+              minWidth: 280,
+              maxWidth: 380,
+              border: "1.5px solid rgba(218,165,32,.35)",
+            }}>
+              <div style={{ fontWeight: 800, fontSize: 15 }}>{n.title}</div>
+              {n.description && <div style={{ fontSize: 13, opacity: 0.75, marginTop: 4 }}>{n.description}</div>}
+            </div>
+          ))}
+        </div>
+      )}
     </DashboardLayout>
   );
 }
