@@ -47,54 +47,59 @@ router.get("/applications", requireAdmin, async (_req, res): Promise<void> => {
 });
 
 router.post("/applications", cvUpload.single("cvFile"), async (req, res): Promise<void> => {
-  let d = req.body?.data ?? req.body ?? {};
-  if (typeof d === "string") {
-    try {
-      d = JSON.parse(d);
-    } catch {
-      d = {};
+  try {
+    let d = req.body?.data ?? req.body ?? {};
+    if (typeof d === "string") {
+      try {
+        d = JSON.parse(d);
+      } catch {
+        d = {};
+      }
     }
+    const firstName = String(d.firstName ?? "").trim();
+    const lastName = String(d.lastName ?? "").trim();
+    const email = String(d.email ?? "").trim().toLowerCase();
+    const password = String(d.password ?? "").trim();
+    if (!firstName || !email || !password) {
+      res.status(400).json({ error: "Name, email, and password are required." });
+      return;
+    }
+    const role = d.role === "teacher" ? "teacher" : "student";
+    const passwordHash = await bcrypt.hash(password, 10);
+    
+    let cvUrl: string | null = null;
+    if (req.file) {
+      cvUrl = `/uploads/cvs/${req.file.filename}`;
+    }
+    
+    const [app] = await db
+      .insert(applicationsTable)
+      .values({
+        firstName,
+        lastName: lastName || null,
+        email,
+        passwordHash,
+        phone: d.phone ?? null,
+        city: d.city ?? null,
+        role,
+        status: "pending",
+        grade: d.grade ?? null,
+        school: d.school ?? null,
+        parentName: d.parentName ?? null,
+        parentPhone: d.parentPhone ?? null,
+        department: d.department ?? null,
+        qualification: d.qualification ?? null,
+        experience: d.experience ?? null,
+        subjects: d.subjects ?? null,
+        cvUrl,
+        notes: d.notes ?? null,
+      })
+      .returning();
+    res.status(201).json({ application: app });
+  } catch (err) {
+    logger.error({ err }, "Error creating application");
+    res.status(500).json({ error: "Internal server error", requestId: req.id });
   }
-  const firstName = String(d.firstName ?? "").trim();
-  const lastName = String(d.lastName ?? "").trim();
-  const email = String(d.email ?? "").trim().toLowerCase();
-  const password = String(d.password ?? "").trim();
-  if (!firstName || !email || !password) {
-    res.status(400).json({ error: "Name, email, and password are required." });
-    return;
-  }
-  const role = d.role === "teacher" ? "teacher" : "student";
-  const passwordHash = await bcrypt.hash(password, 10);
-  
-  let cvUrl: string | null = null;
-  if (req.file) {
-    cvUrl = `/uploads/cvs/${req.file.filename}`;
-  }
-  
-  const [app] = await db
-    .insert(applicationsTable)
-    .values({
-      firstName,
-      lastName: lastName || null,
-      email,
-      passwordHash,
-      phone: d.phone ?? null,
-      city: d.city ?? null,
-      role,
-      status: "pending",
-      grade: d.grade ?? null,
-      school: d.school ?? null,
-      parentName: d.parentName ?? null,
-      parentPhone: d.parentPhone ?? null,
-      department: d.department ?? null,
-      qualification: d.qualification ?? null,
-      experience: d.experience ?? null,
-      subjects: d.subjects ?? null,
-      cvUrl,
-      notes: d.notes ?? null,
-    })
-    .returning();
-  res.status(201).json({ application: app });
 });
 
 router.patch("/applications/:id", requireAdmin, async (req, res): Promise<void> => {
