@@ -289,6 +289,30 @@ function ApplicationCard({
               </button>
             </>
           ) : null}
+          {!isStudent && app.cvUrl && (
+            <a
+              href={`https://alshamail.onrender.com${app.cvUrl}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "8px 14px",
+                fontSize: 12,
+                fontWeight: 700,
+                cursor: "pointer",
+                background: `${B.navy}10`,
+                border: `1px solid ${B.navy}30`,
+                color: B.navy,
+                borderRadius: 8,
+                textDecoration: "none",
+              }}
+            >
+              <Download size={12} />
+              CV
+            </a>
+          )}
           <button
             onClick={() => setOpen((v) => !v)}
             style={{
