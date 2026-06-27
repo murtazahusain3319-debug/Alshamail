@@ -518,7 +518,6 @@ export default function Home() {
         .als-nav-pill:hover { color:${t.gold}; }
 
         @media (max-width:900px) {
-          .als-nav-links { display:none !important; }
           .als-gamif-grid { grid-template-columns:1fr !important; gap:32px !important; }
           .als-footer-grid { grid-template-columns:1fr !important; gap:28px !important; }
           .als-mobile-menu-btn { display:flex !important; }
@@ -535,11 +534,19 @@ export default function Home() {
           .slide-indicators { display:none !important; }
           .hero-slide-indicators { display:none !important; }
           .hero-logo-mobile-hide { display:none !important; }
+          .hero-slide-heading { display:none !important; }
           .slide-nav-btn svg { width:24px !important; height:24px !important; }
           .hero-slide-nav-btn svg { width:24px !important; height:24px !important; }
           .slide-nav-btn, .hero-slide-nav-btn { top:50% !important; }
           .slide-cta-buttons { position:absolute !important; bottom:200px !important; left:20px !important; right:20px !important; order:unset !important; margin-bottom:unset !important; }
           .slide-trust-badges { position:absolute !important; bottom:60px !important; left:20px !important; right:20px !important; order:unset !important; padding-top:unset !important; }
+          .als-nav-links { display:flex !important; gap:2px !important; }
+          .als-nav-pill { font-size:10px !important; padding:4px 6px !important; }
+          .als-nav-trigger { font-size:10px !important; padding:4px 6px !important; }
+          .als-btn-gold { padding:6px 12px !important; font-size:10px !important; }
+          .als-btn-outline { padding:6px 12px !important; font-size:10px !important; }
+          .als-mobile-menu-btn { display:none !important; }
+          .als-mobile-menu { display:none !important; }
         }
         @media (min-width:901px) {
           .als-mobile-menu-btn { display:none !important; }
@@ -1260,6 +1267,7 @@ export default function Home() {
           >
                   <>
                     <h1
+                      className="hero-slide-heading"
                       style={{
                         fontSize: "clamp(38px, 5.5vw, 68px)",
                         fontWeight: 900,
@@ -1274,6 +1282,7 @@ export default function Home() {
                       {slide.heading}
                     </h1>
                     <p
+                      className="hero-slide-subtitle"
                       style={{
                         fontSize: 17,
                         color: "rgba(255,255,255,.9)",
