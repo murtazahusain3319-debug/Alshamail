@@ -118,6 +118,15 @@ app.use("/uploads/videos", express.static(uploadsRoot));
 app.use("/uploads/messages", express.static(messageUploadsRoot));
 app.use("/uploads/cvs", express.static(cvUploadsRoot));
 
+// Public routes (no authentication required)
+app.post("/api/applications", (req, res, next) => {
+  if (req.method === "GET") {
+    res.set("Cache-Control", "no-store");
+  }
+  next();
+}, router);
+
+// Protected routes (authentication required)
 app.use(
   "/api",
   (req, res, next) => {
@@ -126,13 +135,7 @@ app.use(
     }
     next();
   },
-  (req, res, next) => {
-    // Skip authentication for POST /api/applications (registration endpoint)
-    if (req.path === "/applications" && req.method === "POST") {
-      return next();
-    }
-    return attachUser(req, res, next);
-  },
+  attachUser,
   router,
 );
 
