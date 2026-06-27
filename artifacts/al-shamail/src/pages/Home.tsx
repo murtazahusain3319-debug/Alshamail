@@ -366,6 +366,7 @@ function ActivitiesGallery() {
           </div>
 
           <div
+            className="slide-indicators"
             style={{
               display: "flex",
               justifyContent: "center",
@@ -531,8 +532,12 @@ export default function Home() {
           .als-btn { padding:12px 20px !important; font-size:14px !important; }
           .whatsapp-float-btn { width:48px !important; height:48px !important; }
           .whatsapp-float-btn img { width:48px !important; height:48px !important; }
-          .hero-slide-nav-btn { display:none !important; }
-          .slide-cta-buttons { position:absolute !important; bottom:200px !important; left:20px !important; right:20px !important; order:unset !important; margin-bottom:unset !important; }
+          .slide-cta-buttons { display:none !important; }
+          .slide-indicators { display:none !important; }
+          .slide-nav-btn { width:40px !important; height:40px !important; }
+          .slide-nav-btn svg { width:18px !important; height:18px !important; }
+          .hero-slide-nav-btn { width:40px !important; height:40px !important; }
+          .hero-slide-nav-btn svg { width:18px !important; height:18px !important; }
           .slide-trust-badges { position:absolute !important; bottom:60px !important; left:20px !important; right:20px !important; order:unset !important; padding-top:unset !important; }
         }
         @media (min-width:901px) {
