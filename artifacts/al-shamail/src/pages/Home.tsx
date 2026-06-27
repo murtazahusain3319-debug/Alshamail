@@ -541,16 +541,16 @@ export default function Home() {
           .slide-cta-buttons { position:absolute !important; bottom:200px !important; left:20px !important; right:20px !important; order:unset !important; margin-bottom:unset !important; }
           .slide-trust-badges { position:absolute !important; bottom:60px !important; left:20px !important; right:20px !important; order:unset !important; padding-top:unset !important; }
           .als-nav-links { display:flex !important; gap:2px !important; }
-          .als-nav-pill { font-size:10px !important; padding:4px 6px !important; }
-          .als-nav-trigger { font-size:10px !important; padding:4px 6px !important; }
-          .als-btn-gold { padding:6px 12px !important; font-size:10px !important; }
-          .als-btn-outline { padding:6px 12px !important; font-size:10px !important; }
+          .als-nav-pill { font-size:11px !important; padding:4px 5px !important; }
+          .als-nav-trigger { font-size:11px !important; padding:4px 5px !important; }
+          .als-btn-gold { display:none !important; }
+          .als-btn-outline { display:none !important; }
           .als-mobile-menu-btn { display:none !important; }
           .als-mobile-menu { display:none !important; }
           .hero-slide-subtitle { margin-top:100px !important; }
-          header img { width:27px !important; height:27px !important; }
-          header > div > div > div:first-child { font-size:6px !important; }
-          header > div > div > div:nth-child(2) { font-size:4px !important; }
+          header img { width:36px !important; height:36px !important; }
+          header > div > div > div:first-child { font-size:13px !important; }
+          header > div > div > div:nth-child(2) { font-size:5px !important; }
         }
         @media (max-width:768px) and (orientation: landscape) {
           .als-nav-links { display:flex !important; gap:8px !important; }
@@ -1904,7 +1904,7 @@ export default function Home() {
           height: 64,
           borderRadius: "50%",
           border: "none",
-          background: "transparent",
+          background: "#25D366",
           padding: 0,
           display: "inline-flex",
           alignItems: "center",
@@ -1915,7 +1915,7 @@ export default function Home() {
           overflow: "hidden",
         }}
       >
-        <img src={publicUrl("whatsapp.png")} alt="WhatsApp" style={{ width: 64, height: 64, objectFit: "cover", display: "block" }} />
+        <img src={publicUrl("whatsapp.png")} alt="WhatsApp" style={{ width: 64, height: 64, objectFit: "cover", display: "block", borderRadius: "50%" }} />
       </button>
 
       <footer style={{ background: t.navyD, padding: "64px 28px 32px", color: "rgba(255,255,255,.6)" }}>
