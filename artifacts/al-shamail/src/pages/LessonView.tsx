@@ -357,6 +357,12 @@ export default function LessonView() {
       console.log("New badges from server:", newBadges.length, newBadges);
       // Setting reward triggers the useEffect below which fires the toasts
       setReward({ xpAwarded: (r as any).xpAwarded, leveledUp: (r as any).leveledUp, level: (r as any).level, newBadges });
+      toast.success("Lesson Completed! 🎉", { description: lesson?.title ?? "" });
+      newBadges.forEach((badge: any, i: number) => {
+        setTimeout(() => {
+          toast.success("🏅 Badge Earned!", { description: badge.name });
+        }, (i + 1) * 500);
+      });
       qc.invalidateQueries({ queryKey: ["my-gamification"] });
       qc.invalidateQueries({ queryKey: getGetLessonQueryKey(id) });
       if (lesson?.courseId) qc.invalidateQueries({ queryKey: getGetCourseQueryKey(lesson.courseId) });
@@ -371,20 +377,6 @@ export default function LessonView() {
       completingRef.current = false;
     }
   }, [id, qc, complete, lesson?.courseId, lesson?.title, isReading, watched]);
-
-  // Show toasts after reward state is committed — more reliable than calling toast inside async mutate
-  const rewardRef = useRef<typeof reward>(null);
-  useEffect(() => {
-    console.log("reward effect triggered:", reward);
-    if (!reward || reward === rewardRef.current) return;
-    rewardRef.current = reward;
-    toast.success("Lesson Completed! 🎉", { description: lesson?.title ?? "" });
-    reward.newBadges.forEach((badge: any, i: number) => {
-      setTimeout(() => {
-        toast.success("🏅 Badge Earned!", { description: badge.name });
-      }, (i + 1) * 500);
-    });
-  }, [reward, lesson?.title]);
 
   const onVideoEnded = () => {
     if (lesson && !lesson?.completed && !complete.isPending) {
