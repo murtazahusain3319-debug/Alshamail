@@ -368,13 +368,8 @@ export default function LessonView() {
         console.log("No new badges earned from lesson completion");
       }
       startConfetti();
-      // Delay cache invalidation to allow UI to render badge popup/toast first
-      setTimeout(async () => {
-        await qc.invalidateQueries({ queryKey: getGetLessonQueryKey(id) });
-        if (lesson?.courseId) await qc.invalidateQueries({ queryKey: getGetCourseQueryKey(lesson.courseId) });
-        await qc.invalidateQueries({ queryKey: getGetCurrentUserQueryKey() });
-        await qc.invalidateQueries({ queryKey: getListMyEnrollmentsQueryKey() });
-      }, 1000);
+      // Don't invalidate cache immediately - let the badge popup show first
+      // Cache will be refreshed on next navigation or manual refresh
       setErrorMessage(null);
     } catch (err: any) {
       setErrorMessage(err?.message ?? "Failed to complete lesson.");
@@ -866,6 +861,7 @@ export default function LessonView() {
         </div>
       )}
 
+      {console.log("Badge popup render check:", { showBadgePopup, badgePopupBadge })}
       {showBadgePopup && badgePopupBadge && (
         <div
           onClick={() => setShowBadgePopup(false)}
