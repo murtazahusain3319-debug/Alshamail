@@ -216,6 +216,8 @@ export default function Apply() {
     if (userType === "student" && !formData.grade) errors.grade = "Grade level is required";
     if (userType === "teacher" && !formData.experience)
       errors.experience = "Experience level is required";
+    if (userType === "teacher" && !formData.cvFile)
+      errors.cvFile = "CV is required for teacher applications";
     return errors;
   };
 
@@ -974,15 +976,14 @@ export default function Apply() {
                             />
                           </Field>
                         </div>
-                        <Field label="Upload CV (PDF)">
+                        <Field label="Upload CV (PDF)" required error={fieldErrors.cvFile}>
                           <div style={{
-                            border: `1.5px dashed ${B.light}`,
+                            border: `1.5px dashed ${fieldErrors.cvFile ? B.error : formData.cvFile ? B.gold : B.light}`,
                             borderRadius: 12,
                             padding: "20px",
                             textAlign: "center",
                             cursor: "pointer",
                             background: formData.cvFile ? `${B.gold}10` : B.white,
-                            borderColor: formData.cvFile ? B.gold : B.light,
                           }}>
                             <input
                               type="file"
@@ -1011,6 +1012,11 @@ export default function Apply() {
                               </div>
                             </label>
                           </div>
+                          {fieldErrors.cvFile && (
+                            <div style={{ color: B.error, fontSize: 11, marginTop: 4 }}>
+                              {fieldErrors.cvFile}
+                            </div>
+                          )}
                         </Field>
                       </div>
                     )}

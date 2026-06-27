@@ -47,7 +47,14 @@ router.get("/applications", requireAdmin, async (_req, res): Promise<void> => {
 });
 
 router.post("/applications", cvUpload.single("cvFile"), async (req, res): Promise<void> => {
-  const d = req.body?.data ?? req.body ?? {};
+  let d = req.body?.data ?? req.body ?? {};
+  if (typeof d === "string") {
+    try {
+      d = JSON.parse(d);
+    } catch {
+      d = {};
+    }
+  }
   const firstName = String(d.firstName ?? "").trim();
   const lastName = String(d.lastName ?? "").trim();
   const email = String(d.email ?? "").trim().toLowerCase();
