@@ -21,7 +21,7 @@ router.post("/applications", async (req, res): Promise<void> => {
   const lastName = String(d.lastName ?? "").trim();
   const email = String(d.email ?? "").trim().toLowerCase();
   const password = String(d.password ?? "").trim();
-  if (!firstName || !lastName || !email || !password) {
+  if (!firstName || !email || !password) {
     res.status(400).json({ error: "Name, email, and password are required." });
     return;
   }
@@ -31,7 +31,7 @@ router.post("/applications", async (req, res): Promise<void> => {
     .insert(applicationsTable)
     .values({
       firstName,
-      lastName,
+      lastName: lastName || null,
       email,
       passwordHash,
       phone: d.phone ?? null,

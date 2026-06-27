@@ -308,94 +308,57 @@ export function StudentProgressReport({
         </table>
       </div>
 
-      {/* Summary Statistics */}
+      {/* Signature Section */}
       <div style={{
-        background: `linear-gradient(135deg, ${B.navy} 0%, ${B.navyD} 100%)`,
-        padding: "24px",
-        borderRadius: "8px",
-        marginBottom: "32px",
-        color: "#fff",
+        marginTop: "48px",
+        paddingTop: "24px",
+        borderTop: `2px solid ${B.light}`,
       }}>
-        <h2 style={{
-          fontSize: "16px",
-          fontWeight: 600,
-          margin: "0 0 20px 0",
-          textTransform: "uppercase",
-          letterSpacing: "0.5px",
-        }}>
-          Summary Statistics
-        </h2>
         <div style={{
           display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
-          gap: "20px",
+          gridTemplateColumns: "repeat(2, 1fr)",
+          gap: "40px",
         }}>
           <div>
             <div style={{
-              fontSize: "32px",
-              fontWeight: 700,
-              marginBottom: "4px",
+              fontSize: "13px",
+              fontWeight: 600,
+              color: B.navy,
+              marginBottom: "8px",
             }}>
-              {totalLessons}
+              Teacher's Signature
             </div>
             <div style={{
+              height: "60px",
+              borderBottom: `2px solid ${B.navy}`,
+              marginBottom: "8px",
+            }}></div>
+            <div style={{
               fontSize: "12px",
-              opacity: 0.8,
-              textTransform: "uppercase",
-              letterSpacing: "0.5px",
+              color: B.muted,
             }}>
-              Total Lessons
+              ___________________
             </div>
           </div>
           <div>
             <div style={{
-              fontSize: "32px",
-              fontWeight: 700,
-              marginBottom: "4px",
+              fontSize: "13px",
+              fontWeight: 600,
+              color: B.navy,
+              marginBottom: "8px",
             }}>
-              {completedLessons.length}
+              Principal's Signature
             </div>
+            <div style={{
+              height: "60px",
+              borderBottom: `2px solid ${B.navy}`,
+              marginBottom: "8px",
+            }}></div>
             <div style={{
               fontSize: "12px",
-              opacity: 0.8,
-              textTransform: "uppercase",
-              letterSpacing: "0.5px",
+              color: B.muted,
             }}>
-              Completed
-            </div>
-          </div>
-          <div>
-            <div style={{
-              fontSize: "32px",
-              fontWeight: 700,
-              marginBottom: "4px",
-            }}>
-              {averageScore}%
-            </div>
-            <div style={{
-              fontSize: "12px",
-              opacity: 0.8,
-              textTransform: "uppercase",
-              letterSpacing: "0.5px",
-            }}>
-              Avg Score
-            </div>
-          </div>
-          <div>
-            <div style={{
-              fontSize: "32px",
-              fontWeight: 700,
-              marginBottom: "4px",
-            }}>
-              {overallProgress}%
-            </div>
-            <div style={{
-              fontSize: "12px",
-              opacity: 0.8,
-              textTransform: "uppercase",
-              letterSpacing: "0.5px",
-            }}>
-              Overall Progress
+              ___________________
             </div>
           </div>
         </div>
@@ -404,7 +367,7 @@ export function StudentProgressReport({
       {/* Footer */}
       <div style={{
         textAlign: "center",
-        paddingTop: "20px",
+        paddingTop: "32px",
         borderTop: `1px solid ${B.light}`,
         color: B.muted,
         fontSize: "12px",
