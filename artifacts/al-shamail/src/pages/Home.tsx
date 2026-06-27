@@ -531,7 +531,7 @@ export default function Home() {
           .als-btn { padding:12px 20px !important; font-size:14px !important; }
           .whatsapp-float-btn { width:48px !important; height:48px !important; }
           .whatsapp-float-btn img { width:48px !important; height:48px !important; }
-          .slide-nav-btn { display:none !important; }
+          .hero-slide-nav-btn { display:none !important; }
           .slide-cta-buttons { position:absolute !important; bottom:200px !important; left:20px !important; right:20px !important; order:unset !important; margin-bottom:unset !important; }
           .slide-trust-badges { position:absolute !important; bottom:60px !important; left:20px !important; right:20px !important; order:unset !important; padding-top:unset !important; }
         }
@@ -1342,6 +1342,7 @@ export default function Home() {
           type="button"
           onClick={prevSlide}
           aria-label="Previous slide"
+          className="hero-slide-nav-btn"
           style={{
             position: "absolute",
             left: 24,
@@ -1368,6 +1369,7 @@ export default function Home() {
           type="button"
           onClick={nextSlide}
           aria-label="Next slide"
+          className="hero-slide-nav-btn"
           style={{
             position: "absolute",
             right: 24,
