@@ -1057,7 +1057,7 @@ export default function Home() {
                       }}
                     >
                       <div
-                        className="als-brand-logo-wrap hero-logo-mobile-hide"
+                        className="als-brand-logo-wrap"
                         style={{ flexShrink: 0, animation: "als-slideInL 0.8s cubic-bezier(0.34,1.56,0.64,1) 0.08s both" }}
                       >
                         <div style={{ position: "relative" }}>
