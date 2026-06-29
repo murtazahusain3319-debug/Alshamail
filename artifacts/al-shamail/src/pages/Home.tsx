@@ -556,6 +556,7 @@ export default function Home() {
           header > div > div > div { text-align:left !important; }
           header > div > div > div:first-child { font-size:13px !important; }
           header > div > div > div:nth-child(2) { font-size:5px !important; }
+          .als-brand-logo-wrap { margin-left: -10% !important; }
         }
         @media (max-width:768px) and (orientation: landscape) {
           .als-nav-links { display:flex !important; gap:8px !important; }
