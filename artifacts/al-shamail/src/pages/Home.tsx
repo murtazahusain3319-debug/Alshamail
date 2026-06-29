@@ -535,6 +535,8 @@ export default function Home() {
           .hero-slide-indicators { display:none !important; }
           .hero-logo-mobile-hide { display:none !important; }
           .hero-slide-heading { display:none !important; }
+          .header-logo-mobile { display:none !important; }
+          .header-divider-mobile { display:none !important; }
           .slide-nav-btn svg { width:24px !important; height:24px !important; }
           .hero-slide-nav-btn svg { width:24px !important; height:24px !important; }
           .slide-nav-btn, .hero-slide-nav-btn { top:50% !important; }
@@ -543,14 +545,16 @@ export default function Home() {
           .als-nav-links { display:flex !important; gap:2px !important; }
           .als-nav-pill { font-size:11px !important; padding:4px 5px !important; }
           .als-nav-trigger { font-size:11px !important; padding:4px 5px !important; }
-          .als-btn-gold { display:none !important; }
-          .als-btn-outline { display:none !important; }
+          .als-btn-gold { padding:10px 18px !important; font-size:12px !important; }
+          .als-btn-outline { padding:10px 18px !important; font-size:12px !important; }
           .als-mobile-menu-btn { display:none !important; }
           .als-mobile-menu { display:none !important; }
           .hero-slide-subtitle { margin-top:100px !important; }
-          header img { width:36px !important; height:36px !important; }
-          header > div > div > div:first-child { font-size:13px !important; }
-          header > div > div > div:nth-child(2) { font-size:5px !important; }
+          header img { display:none !important; }
+          header > div > div > div { text-align:left !important; }
+          header > div > div > div:first-child { font-size:16px !important; }
+          header > div > div > div:nth-child(2) { font-size:9px !important; }
+          header > div > div > div:nth-child(3) { font-size:7px !important; }
         }
         @media (max-width:768px) and (orientation: landscape) {
           .als-nav-links { display:flex !important; gap:8px !important; }
@@ -613,6 +617,7 @@ export default function Home() {
         >
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <img
+              className="header-logo-mobile"
               src={publicUrl("logo.jpeg")}
               alt="Al Shamail Logo"
               style={{
@@ -626,7 +631,7 @@ export default function Home() {
                 (e.target as HTMLImageElement).style.display = "none";
               }}
             />
-            <div style={{ width: 1, height: scrolled ? 40 : 52, background: t.light, transition: "height .3s" }} />
+            <div className="header-divider-mobile" style={{ width: 1, height: scrolled ? 40 : 52, background: t.light, transition: "height .3s" }} />
             <div>
               <div
                 style={{
