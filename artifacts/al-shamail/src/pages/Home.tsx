@@ -547,6 +547,8 @@ export default function Home() {
           .als-nav-trigger { font-size:11px !important; padding:4px 5px !important; }
           header .als-btn-gold { display:none !important; }
           header .als-btn-outline { display:none !important; }
+          .header-signin-btn { display:none !important; }
+          .header-getstarted-btn { display:none !important; }
           .als-mobile-menu-btn { display:none !important; }
           .als-mobile-menu { display:none !important; }
           .hero-slide-subtitle { margin-top:100px !important; }
@@ -742,6 +744,7 @@ export default function Home() {
               </svg>
             </button>
             <motion.button
+              className="header-signin-btn"
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               onClick={goLogin}
@@ -769,6 +772,7 @@ export default function Home() {
               Sign In
             </motion.button>
             <motion.button
+              className="header-getstarted-btn"
               whileHover={{ scale: 1.03, boxShadow: "0 8px 24px rgba(201,168,76,.5)" }}
               whileTap={{ scale: 0.97 }}
               onClick={goApply}
@@ -998,7 +1002,7 @@ export default function Home() {
                     .als-brand-body { font-size:13px !important; }
                     .als-orbit-1 { width:280px !important; height:280px !important; margin:-140px 0 0 -140px !important; }
                     .als-orbit-2 { width:380px !important; height:380px !important; margin:-190px 0 0 -190px !important; }
-                    .als-brand-logo-wrap { width:clamp(48px, 10vw, 64px) !important; height:clamp(48px, 10vw, 64px) !important; transform:translateY(-10%) translateX(-5%) !important; }
+                    .als-brand-logo-wrap { width:clamp(48px, 10vw, 64px) !important; height:clamp(48px, 10vw, 64px) !important; transform:translateY(-10%) translateX(-10%) !important; }
                     .als-brand-title-row { flex-direction:row !important; align-items:center !important; }
                     .als-brand-text { flex-direction:column !important; }
                   }
