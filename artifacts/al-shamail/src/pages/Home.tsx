@@ -557,7 +557,6 @@ export default function Home() {
           header > div > div > div:first-child { font-size:13px !important; }
           header > div > div > div:nth-child(2) { font-size:5px !important; }
           .als-brand-logo-wrap { margin-left: -10% !important; }
-          .header-logo-container { margin-left: -10% !important; }
         }
         @media (max-width:768px) and (orientation: landscape) {
           .als-nav-links { display:flex !important; gap:8px !important; }
@@ -618,7 +617,7 @@ export default function Home() {
             gap: 16,
           }}
         >
-          <div className="header-logo-container" style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <img
               className="header-logo-mobile"
               src={publicUrl("logo.jpeg")}
