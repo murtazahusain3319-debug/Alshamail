@@ -552,10 +552,10 @@ export default function Home() {
           .hero-slide-subtitle { margin-top:100px !important; }
           header img { display:none !important; }
           header > div > div > div { text-align:left !important; }
-          header > div > div > div:first-child { font-size:16px !important; }
-          header > div > div > div:nth-child(2) { font-size:9px !important; }
-          header > div > div > div:nth-child(3) { font-size:7px !important; }
-          header > div > div > div > div { display:inline !important; margin-right:4px !important; margin-top:0 !important; }
+          header > div > div > div:first-child { font-size:14px !important; }
+          header > div > div > div:nth-child(2) { font-size:8px !important; }
+          header > div > div > div:nth-child(3) { font-size:6px !important; }
+          header > div > div > div > div { display:inline !important; margin-right:3px !important; margin-top:0 !important; }
         }
         @media (max-width:768px) and (orientation: landscape) {
           .als-nav-links { display:flex !important; gap:8px !important; }
@@ -993,15 +993,16 @@ export default function Home() {
                     .als-brand-title-row { flex-direction:column !important; align-items:center !important; }
                   }
                   @media (max-width:768px) {
-                    .als-brand-eyebrow { font-size:10px !important; order:2 !important; }
+                    .als-brand-eyebrow { font-size:10px !important; }
                     .als-brand-title { font-size:28px !important; }
                     .als-brand-academy { font-size:14px !important; }
                     .als-brand-tagline { font-size:11px !important; }
                     .als-brand-body { font-size:13px !important; }
                     .als-orbit-1 { width:280px !important; height:280px !important; margin:-140px 0 0 -140px !important; }
                     .als-orbit-2 { width:380px !important; height:380px !important; margin:-190px 0 0 -190px !important; }
-                    .als-brand-logo-wrap { width:clamp(48px, 10vw, 64px) !important; height:clamp(48px, 10vw, 64px) !important; order:1 !important; }
+                    .als-brand-logo-wrap { width:clamp(48px, 10vw, 64px) !important; height:clamp(48px, 10vw, 64px) !important; }
                     .als-brand-title-row { flex-direction:column !important; align-items:center !important; }
+                    .als-brand-text { flex-direction:column !important; }
                   }
                 `}</style>
                 <div
