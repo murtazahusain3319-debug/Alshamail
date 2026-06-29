@@ -552,10 +552,8 @@ export default function Home() {
           .hero-slide-subtitle { margin-top:100px !important; }
           header img { display:none !important; }
           header > div > div > div { text-align:left !important; }
-          header > div > div > div:first-child { font-size:14px !important; }
-          header > div > div > div:nth-child(2) { font-size:8px !important; }
-          header > div > div > div:nth-child(3) { font-size:6px !important; }
-          header > div > div > div > div { display:inline !important; margin-right:3px !important; margin-top:0 !important; }
+          header > div > div > div:first-child { font-size:13px !important; }
+          header > div > div > div:nth-child(2) { font-size:5px !important; }
         }
         @media (max-width:768px) and (orientation: landscape) {
           .als-nav-links { display:flex !important; gap:8px !important; }
@@ -993,7 +991,7 @@ export default function Home() {
                     .als-brand-title-row { flex-direction:column !important; align-items:center !important; }
                   }
                   @media (max-width:768px) {
-                    .als-brand-eyebrow { font-size:10px !important; }
+                    .als-brand-eyebrow { font-size:10px !important; margin-top:20px !important; }
                     .als-brand-title { font-size:28px !important; }
                     .als-brand-academy { font-size:14px !important; }
                     .als-brand-tagline { font-size:11px !important; }
