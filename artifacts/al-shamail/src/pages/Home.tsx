@@ -545,8 +545,8 @@ export default function Home() {
           .als-nav-links { display:flex !important; gap:2px !important; }
           .als-nav-pill { font-size:11px !important; padding:4px 5px !important; }
           .als-nav-trigger { font-size:11px !important; padding:4px 5px !important; }
-          .als-btn-gold { display:none !important; }
-          .als-btn-outline { display:none !important; }
+          header .als-btn-gold { display:none !important; }
+          header .als-btn-outline { display:none !important; }
           .als-mobile-menu-btn { display:none !important; }
           .als-mobile-menu { display:none !important; }
           .hero-slide-subtitle { margin-top:100px !important; }
@@ -998,7 +998,7 @@ export default function Home() {
                     .als-brand-body { font-size:13px !important; }
                     .als-orbit-1 { width:280px !important; height:280px !important; margin:-140px 0 0 -140px !important; }
                     .als-orbit-2 { width:380px !important; height:380px !important; margin:-190px 0 0 -190px !important; }
-                    .als-brand-logo-wrap { width:clamp(48px, 10vw, 64px) !important; height:clamp(48px, 10vw, 64px) !important; transform:translateY(-10%) translateX(5%) !important; }
+                    .als-brand-logo-wrap { width:clamp(48px, 10vw, 64px) !important; height:clamp(48px, 10vw, 64px) !important; transform:translateY(-10%) translateX(-5%) !important; }
                     .als-brand-title-row { flex-direction:row !important; align-items:center !important; }
                     .als-brand-text { flex-direction:column !important; }
                   }
