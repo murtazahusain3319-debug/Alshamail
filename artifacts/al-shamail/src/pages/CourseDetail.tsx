@@ -2418,13 +2418,13 @@ export default function CourseDetail() {
             {shouldShowEmptyPlaceholder ? (
               <div style={{ textAlign: "center", padding: "40px 20px", background: B.offW, borderRadius: 14, border: `1.5px dashed ${B.light}` }}>
                 <div style={{ fontSize: 32, marginBottom: 8, opacity: .4 }}>
-                  {tab === "video" ? "🎬" : tab === "reading" ? "📖" : "🧠"}
+                  {tab === "video" ? "🎬" : "🧠"}
                 </div>
                 <div style={{ fontWeight: 700, color: B.navy, marginBottom: 4, fontSize: 15 }}>
-                  No {tab === "video" ? "videos" : tab === "reading" ? "reading material" : "quizzes"} yet
+                  No {tab === "video" ? "videos" : "quizzes"} yet
                 </div>
                 <div style={{ fontSize: 13, color: B.muted }}>
-                  {canManageCourse ? `Click "Add ${tab === "video" ? "Video" : tab === "reading" ? "Reading" : "Quiz"}" to add content.` : "Your teacher hasn't added this yet."}
+                  {canManageCourse ? `Click "Add ${tab === "video" ? "Video" : "Quiz"}" to add content.` : "Your teacher hasn't added this yet."}
                 </div>
               </div>
             ) : tab === "members" ? (

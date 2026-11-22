@@ -477,6 +477,7 @@ export default function MessagesPage() {
                   messages.map((m) => {
                     const mine = m.fromUserId === myId;
                     const parsed = parseMessageBody(m.body);
+                    const imageUrl = parsed.imageUrl;
                     const senderAvatar = mine
                       ? me.data?.user?.avatarUrl ?? null
                       : resolveContactAvatar(contactsById, m.fromUserId, otherAvatarUrl);
@@ -548,12 +549,12 @@ export default function MessagesPage() {
                             <X size={10} />
                           </button>
                         )}
-                        {parsed.imageUrl && (
+                        {imageUrl && (
                           <img
-                            src={resolveMessageMediaUrl(parsed.imageUrl)}
+                            src={resolveMessageMediaUrl(imageUrl)}
                             alt="Shared image"
                             crossOrigin="anonymous"
-                            onClick={() => setViewingImage(resolveMessageMediaUrl(parsed.imageUrl))}
+                            onClick={() => setViewingImage(resolveMessageMediaUrl(imageUrl))}
                             style={{
                               width: "100%",
                               maxWidth: 280,

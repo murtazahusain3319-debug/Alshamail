@@ -18,6 +18,11 @@ import {
   BRAND_TAGLINE,
 } from "@/lib/brand";
 import { prefetchRoute } from "@/lib/route-prefetch";
+import {
+  getBadgeAwardNotifications,
+  markBadgeAwardNotificationRead,
+  subscribeToBadgeAwardNotifications,
+} from "@/lib/badge-notifications";
 import { useToast } from "@/hooks/use-toast";
 import { UserAvatar } from "@/components/UserAvatar";
 
@@ -781,7 +786,11 @@ function NotificationsBell() {
   const assignmentNotifications = (isAdmin || isTeacher) ? loadAssignmentNotifications() : [];
   const [, navigate] = useLocation();
   const [open, setOpen] = useState(false);
+  const [badgeNotifications, setBadgeNotifications] = useState(getBadgeAwardNotifications);
   const wrapRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => subscribeToBadgeAwardNotifications(() => {
+    setBadgeNotifications(getBadgeAwardNotifications());
+  }), []);
   const contactsQ = useListMessageContacts({
     query: {
       enabled: !!user,
@@ -801,7 +810,8 @@ function NotificationsBell() {
     (n, c) => n + (c.unreadCount ?? 0), 0,
   );
   const totalAssignmentUnread = assignmentNotifications.length;
-  const totalUnread = totalMessageUnread + totalAssignmentUnread;
+  const totalBadgeUnread = badgeNotifications.filter((notification) => !notification.read).length;
+  const totalUnread = totalMessageUnread + totalAssignmentUnread + totalBadgeUnread;
 
   // Close the dropdown on outside click.
   useEffect(() => {
@@ -878,7 +888,7 @@ function NotificationsBell() {
             </span>
           </div>
 
-          {assignmentNotifications.length === 0 && unreadConvos.length === 0 ? (
+          {badgeNotifications.length === 0 && assignmentNotifications.length === 0 && unreadConvos.length === 0 ? (
             <div style={{
               padding: "24px 14px", textAlign: "center",
               color: B.muted, fontSize: 12,
@@ -891,6 +901,53 @@ function NotificationsBell() {
             </div>
           ) : (
             <div style={{ maxHeight: 360, overflowY: "auto" }}>
+              {badgeNotifications.length > 0 && (
+                <div style={{ padding: "10px 14px", borderBottom: `1px solid ${B.light}` }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: B.muted, marginBottom: 8 }}>
+                    Badge notifications
+                  </div>
+                  {badgeNotifications.map((note) => (
+                    <button
+                      key={`badge-notification-${note.id}`}
+                      type="button"
+                      onClick={() => {
+                        markBadgeAwardNotificationRead(note.id);
+                        setOpen(false);
+                        navigate("/badges");
+                      }}
+                      style={{
+                        width: "100%",
+                        padding: "10px 12px",
+                        border: "none",
+                        borderRadius: 12,
+                        background: note.read ? "transparent" : B.offW,
+                        color: B.text,
+                        fontSize: 12,
+                        marginBottom: 8,
+                        cursor: "pointer",
+                        display: "flex",
+                        gap: 10,
+                        alignItems: "flex-start",
+                        textAlign: "left",
+                        fontFamily: "inherit",
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = B.offW)}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = note.read ? "transparent" : B.offW)}
+                    >
+                      <Award size={16} color={B.goldD} style={{ flexShrink: 0, marginTop: 1 }} />
+                      <span style={{ flex: 1 }}>
+                        <span style={{ display: "block", fontWeight: 800, color: B.navy }}>
+                          You just earned {note.badgeName}!
+                        </span>
+                        <span style={{ display: "block", marginTop: 3, color: B.muted, fontSize: 10 }}>
+                          View your badges · {fmt(note.earnedAt)}
+                        </span>
+                      </span>
+                      {!note.read && <span aria-label="Unread" style={{ width: 7, height: 7, borderRadius: "50%", background: B.error, flexShrink: 0, marginTop: 5 }} />}
+                    </button>
+                  ))}
+                </div>
+              )}
               {assignmentNotifications.length > 0 && (
                 <div style={{ padding: "10px 14px", borderBottom: `1px solid ${B.light}` }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: B.muted, marginBottom: 8 }}>

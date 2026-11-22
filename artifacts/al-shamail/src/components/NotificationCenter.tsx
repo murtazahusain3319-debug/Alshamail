@@ -90,7 +90,7 @@ export function NotificationCenter() {
     };
   }, [notificationId]);
 
-  if (!badge) return null;
+  if (!badge || notificationId === undefined) return null;
 
   const color = badge.color || "#C9A84C";
   const imageUrl = resolveBadgeImage(badge.imageUrl);
