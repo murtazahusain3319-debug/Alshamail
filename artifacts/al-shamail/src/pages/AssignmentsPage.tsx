@@ -77,12 +77,21 @@ function findCourseName(courseId: string, options: { id: string; name: string }[
   return options.find((course) => course.id === courseId)?.name ?? getCourseName(courseId);
 }
 
+function cleanAssignmentText(value: string) {
+  return value
+    .replace(/ΓÇô/g, "-")
+    .replace(/ΓÇª/g, "...")
+    .replace(/┬╖/g, "-");
+}
+
 function loadAssignments(): Assignment[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       return (JSON.parse(raw) as Assignment[]).map((assignment) => ({
         ...assignment,
+        title: cleanAssignmentText(assignment.title),
+        description: cleanAssignmentText(assignment.description),
         courseId: assignment.courseId ?? "english",
         courseName: assignment.courseName ?? getCourseName(assignment.courseId ?? "english"),
         classId: assignment.classId ?? undefined,
@@ -93,8 +102,8 @@ function loadAssignments(): Assignment[] {
   return [
     {
       id: "asgn-1",
-      title: "Chapter 5 ΓÇô Algebra Review",
-      description: "Complete exercises 1ΓÇô20 on page 112. Show all working.",
+      title: "Chapter 5 - Algebra Review",
+      description: "Complete exercises 1-20 on page 112. Show all working.",
       type: "homework",
       dueDate: new Date(Date.now() + 2 * 86400000).toISOString(),
       createdBy: "teacher-demo",
@@ -108,7 +117,7 @@ function loadAssignments(): Assignment[] {
     {
       id: "asgn-2",
       title: "Mid-term Science Test",
-      description: "Covers chapters 3ΓÇô7. Estimated 45 minutes. Submit your answer sheet as a clear photo.",
+      description: "Covers chapters 3-7. Estimated 45 minutes. Submit your answer sheet as a clear photo.",
       type: "test",
       dueDate: new Date(Date.now() + 7 * 86400000).toISOString(),
       createdBy: "teacher-demo",
@@ -507,7 +516,7 @@ function AssignmentForm({
           value={desc}
           onChange={(e) => setDesc(e.target.value)}
           rows={4}
-          placeholder="Describe what students need to doΓÇª"
+          placeholder="Describe what students need to do..."
           style={{ ...inp, marginTop: 6, resize: "vertical" }}
         />
       </div>
@@ -668,7 +677,7 @@ function SubmissionViewer({
                   value={feedback}
                   onChange={(e) => setFeedback(e.target.value)}
                   rows={3}
-                  placeholder="Write feedback for the studentΓÇª"
+                  placeholder="Write feedback for the student..."
                   disabled={isReturned}
                   style={{ ...inp, marginTop: 6, resize: "vertical", opacity: isReturned ? .7 : 1 }}
                 />
@@ -1362,9 +1371,9 @@ export default function AssignmentsPage() {
             </div>
           </Card>
         </div>
-      ) : (showCreate || editId) && createClassId ? (
+      ) : (showCreate || editId) && (editId || createClassId) ? (
         <div style={{ marginBottom: 24 }}>
-          <Card title={editId ? "Edit Assignment" : createSubjectId ? `Create Assignment ┬╖ ${findCourseName(createSubjectId, courseOptions)}` : "Create Assignment"}>
+          <Card title={editId ? "Edit Assignment" : createSubjectId ? `Create Assignment - ${findCourseName(createSubjectId, courseOptions)}` : "Create Assignment"}>
             <AssignmentForm
               initial={editId ? assignments.find((a) => a.id === editId) : createAssignmentInitial}
               courseOptions={courseOptions}
@@ -1619,12 +1628,12 @@ export default function AssignmentsPage() {
                                           </span>
                                         </div>
                                         <div style={{ fontSize: 11, color: B.muted, marginTop: 3 }}>
-                                          {a.description.slice(0, 80)}{a.description.length > 80 ? "ΓÇª" : ""}
+                                          {a.description.slice(0, 80)}{a.description.length > 80 ? "..." : ""}
                                         </div>
                                         {!isStudent && (
                                           <div style={{ fontSize: 10, color: B.muted, marginTop: 4 }}>
                                             <span style={{ fontWeight: 700, color: B.navy }}>{submissionCount}</span> submission{submissionCount !== 1 ? "s" : ""}
-                                            {pendingCount > 0 && <span style={{ marginLeft: 5, color: B.warning, fontWeight: 700 }}>┬╖ {pendingCount} pending</span>}
+                                            {pendingCount > 0 && <span style={{ marginLeft: 5, color: B.warning, fontWeight: 700 }}>- {pendingCount} pending</span>}
                                           </div>
                                         )}
                                       </div>
@@ -1690,7 +1699,7 @@ export default function AssignmentsPage() {
                                         </div>
 
                                         <div style={{ fontSize: 10, color: B.muted, marginBottom: 14 }}>
-                                          By <strong>{a.createdByName}</strong> ┬╖ Due {new Date(a.dueDate).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}
+                                          By <strong>{a.createdByName}</strong> - Due {new Date(a.dueDate).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}
                                         </div>
 
                                         {isStudent && (
