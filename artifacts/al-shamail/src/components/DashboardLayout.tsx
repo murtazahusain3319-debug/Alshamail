@@ -19,8 +19,9 @@ import {
 } from "@/lib/brand";
 import { prefetchRoute } from "@/lib/route-prefetch";
 import {
+  clearBadgeAwardNotifications,
+  dismissBadgeAwardNotification,
   getBadgeAwardNotifications,
-  markBadgeAwardNotificationRead,
   subscribeToBadgeAwardNotifications,
 } from "@/lib/badge-notifications";
 import { useToast } from "@/hooks/use-toast";
@@ -765,6 +766,7 @@ export const inputStyle: React.CSSProperties = {
 };
 /* ─── Header notifications bell ──────────────────── */
 const ASSIGNMENT_NOTIFICATIONS_KEY = "al_shamail_assignment_notifications_v1";
+const dismissedMessageNotifications = new Map<string, string>();
 
 function loadAssignmentNotifications() {
   try {
@@ -799,8 +801,31 @@ function NotificationsBell() {
     },
   });
   const contacts: any[] = (contactsQ.data as any)?.items ?? [];
-  const unreadConvos = contacts
-    .filter((c) => (c.unreadCount ?? 0) > 0)
+  const unreadConvosBySender = new Map<number, any>();
+  contacts.forEach((contact) => {
+    const unreadCount = Number(contact.unreadCount ?? 0);
+    if (unreadCount <= 0) return;
+
+    const previous = unreadConvosBySender.get(contact.id);
+    if (!previous) {
+      unreadConvosBySender.set(contact.id, { ...contact, unreadCount });
+      return;
+    }
+
+    const previousTime = previous.lastAt ? new Date(previous.lastAt).getTime() : 0;
+    const contactTime = contact.lastAt ? new Date(contact.lastAt).getTime() : 0;
+    const latest = contactTime > previousTime ? contact : previous;
+    unreadConvosBySender.set(contact.id, {
+      ...latest,
+      unreadCount: Number(previous.unreadCount ?? 0) + unreadCount,
+    });
+  });
+  const unreadConvos = Array.from(unreadConvosBySender.values())
+    .filter((contact) => {
+      const ownerAndSender = `${user?.id ?? "anonymous"}:${contact.id}`;
+      const activity = `${contact.unreadCount}:${contact.lastAt ?? ""}`;
+      return dismissedMessageNotifications.get(ownerAndSender) !== activity;
+    })
     .sort((a, b) => {
       const at = a.lastAt ? new Date(a.lastAt).getTime() : 0;
       const bt = b.lastAt ? new Date(b.lastAt).getTime() : 0;
@@ -810,8 +835,17 @@ function NotificationsBell() {
     (n, c) => n + (c.unreadCount ?? 0), 0,
   );
   const totalAssignmentUnread = assignmentNotifications.length;
-  const totalBadgeUnread = badgeNotifications.filter((notification) => !notification.read).length;
+  const totalBadgeUnread = badgeNotifications.length;
   const totalUnread = totalMessageUnread + totalAssignmentUnread + totalBadgeUnread;
+  const clearAllNotifications = () => {
+    clearAssignmentNotifications();
+    clearBadgeAwardNotifications();
+    unreadConvos.forEach((contact) => {
+      const ownerAndSender = `${user?.id ?? "anonymous"}:${contact.id}`;
+      dismissedMessageNotifications.set(ownerAndSender, `${contact.unreadCount}:${contact.lastAt ?? ""}`);
+    });
+    setOpen(false);
+  };
 
   // Close the dropdown on outside click.
   useEffect(() => {
@@ -883,9 +917,31 @@ function NotificationsBell() {
             <span style={{ fontWeight: 800, color: B.navy, fontSize: 13 }}>
               Notifications
             </span>
-            <span style={{ fontSize: 11, color: B.muted, fontWeight: 600 }}>
-              {totalUnread > 0 ? `${totalUnread} unread` : "All caught up"}
-            </span>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              {totalUnread > 0 && (
+                <span style={{ fontSize: 11, color: B.muted, fontWeight: 600 }}>
+                  {totalUnread} unread
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={clearAllNotifications}
+                disabled={totalUnread === 0}
+                style={{
+                  padding: "5px 8px",
+                  border: "none",
+                  borderRadius: 7,
+                  background: "transparent",
+                  color: totalUnread > 0 ? B.navy : B.muted,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  cursor: totalUnread > 0 ? "pointer" : "default",
+                  opacity: totalUnread > 0 ? 1 : 0.5,
+                }}
+              >
+                Clear
+              </button>
+            </div>
           </div>
 
           {badgeNotifications.length === 0 && assignmentNotifications.length === 0 && unreadConvos.length === 0 ? (
@@ -911,7 +967,7 @@ function NotificationsBell() {
                       key={`badge-notification-${note.id}`}
                       type="button"
                       onClick={() => {
-                        markBadgeAwardNotificationRead(note.id);
+                        dismissBadgeAwardNotification(note.id);
                         setOpen(false);
                         navigate("/badges");
                       }}
@@ -920,7 +976,7 @@ function NotificationsBell() {
                         padding: "10px 12px",
                         border: "none",
                         borderRadius: 12,
-                        background: note.read ? "transparent" : B.offW,
+                        background: B.offW,
                         color: B.text,
                         fontSize: 12,
                         marginBottom: 8,
@@ -932,18 +988,18 @@ function NotificationsBell() {
                         fontFamily: "inherit",
                       }}
                       onMouseEnter={(e) => (e.currentTarget.style.background = B.offW)}
-                      onMouseLeave={(e) => (e.currentTarget.style.background = note.read ? "transparent" : B.offW)}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = B.offW)}
                     >
                       <Award size={16} color={B.goldD} style={{ flexShrink: 0, marginTop: 1 }} />
                       <span style={{ flex: 1 }}>
                         <span style={{ display: "block", fontWeight: 800, color: B.navy }}>
-                          You just earned {note.badgeName}!
+                          You just earned the badge "{note.badgeName}"
                         </span>
                         <span style={{ display: "block", marginTop: 3, color: B.muted, fontSize: 10 }}>
                           View your badges · {fmt(note.earnedAt)}
                         </span>
                       </span>
-                      {!note.read && <span aria-label="Unread" style={{ width: 7, height: 7, borderRadius: "50%", background: B.error, flexShrink: 0, marginTop: 5 }} />}
+                      <span aria-label="Unread" style={{ width: 7, height: 7, borderRadius: "50%", background: B.error, flexShrink: 0, marginTop: 5 }} />
                     </button>
                   ))}
                 </div>
@@ -963,7 +1019,13 @@ function NotificationsBell() {
                   ))}
                 </div>
               )}
-              {unreadConvos.map((c) => (
+              {unreadConvos.map((c) => {
+                const senderName = `${c.firstName ?? ""} ${c.lastName ?? ""}`.trim() || "Unknown";
+                const unreadCount = Number(c.unreadCount ?? 0);
+                const messageNotification = unreadCount === 1
+                  ? `You received a message from "${senderName}"`
+                  : `You received ${unreadCount} unread messages from "${senderName}"`;
+                return (
                 <button
                   key={c.id}
                   onClick={() => {
@@ -993,7 +1055,7 @@ function NotificationsBell() {
                       alignItems: "baseline",
                     }}>
                       <span style={{ fontWeight: 800, color: B.navy, fontSize: 13 }}>
-                        {c.firstName} {c.lastName}
+                        {messageNotification}
                       </span>
                       <span style={{ fontSize: 10, color: B.muted, flexShrink: 0 }}>
                         {fmt(c.lastAt)}
@@ -1007,17 +1069,9 @@ function NotificationsBell() {
                       {c.lastBody ?? "New message"}
                     </div>
                   </div>
-                  {c.unreadCount > 1 && (
-                    <span style={{
-                      fontSize: 10, fontWeight: 800,
-                      background: B.gold, color: B.navy,
-                      borderRadius: 99, padding: "2px 7px", flexShrink: 0,
-                    }}>
-                      {c.unreadCount}
-                    </span>
-                  )}
                 </button>
-              ))}
+                );
+              })}
             </div>
           )}
 

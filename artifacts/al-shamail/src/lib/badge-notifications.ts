@@ -6,7 +6,6 @@ export type BadgeAwardNotification = {
   id: number;
   badgeName: string;
   earnedAt: string;
-  read: boolean;
 };
 
 let earnedBadgeNotifications: BadgeAwardNotification[] = [];
@@ -28,13 +27,18 @@ export function subscribeToBadgeAwardNotifications(listener: () => void): () => 
   };
 }
 
-export function markBadgeAwardNotificationRead(id: number): void {
-  const notification = earnedBadgeNotifications.find((item) => item.id === id);
-  if (!notification || notification.read) return;
+export function dismissBadgeAwardNotification(id: number): void {
+  const nextNotifications = earnedBadgeNotifications.filter((item) => item.id !== id);
+  if (nextNotifications.length === earnedBadgeNotifications.length) return;
 
-  earnedBadgeNotifications = earnedBadgeNotifications.map((item) =>
-    item.id === id ? { ...item, read: true } : item,
-  );
+  earnedBadgeNotifications = nextNotifications;
+  publishBadgeNotifications();
+}
+
+export function clearBadgeAwardNotifications(): void {
+  if (earnedBadgeNotifications.length === 0) return;
+
+  earnedBadgeNotifications = [];
   publishBadgeNotifications();
 }
 
@@ -43,7 +47,6 @@ export function notifyBadgeAwards(badges: readonly EarnedBadge[]): void {
     id: enqueueBadgeNotification(badge),
     badgeName: badge.name,
     earnedAt: new Date().toISOString(),
-    read: false,
   }));
   if (notifications.length === 0) return;
 
