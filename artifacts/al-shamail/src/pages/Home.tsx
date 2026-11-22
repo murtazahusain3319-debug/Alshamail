@@ -529,8 +529,8 @@ export default function Home() {
           .als-section-title { font-size:22px !important; }
           .als-card { padding:20px !important; }
           .als-btn { padding:12px 20px !important; font-size:14px !important; }
-          .whatsapp-float-btn { width:60px !important; height:60px !important; background:#25D366 !important; }
-          .whatsapp-float-btn img { width:60px !important; height:60px !important; }
+          .whatsapp-float-btn { width:60px !important; height:60px !important; background:#fff !important; border:2px solid #25D366 !important; }
+          .whatsapp-float-btn svg { width:46px !important; height:46px !important; flex-shrink:0 !important; }
           .slide-indicators { display:none !important; }
           .hero-slide-indicators { display:none !important; }
           .hero-logo-mobile-hide { display:none !important; }
@@ -566,8 +566,8 @@ export default function Home() {
           .als-btn-outline { padding:10px 20px !important; font-size:12px !important; }
           .als-mobile-menu-btn { display:none !important; }
           .als-mobile-menu { display:none !important; }
-          .whatsapp-float-btn { width:60px !important; height:60px !important; background:#25D366 !important; }
-          .whatsapp-float-btn img { width:60px !important; height:60px !important; }
+          .whatsapp-float-btn { width:60px !important; height:60px !important; background:#fff !important; border:2px solid #25D366 !important; }
+          .whatsapp-float-btn svg { width:46px !important; height:46px !important; flex-shrink:0 !important; }
           header img { width:45px !important; height:45px !important; }
           header > div > div > div:first-child { font-size:14px !important; }
           header > div > div > div:nth-child(2) { font-size:8px !important; }
@@ -1532,8 +1532,6 @@ export default function Home() {
         </div>
       </section>
 
-      <ActivitiesGallery />
-
       {/* ── Fee Details Section ────────────────────────────────────────────── */}
       <section style={{ padding: "96px 28px", background: t.white, position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", top: -80, right: -80, width: 400, height: 400, borderRadius: "50%", border: "1px solid rgba(201,168,76,.1)", pointerEvents: "none" }} />
@@ -1909,24 +1907,36 @@ export default function Home() {
         className="whatsapp-float-btn"
         style={{
           position: "fixed",
-          right: 20,
-          bottom: 20,
-          width: 64,
-          height: 64,
+          right: 16,
+          bottom: 16,
+          width: 56,
+          height: 56,
           borderRadius: "50%",
-          border: "none",
-          background: "#25D366",
+          border: "2px solid #25D366",
+          background: "#fff",
           padding: 0,
           display: "inline-flex",
           alignItems: "center",
           justifyContent: "center",
           cursor: "pointer",
-          boxShadow: "0 10px 30px rgba(18, 140, 126, 0.16)",
+          boxShadow: "0 8px 24px rgba(18, 140, 126, 0.28)",
           zIndex: 1200,
           overflow: "hidden",
         }}
       >
-        <img src={publicUrl("whatsapp.png")} alt="WhatsApp" style={{ width: 64, height: 64, objectFit: "cover", display: "block", borderRadius: "50%" }} />
+        <svg
+          width="46"
+          height="46"
+          viewBox="3 3 26 26"
+          fill="none"
+          aria-hidden="true"
+          style={{ display: "block", flexShrink: 0 }}
+        >
+          <path
+            fill="#25D366"
+            d="M16.04 3C8.86 3 3.02 8.82 3.02 16c0 2.29.6 4.52 1.74 6.48L3 29l6.68-1.75A13.02 13.02 0 0 0 16.04 29C23.22 29 29 23.18 29 16S23.22 3 16.04 3Zm0 23.75c-2.08 0-4.12-.56-5.9-1.62l-.42-.25-3.96 1.04 1.06-3.86-.28-.44A10.7 10.7 0 0 1 5.27 16c0-5.92 4.83-10.74 10.77-10.74S26.75 10.08 26.75 16 21.98 26.75 16.04 26.75Zm5.9-8.04c-.32-.16-1.91-.94-2.21-1.05-.3-.1-.52-.16-.74.16-.22.32-.84 1.05-1.03 1.27-.19.22-.38.24-.7.08-.32-.16-1.36-.5-2.58-1.59-.95-.85-1.59-1.9-1.78-2.22-.19-.32-.02-.49.14-.65.14-.14.32-.38.48-.57.16-.19.22-.32.32-.54.1-.22.05-.41-.03-.57-.08-.16-.74-1.78-1.02-2.44-.27-.64-.54-.55-.74-.56h-.63c-.22 0-.57.08-.87.41-.3.32-1.14 1.11-1.14 2.71 0 1.6 1.16 3.15 1.33 3.37.16.22 2.29 3.5 5.54 4.91.77.33 1.37.53 1.84.68.77.24 1.48.21 2.04.13.62-.09 1.91-.78 2.18-1.53.27-.76.27-1.4.19-1.53-.08-.14-.3-.22-.62-.38Z"
+          />
+        </svg>
       </button>
 
       <footer style={{ background: t.navyD, padding: "64px 28px 32px", color: "rgba(255,255,255,.6)" }}>
