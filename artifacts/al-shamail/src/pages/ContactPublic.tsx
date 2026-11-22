@@ -21,6 +21,12 @@ export default function ContactPublic() {
           </div>
         </div>
       </div>
+      <section style={{ marginTop: 16, background: "#fff", border: "1px solid #E8EBF4", borderRadius: 16, padding: 18 }}>
+        <h2 style={{ fontSize: 16, fontWeight: 900, color: "#1B2B5E", margin: "0 0 10px" }}>Address</h2>
+        <address style={{ color: "#64748b", lineHeight: 1.8, fontSize: 14, fontStyle: "normal" }}>
+          EDGA7969, 7969 Al Imam Ali Ibn Abi Talib, 2296, Ash Shifa Dist., DAMMAM, Eastern Province, 32236
+        </address>
+      </section>
       <div style={{ marginTop: 18, color: "#64748b", fontSize: 13 }}>
         Note: This page is informational; in-app messaging is available once you’re enrolled and signed in.
       </div>

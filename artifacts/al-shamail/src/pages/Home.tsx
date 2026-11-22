@@ -556,7 +556,7 @@ export default function Home() {
           header > div > div > div { text-align:left !important; }
           header > div > div > div:first-child { font-size:13px !important; }
           header > div > div > div:nth-child(2) { font-size:5px !important; }
-          .als-brand-logo-wrap { margin-left: -10% !important; }
+          .als-brand-logo-wrap { margin-left: -10% !important; position:relative; left:-6px; }
         }
         @media (max-width:768px) and (orientation: landscape) {
           .als-nav-links { display:flex !important; gap:8px !important; }
@@ -2042,6 +2042,9 @@ export default function Home() {
               gap: 12,
             }}
           >
+            <p style={{ flexBasis: "100%", fontSize: 12, margin: 0, textAlign: "center" }}>
+              EDGA7969, 7969 Al Imam Ali Ibn Abi Talib, 2296, Ash Shifa Dist., DAMMAM, Eastern Province, 32236
+            </p>
             <p style={{ fontSize: 12 }}>© {new Date().getFullYear()} Al Shamail Learning Center. All rights reserved.</p>
             <p style={{ fontSize: 12, color: t.gold }}>Learn · Grow · Excel</p>
           </div>
