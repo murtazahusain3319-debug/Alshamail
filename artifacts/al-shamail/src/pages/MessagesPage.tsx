@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useRoute, useLocation } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import { Send, MessageCircle, ArrowLeft, Plus, Trash2, Search, X, ImagePlus } from "lucide-react";
@@ -141,10 +141,19 @@ export default function MessagesPage() {
     }
   };
 
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
+  useLayoutEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+
+    const scrollToLatest = () => {
+      if (scrollRef.current === container) {
+        container.scrollTop = container.scrollHeight;
+      }
+    };
+
+    scrollToLatest();
+    const frame = window.requestAnimationFrame(scrollToLatest);
+    return () => window.cancelAnimationFrame(frame);
   }, [messages.length, otherId]);
 
   useEffect(() => {

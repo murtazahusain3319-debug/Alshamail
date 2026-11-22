@@ -94,7 +94,12 @@ export function NotificationCenter() {
 
   const color = badge.color || "#C9A84C";
   const imageUrl = resolveBadgeImage(badge.imageUrl);
-  const icon = badge.icon && badge.icon.length <= 4 ? badge.icon : "🏅";
+  const badgeIcon = badge.icon?.trim();
+  const cornerIcon = !badgeIcon || badgeIcon.length > 4
+    ? "🏅"
+    : /^\d+$/.test(badgeIcon)
+    ? null
+    : badgeIcon;
 
   return (
     <div className={`badge-celebration-backdrop${backdropExitId === notificationId ? " badge-celebration-backdrop-exiting" : ""}`}>
@@ -134,7 +139,7 @@ export function NotificationCenter() {
           style={{ color, borderColor: `${color}88`, background: `${color}18` }}
         >
           <Award size={42} strokeWidth={1.8} />
-          <span>{icon}</span>
+          {cornerIcon && <span>{cornerIcon}</span>}
           {imageUrl && <img src={imageUrl} alt="" onError={(event) => (event.currentTarget.style.display = "none")} />}
         </div>
         <div className="badge-celebration-eyebrow">A new achievement!</div>
