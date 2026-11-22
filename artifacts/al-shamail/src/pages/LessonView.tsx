@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { useRoute, Link, useLocation } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 import {
   ArrowLeft, CheckCircle2, Sparkles, Trophy, ClipboardList,
   BookOpen, Play, Clock, ChevronLeft, ChevronRight,
@@ -159,7 +159,6 @@ export default function LessonView() {
   const [videoError, setVideoError] = useState<string | null>(null);
   const [confettiActive, setConfettiActive] = useState(false);
   const [youtubeEnded, setYoutubeEnded] = useState(false);
-  const [notifications, setNotifications] = useState<{id: string; title: string; description: string}[]>([]);
   const youtubePlayerRef = useRef<any>(null);
   const progressIntervalRef = useRef<number | null>(null);
   const completingRef = useRef(false);
@@ -179,7 +178,6 @@ export default function LessonView() {
     setWatched(0);
     setVideoError(null);
     setYoutubeEnded(false);
-    setNotifications([]);
     stopConfetti();
     // Reset auto-completion refs when lesson changes
     hasAutoCompletedRef.current = null;
@@ -374,9 +372,11 @@ export default function LessonView() {
       // Setting reward triggers the useEffect below which fires the toasts
       setReward({ xpAwarded: (r as any).xpAwarded, leveledUp: (r as any).leveledUp, level: (r as any).level, newBadges });
       
-      toast.success("Lesson completed! 🎉", {
+      toast({
+        title: "Lesson completed! 🎉",
         description: lesson?.title,
         duration: 4000,
+        type: "success",
       });
 
       notifyBadgeAwards(newBadges);
@@ -892,17 +892,6 @@ export default function LessonView() {
       />
     </DashboardLayout>
 
-    {/* Inline notifications — guaranteed to show regardless of toast library issues */}
-    {notifications.length > 0 && (
-      <div style={{ position: "fixed", bottom: 28, right: 28, zIndex: 99999, display: "flex", flexDirection: "column", gap: 10, pointerEvents: "none" }}>
-        {notifications.map(n => (
-          <div key={n.id} style={{ background: "#1b2b5e", color: "#fff", borderRadius: 16, padding: "16px 22px", boxShadow: "0 10px 40px rgba(27,43,94,.35)", minWidth: 280, maxWidth: 380, border: "1.5px solid rgba(218,165,32,.4)" }}>
-            <div style={{ fontWeight: 800, fontSize: 15 }}>{n.title}</div>
-            {n.description && <div style={{ fontSize: 13, opacity: 0.75, marginTop: 4 }}>{n.description}</div>}
-          </div>
-        ))}
-      </div>
-    )}
     </>
   );
 

@@ -17,6 +17,7 @@ import {
   getGetCurrentUserQueryKey,
 } from "@workspace/api-client-react";
 import { B } from "@/lib/brand";
+import { toast } from "@/hooks/use-toast";
 import { notifyBadgeAwards } from "@/lib/badge-notifications";
 import {
   DashboardLayout,
@@ -24,15 +25,6 @@ import {
   Pill,
   GoldButton,
 } from "@/components/DashboardLayout";
-
-function resolveImageUrl(url: string | null): string | undefined {
-  if (!url) return undefined;
-  if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  const API_BASE = import.meta.env.VITE_API_BASE || "/api";
-  const normalized = url.startsWith("/") ? url.slice(1) : url;
-  const baseUrl = API_BASE.replace(/\/api\/?$/, "");
-  return `${baseUrl}${normalized}`;
-}
 
 export default function QuizView() {
   const [, params] = useRoute<{ id: string }>("/lessons/:id/quiz");
@@ -49,9 +41,6 @@ export default function QuizView() {
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [result, setResult] = useState<any | null>(null);
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
-  const [showBadgePopup, setShowBadgePopup] = useState(false);
-  const [badgePopupBadge, setBadgePopupBadge] = useState<any | null>(null);
-  const [notifications, setNotifications] = useState<{id: string; title: string; description: string}[]>([]);
 
   const allAnswered =
     quiz?.questions?.length &&
@@ -75,13 +64,11 @@ export default function QuizView() {
     const newBadges = (r as any).newBadges ?? [];
     console.log("Quiz - New badges from server:", newBadges.length, newBadges);
     
-    // Show quiz completion notification
-    const baseId = `notif-${Date.now()}`;
-    setNotifications(prev => [...prev, { id: baseId, title: "Quiz Submitted!", description: r?.passed ? "You passed!" : "Keep practicing!" }]);
-    setTimeout(() => setNotifications(prev => prev.filter(n => n.id !== baseId)), 5000);
-    
-    // Show badge notifications for new badges
     notifyBadgeAwards(newBadges);
+    toast({
+      title: "Quiz Submitted!",
+      description: r?.passed ? "You passed!" : "Keep practicing!",
+    });
     
     // Refresh gamification cache in the background
     qc.invalidateQueries({ queryKey: ["my-gamification"] });
@@ -454,139 +441,6 @@ export default function QuizView() {
             alt="Preview"
             style={{ maxWidth: "94%", maxHeight: "94%", borderRadius: 8, boxShadow: "0 10px 30px rgba(0,0,0,.6)" }}
           />
-        </div>
-      )}
-      {showBadgePopup && badgePopupBadge && (
-        <div
-          onClick={() => setShowBadgePopup(false)}
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.7)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 9999,
-            animation: "fadeIn 0.3s ease-out",
-          }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              background: B.white,
-              borderRadius: 24,
-              padding: 32,
-              textAlign: "center",
-              maxWidth: 400,
-              width: "90%",
-              boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
-              animation: "scaleIn 0.4s ease-out",
-            }}
-          >
-            <div style={{ fontSize: 14, fontWeight: 700, color: B.gold, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>
-              🎉 Badge Earned!
-            </div>
-            {badgePopupBadge.imageUrl ? (
-              <img
-                src={resolveImageUrl(badgePopupBadge.imageUrl) || badgePopupBadge.imageUrl}
-                alt={badgePopupBadge.name}
-                style={{ width: 120, height: 120, objectFit: "contain", margin: "0 auto 16px", animation: "bounce 1s ease-in-out infinite" }}
-              />
-            ) : (
-              <div
-                style={{
-                  width: 120,
-                  height: 120,
-                  borderRadius: "50%",
-                  background: `linear-gradient(135deg, ${badgePopupBadge.color || B.gold} 0%, ${badgePopupBadge.color || B.gold}cc 100%)`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 48,
-                  margin: "0 auto 16px",
-                  animation: "bounce 1s ease-in-out infinite",
-                }}
-              >
-                🏆
-              </div>
-            )}
-            <div style={{ fontSize: 24, fontWeight: 800, color: B.navy, marginBottom: 8 }}>
-              {badgePopupBadge.name}
-            </div>
-            <div style={{ fontSize: 14, color: B.muted, marginBottom: 24, lineHeight: 1.5 }}>
-              {badgePopupBadge.description}
-            </div>
-            <button
-              onClick={() => {
-                setShowBadgePopup(false);
-                if (badgePopupBadge) {
-                  const bId = `notif-${Date.now()}`;
-                  setNotifications(prev => [...prev, { id: bId, title: "🏅 Badge Earned!", description: badgePopupBadge.name }]);
-                  setTimeout(() => setNotifications(prev => prev.filter(n => n.id !== bId)), 5000);
-                }
-              }}
-              style={{
-                background: B.gold,
-                color: B.white,
-                border: "none",
-                borderRadius: 12,
-                padding: "12px 24px",
-                fontSize: 14,
-                fontWeight: 700,
-                cursor: "pointer",
-              }}
-            >
-              Awesome!
-            </button>
-          </div>
-        </div>
-      )}
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes scaleIn {
-          from { transform: scale(0.8); opacity: 0; }
-          to { transform: scale(1); opacity: 1; }
-        }
-        @keyframes bounce {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-10px); }
-        }
-        @keyframes slideInRight {
-          from { transform: translateX(100%); opacity: 0; }
-          to { transform: translateX(0); opacity: 1; }
-        }
-      `}</style>
-
-      {/* Inline notifications — guaranteed to show regardless of toast library issues */}
-      {notifications.length > 0 && (
-        <div style={{
-          position: "fixed",
-          bottom: 28,
-          right: 28,
-          zIndex: 99998,
-          display: "flex",
-          flexDirection: "column",
-          gap: 10,
-          pointerEvents: "none",
-        }}>
-          {notifications.map(n => (
-            <div key={n.id} style={{
-              background: "#1b2b5e",
-              color: "#fff",
-              borderRadius: 16,
-              padding: "16px 22px",
-              boxShadow: "0 10px 40px rgba(27,43,94,.35)",
-              minWidth: 280,
-              maxWidth: 380,
-              border: "1.5px solid rgba(218,165,32,.35)",
-            }}>
-              <div style={{ fontWeight: 800, fontSize: 15 }}>{n.title}</div>
-              {n.description && <div style={{ fontSize: 13, opacity: 0.75, marginTop: 4 }}>{n.description}</div>}
-            </div>
-          ))}
         </div>
       )}
     </DashboardLayout>

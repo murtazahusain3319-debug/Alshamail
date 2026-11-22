@@ -4,6 +4,7 @@ import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { NotificationCenter } from "@/components/NotificationCenter";
 import { B } from "@/lib/brand";
 const Home = lazy(() => import("@/pages/Home"));
 const Apply = lazy(() => import("@/pages/Apply"));
@@ -331,6 +332,7 @@ function App() {
               <Router />
             </Suspense>
           </WouterRouter>
+          <NotificationCenter />
           <Toaster position="bottom-right" richColors />
         </TooltipProvider>
       </QueryClientProvider>

@@ -1,4 +1,10 @@
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
+import {
+  completeNotification,
+  enqueueToastNotification,
+  getCurrentNotification,
+  subscribeToNotifications,
+} from "@/lib/notification-queue";
 
 export type ToastVariant = "default" | "destructive";
 
@@ -10,39 +16,38 @@ export type Toast = {
   action?: React.ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  type?: "default" | "success" | "error" | "warning" | "info";
+  duration?: number;
 };
 
-let counter = 0;
-const listeners: Array<(toasts: Toast[]) => void> = [];
-let memoryState: Toast[] = [];
-
-function dispatch(next: Toast[]) {
-  memoryState = next;
-  for (const l of listeners) l(memoryState);
-}
-
 export function toast(t: Omit<Toast, "id">) {
-  const id = `t-${++counter}`;
-  dispatch([...memoryState, { ...t, id, open: true }]);
-  setTimeout(() => {
-    dispatch(memoryState.filter((x) => x.id !== id));
-  }, 4000);
-  return { id };
+  const id = enqueueToastNotification(t);
+  return { id: `t-${id}` };
 }
 
 export function useToast() {
-  const [toasts, setToasts] = useState<Toast[]>(memoryState);
-  const subscribe = useCallback(() => {
-    listeners.push(setToasts);
-    return () => {
-      const idx = listeners.indexOf(setToasts);
-      if (idx >= 0) listeners.splice(idx, 1);
-    };
-  }, []);
-  // subscribe on first render
-  if (!listeners.includes(setToasts)) subscribe();
+  const [toasts, setToasts] = useState<Toast[]>([]);
+  useEffect(() => subscribeToNotifications((notification) => {
+    if (!notification || notification.kind !== "toast") {
+      setToasts([]);
+      return;
+    }
+
+    setToasts([{
+      ...notification.toast,
+      id: `t-${notification.id}`,
+      open: true,
+      onOpenChange: (open) => {
+        if (!open) completeNotification(notification.id);
+      },
+    }]);
+  }), []);
+
   const dismiss = useCallback((id?: string) => {
-    dispatch(id ? memoryState.filter((t) => t.id !== id) : []);
+    const current = getCurrentNotification();
+    if (current?.kind === "toast" && (!id || id === `t-${current.id}`)) {
+      completeNotification(current.id);
+    }
   }, []);
   return { toasts, toast, dismiss };
 }
