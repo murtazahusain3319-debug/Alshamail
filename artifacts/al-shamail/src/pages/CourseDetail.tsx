@@ -15,6 +15,7 @@ import {
 } from "@workspace/api-client-react";
 import { useGetCourseMembers, getGetCourseMembersQueryKey } from "@/lib/mock-api";
 import { B } from "@/lib/brand";
+import { notifyBadgeAwards } from "@/lib/badge-notifications";
 import { DashboardLayout, Card, Pill, PrimaryButton, GoldButton, inputStyle } from "@/components/DashboardLayout";
 import { API_BASE } from "@/lib/api-base";
 
@@ -1844,10 +1845,14 @@ export default function CourseDetail() {
       const result = await complete.mutateAsync({ id: activeDocumentLesson.id });
       setActiveDocumentLesson((current: any) => current ? { ...current, completed: true } : current);
       setCompleteMessage("Lesson marked complete!");
+      const newBadges = (result as any)?.newBadges ?? [];
+      notifyBadgeAwards(newBadges);
       await qc.invalidateQueries({ queryKey: getGetCourseQueryKey(id), refetchType: "all" });
       if (result?.lessonId) {
         await qc.invalidateQueries({ queryKey: getGetLessonQueryKey(result.lessonId), refetchType: "all" });
       }
+      await qc.invalidateQueries({ queryKey: ["my-gamification"] });
+      await qc.invalidateQueries({ queryKey: getGetCurrentUserQueryKey() });
     } catch (err: any) {
       setCompleteError(err?.message ?? "Failed to complete lesson.");
     }

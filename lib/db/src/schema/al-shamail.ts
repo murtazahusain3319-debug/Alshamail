@@ -145,7 +145,7 @@ export const badgesTable = pgTable("badges", {
   icon: text("icon").notNull().default("🏅"),
   imageUrl: text("image_url"),
   color: text("color").notNull().default("#C9A84C"),
-  criteria: text("criteria").notNull().default("manual"), // manual | xp | lessons | streak
+  criteria: text("criteria").notNull().default("manual"), // manual | xp | lessons | streak | course
   threshold: integer("threshold"),
 });
 

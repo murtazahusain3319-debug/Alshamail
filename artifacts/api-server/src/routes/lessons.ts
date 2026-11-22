@@ -16,7 +16,7 @@ import {
 } from "@workspace/db";
 import { requireAuth } from "../lib/auth";
 import { levelForXp } from "../lib/level";
-import { awardBadges } from "../lib/awards";
+import { awardBadges, getLearningStreak } from "../lib/awards";
 
 const router: IRouter = Router();
 
@@ -229,23 +229,30 @@ router.post("/lessons/:id/complete", requireAuth, async (req, res): Promise<void
   let xpAwarded = 0;
   let leveledUp = false;
   let newLevel = u.level;
-  let newBadges: any[] = [];
+  let newBadges: Awaited<ReturnType<typeof awardBadges>> = [];
+  let nextXp = u.xp;
+  let streak = 0;
   if (existing.length === 0) {
     await db.insert(lessonProgressTable).values({ userId: u.id, lessonId: id });
     xpAwarded = lesson.xpReward ?? 50;
-    const nextXp = u.xp + xpAwarded;
+    nextXp += xpAwarded;
+    streak = await getLearningStreak(u.id);
     const lvl = levelForXp(nextXp);
     leveledUp = lvl.level > u.level;
     newLevel = lvl.level;
     await db
       .update(usersTable)
-      .set({ xp: nextXp, level: lvl.level, lastActiveAt: new Date() })
+      .set({ xp: nextXp, level: lvl.level, streak, lastActiveAt: new Date() })
       .where(eq(usersTable.id, u.id));
     await db.insert(xpEventsTable).values({ userId: u.id, amount: xpAwarded, reason: "Lesson complete" });
-
-    // Award badges using the reusable utility
-    newBadges = await awardBadges(u.id, nextXp, lesson.courseId).catch(() => []);
+  } else {
+    streak = await getLearningStreak(u.id);
+    await db
+      .update(usersTable)
+      .set({ streak })
+      .where(eq(usersTable.id, u.id));
   }
+  newBadges = await awardBadges(u.id, nextXp, lesson.courseId, streak);
   res.json({ lessonId: id, xpAwarded, leveledUp, level: newLevel, newBadges });
 });
 
@@ -369,8 +376,13 @@ router.post("/lessons/:id/quiz/submit", requireAuth, async (req, res): Promise<v
     }
   }
 
-  // Award badges using the reusable utility
-  const newBadges = await awardBadges(req.user!.id, nextXp, lesson.courseId).catch(() => []);
+  const streak = await getLearningStreak(req.user!.id);
+  await db
+    .update(usersTable)
+    .set({ streak })
+    .where(eq(usersTable.id, req.user!.id));
+
+  const newBadges = await awardBadges(req.user!.id, nextXp, lesson.courseId, streak);
 
   res.json({
     score,

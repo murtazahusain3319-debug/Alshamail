@@ -1,9 +1,38 @@
-import { db, badgesTable, achievementsTable } from "@workspace/db";
+import {
+  db,
+  badgesTable,
+  achievementsTable,
+  lessonProgressTable,
+  lessonsTable,
+  quizAttemptsTable,
+} from "@workspace/db";
 import { eq, lte, and, inArray } from "drizzle-orm";
-import { lessonsTable, lessonProgressTable } from "@workspace/db";
+import { calculateLearningStreak } from "./streak";
 
-export async function awardBadges(userId: number, nextXp: number, courseId?: number | null) {
-  const newBadges: any[] = [];
+export async function getLearningStreak(userId: number): Promise<number> {
+  const [lessonActivity, quizActivity] = await Promise.all([
+    db
+      .select({ activityAt: lessonProgressTable.completedAt })
+      .from(lessonProgressTable)
+      .where(eq(lessonProgressTable.userId, userId)),
+    db
+      .select({ activityAt: quizAttemptsTable.takenAt })
+      .from(quizAttemptsTable)
+      .where(eq(quizAttemptsTable.userId, userId)),
+  ]);
+
+  return calculateLearningStreak(
+    [...lessonActivity, ...quizActivity].map((activity) => activity.activityAt),
+  );
+}
+
+export async function awardBadges(
+  userId: number,
+  nextXp: number,
+  courseId: number | null | undefined,
+  streak: number,
+) {
+  const newBadges: (typeof badgesTable.$inferSelect)[] = [];
 
   const already = await db
     .select({ badgeId: achievementsTable.badgeId })
@@ -11,10 +40,17 @@ export async function awardBadges(userId: number, nextXp: number, courseId?: num
     .where(eq(achievementsTable.userId, userId));
   const earnedIds = new Set(already.map((r) => r.badgeId));
 
-  const grant = async (badge: any) => {
+  const grant = async (badge: typeof badgesTable.$inferSelect) => {
     if (earnedIds.has(badge.id)) return;
-    await db.insert(achievementsTable).values({ userId, badgeId: badge.id });
-    newBadges.push(badge);
+    const [inserted] = await db
+      .insert(achievementsTable)
+      .values({ userId, badgeId: badge.id })
+      .onConflictDoNothing()
+      .returning({ badgeId: achievementsTable.badgeId });
+    if (inserted) {
+      earnedIds.add(badge.id);
+      newBadges.push(badge);
+    }
   };
 
   // XP badges
@@ -35,6 +71,13 @@ export async function awardBadges(userId: number, nextXp: number, courseId?: num
     .where(and(eq(badgesTable.criteria, "lessons"), lte(badgesTable.threshold, completedLessons.length)));
   for (const b of lessonBadges) await grant(b);
 
+  // Streak badges
+  const streakBadges = await db
+    .select()
+    .from(badgesTable)
+    .where(and(eq(badgesTable.criteria, "streak"), lte(badgesTable.threshold, streak)));
+  for (const b of streakBadges) await grant(b);
+
   // Course completion badges
   if (courseId) {
     const courseLessons = await db
@@ -52,11 +95,10 @@ export async function awardBadges(userId: number, nextXp: number, courseId?: num
         ));
 
       if (completedInCourse.length >= courseLessons.length) {
-        // Award all course-completion badges (threshold is ignored for course criteria)
         const courseBadges = await db
           .select()
           .from(badgesTable)
-          .where(eq(badgesTable.criteria, "course"));
+          .where(and(eq(badgesTable.criteria, "course"), eq(badgesTable.threshold, courseId)));
         for (const b of courseBadges) await grant(b);
       }
     }

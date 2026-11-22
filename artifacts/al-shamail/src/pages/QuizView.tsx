@@ -17,6 +17,7 @@ import {
   getGetCurrentUserQueryKey,
 } from "@workspace/api-client-react";
 import { B } from "@/lib/brand";
+import { notifyBadgeAwards } from "@/lib/badge-notifications";
 import {
   DashboardLayout,
   Card,
@@ -80,15 +81,7 @@ export default function QuizView() {
     setTimeout(() => setNotifications(prev => prev.filter(n => n.id !== baseId)), 5000);
     
     // Show badge notifications for new badges
-    if (newBadges.length > 0) {
-      newBadges.forEach((badge: any, i: number) => {
-        const bId = `${baseId}-${i}`;
-        setTimeout(() => {
-          setNotifications(prev => [...prev, { id: bId, title: "🏅 Badge Earned!", description: badge.name }]);
-          setTimeout(() => setNotifications(prev => prev.filter(n => n.id !== bId)), 5000);
-        }, (i + 1) * 600);
-      });
-    }
+    notifyBadgeAwards(newBadges);
     
     // Refresh gamification cache in the background
     qc.invalidateQueries({ queryKey: ["my-gamification"] });

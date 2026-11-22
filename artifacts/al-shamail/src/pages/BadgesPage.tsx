@@ -13,7 +13,7 @@ import { DashboardLayout, Card, Pill, PrimaryButton, GoldButton } from "@/compon
 import { API_BASE } from "@/lib/api-base";
 
 const BADGE_COLORS = ["#C9A84C", "#1F3A5F", "#7C3AED", "#16A34A", "#DC2626", "#0EA5E9"];
-const BADGE_CRITERIA = ["manual", "xp", "lessons", "course"] as const;
+const BADGE_CRITERIA = ["manual", "xp", "lessons", "streak", "course"] as const;
 
 const BADGE_IMAGES = [
   "https://i.imgur.com/7EBESyS.png", // Star badge
@@ -317,6 +317,22 @@ export default function BadgesPage() {
                     <input
                       type="number"
                       min={0}
+                      value={bForm.threshold}
+                      onChange={(e) =>
+                        setBForm((f) => ({
+                          ...f,
+                          threshold: parseInt(e.target.value, 10) || 0,
+                        }))
+                      }
+                      style={inputStyle}
+                    />
+                  </FormField>
+                )}
+                {bForm.criteria === "streak" && (
+                  <FormField label="Day streak threshold">
+                    <input
+                      type="number"
+                      min={1}
                       value={bForm.threshold}
                       onChange={(e) =>
                         setBForm((f) => ({

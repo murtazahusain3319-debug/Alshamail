@@ -13,6 +13,7 @@ import {
 } from "@workspace/api-client-react";
 import { B } from "@/lib/brand";
 import { API_BASE } from "@/lib/api-base";
+import { notifyBadgeAwards } from "@/lib/badge-notifications";
 import { DashboardLayout, Card, Pill, GoldButton } from "@/components/DashboardLayout";
 
 function resolveImageUrl(url: string | null | undefined): string | undefined {
@@ -378,19 +379,7 @@ export default function LessonView() {
         duration: 4000,
       });
 
-      newBadges.forEach((badge: any, i: number) => {
-        setTimeout(() => {
-          toast("🏅 Badge Earned!", {
-            description: badge.name,
-            duration: 6000,
-            style: {
-              background: "#1b2b5e",
-              color: "#fff",
-              border: "1.5px solid rgba(218,165,32,.5)",
-            },
-          });
-        }, (i + 1) * 700);
-      });
+      notifyBadgeAwards(newBadges);
       
       qc.invalidateQueries({ queryKey: ["my-gamification"] });
       qc.invalidateQueries({ queryKey: getGetLessonQueryKey(id) });
