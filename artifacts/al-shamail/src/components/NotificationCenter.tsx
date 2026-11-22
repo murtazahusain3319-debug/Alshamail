@@ -94,12 +94,6 @@ export function NotificationCenter() {
 
   const color = badge.color || "#C9A84C";
   const imageUrl = resolveBadgeImage(badge.imageUrl);
-  const badgeIcon = badge.icon?.trim();
-  const cornerIcon = !badgeIcon || badgeIcon.length > 4
-    ? "🏅"
-    : /^\d+$/.test(badgeIcon)
-    ? null
-    : badgeIcon;
 
   return (
     <div className={`badge-celebration-backdrop${backdropExitId === notificationId ? " badge-celebration-backdrop-exiting" : ""}`}>
@@ -139,7 +133,6 @@ export function NotificationCenter() {
           style={{ color, borderColor: `${color}88`, background: `${color}18` }}
         >
           <Award size={42} strokeWidth={1.8} />
-          {cornerIcon && <span>{cornerIcon}</span>}
           {imageUrl && <img src={imageUrl} alt="" onError={(event) => (event.currentTarget.style.display = "none")} />}
         </div>
         <div className="badge-celebration-eyebrow">A new achievement!</div>
@@ -216,20 +209,6 @@ export function NotificationCenter() {
           border-radius: 50%;
           box-shadow: inset 0 0 0 7px rgba(255,255,255,.72), 0 12px 25px rgba(31, 41, 55, .12);
           animation: badge-medal-bounce 720ms 100ms cubic-bezier(.16, 1, .3, 1) both;
-        }
-        .badge-celebration-medal > span {
-          position: absolute;
-          right: 4px;
-          bottom: 1px;
-          display: grid;
-          width: 34px;
-          height: 34px;
-          place-items: center;
-          border: 2px solid white;
-          border-radius: 50%;
-          background: #1b2b5e;
-          color: white;
-          font-size: 19px;
         }
         .badge-celebration-medal img {
           position: absolute;
