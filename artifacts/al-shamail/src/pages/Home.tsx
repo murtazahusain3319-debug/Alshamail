@@ -556,7 +556,6 @@ export default function Home() {
           header > div > div > div { text-align:left !important; }
           header > div > div > div:first-child { font-size:13px !important; }
           header > div > div > div:nth-child(2) { font-size:5px !important; }
-          .als-brand-logo-wrap { margin-left: -10% !important; position:relative; left:-6px; }
         }
         @media (max-width:768px) and (orientation: landscape) {
           .als-nav-links { display:flex !important; gap:8px !important; }
@@ -709,9 +708,6 @@ export default function Home() {
                   <button type="button" role="menuitem" onClick={() => goTo("/enrollment/rules")}>
                     <span>Rules &amp; Regulations</span>
                   </button>
-                  <button type="button" role="menuitem" onClick={() => goTo("/enrollment/fees")}>
-                    <span>Fee Details</span>
-                  </button>
                   <button type="button" role="menuitem" onClick={() => goTo("/enrollment/documents")}>
                     <span>Documents Required</span>
                   </button>
@@ -831,7 +827,6 @@ export default function Home() {
             <button onClick={() => { setMobileMenuOpen(false); scrollToFaq(); }}>FAQ</button>
             <button onClick={() => { setMobileMenuOpen(false); goTo("/courses-info"); }}>Courses</button>
             <button onClick={() => { setMobileMenuOpen(false); goTo("/enrollment/rules"); }}>Rules & Regulations</button>
-            <button onClick={() => { setMobileMenuOpen(false); goTo("/enrollment/fees"); }}>Fee Details</button>
             <button onClick={() => { setMobileMenuOpen(false); goTo("/enrollment/documents"); }}>Documents Required</button>
             <button onClick={() => { setMobileMenuOpen(false); goTo("/teachers"); }}>Our Teachers</button>
             <button onClick={() => { setMobileMenuOpen(false); goApply(); }}>Enroll Now</button>
@@ -1006,6 +1001,10 @@ export default function Home() {
                     .als-brand-logo-wrap { width:clamp(48px, 10vw, 64px) !important; height:clamp(48px, 10vw, 64px) !important; transform:translateY(-10%) translateX(-10%) !important; }
                     .als-brand-title-row { flex-direction:row !important; align-items:center !important; }
                     .als-brand-text { flex-direction:column !important; }
+                  }
+                  @media (max-width:768px) and (orientation: portrait) {
+                    .als-brand-logo-wrap { transform:translateY(-10%) !important; margin-right:24px !important; }
+                    .als-brand-title-row { position:relative; left:-16px; }
                   }
                 `}</style>
                 <div
@@ -1529,103 +1528,6 @@ export default function Home() {
               </motion.div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* ── Fee Details Section ────────────────────────────────────────────── */}
-      <section style={{ padding: "96px 28px", background: t.white, position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", top: -80, right: -80, width: 400, height: 400, borderRadius: "50%", border: "1px solid rgba(201,168,76,.1)", pointerEvents: "none" }} />
-        <div style={{ position: "absolute", bottom: -60, left: -60, width: 280, height: 280, borderRadius: "50%", border: "1px solid rgba(201,168,76,.07)", pointerEvents: "none" }} />
-        <div
-          style={{
-            maxWidth: 1160,
-            margin: "0 auto",
-            position: "relative",
-            zIndex: 1,
-            background: t.white,
-            borderRadius: 20,
-            padding: "36px",
-            boxSizing: "border-box",
-          }}
-        >
-          <div style={{ textAlign: "center", marginBottom: 52 }}>
-            <div style={{ fontSize: 12, fontWeight: 800, color: t.gold, textTransform: "uppercase", letterSpacing: ".14em", marginBottom: 12 }}>
-              Tuition &amp; Fees
-            </div>
-            <h2
-              style={{
-                fontSize: "clamp(28px, 4vw, 42px)",
-                fontWeight: 900,
-                color: t.navy,
-                fontFamily: "'Playfair Display', serif",
-                lineHeight: 1.15,
-                marginBottom: 0,
-              }}
-            >
-              Clear, Transparent Pricing
-            </h2>
-            <div style={{ width: 52, height: 3, borderRadius: 99, background: `linear-gradient(90deg, ${t.gold}, ${t.goldL})`, margin: "16px auto 20px" }} />
-            <p style={{ fontSize: 16, color: t.muted, lineHeight: 1.75, maxWidth: 520, margin: "0 auto" }}>
-              We believe every family deserves to know exactly what they&apos;re paying for. View our full fee schedule, payment plans, and sibling discounts all in one place.
-            </p>
-          </div>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: 28,
-              background: t.navy,
-              border: `1px solid ${t.navyL}`,
-              borderRadius: 20,
-              padding: "36px 48px",
-              flexWrap: "wrap",
-              color: "#fff",
-            }}
-          >
-            <div style={{ display: "flex", gap: 32, flexWrap: "wrap" }}>
-              {[
-                { icon: "📋", label: "Full Fee Schedule", desc: "Per subject, per term, all year groups" },
-                { icon: "💳", label: "Payment Plans", desc: "Flexible monthly and termly options" },
-                { icon: "👨‍👩‍👧‍👦", label: "Sibling Discounts", desc: "Special rates for families enrolling multiple children" },
-              ].map((item) => (
-                <div key={item.label} style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
-                  <div
-                    style={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: 12,
-                      background: `${t.gold}18`,
-                      border: `1px solid ${t.gold}44`,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: 20,
-                      flexShrink: 0,
-                    }}
-                  >
-                    {item.icon}
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 14, fontWeight: 800, color: t.white, marginBottom: 3 }}>{item.label}</div>
-                    <div style={{ fontSize: 13, color: "rgba(255,255,255,.5)", lineHeight: 1.5 }}>{item.desc}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <button
-              type="button"
-              className="als-btn-gold"
-              onClick={() => goTo("/enrollment/fees")}
-              style={{ fontSize: 15, padding: "14px 34px", flexShrink: 0 }}
-            >
-              View Fee Details <ArrowRight size={16} />
-            </button>
-          </motion.div>
         </div>
       </section>
 

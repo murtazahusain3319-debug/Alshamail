@@ -36,7 +36,6 @@ const TeachersPublic = lazy(() => import("@/pages/TeachersPublic"));
 const SyllabusBookList = lazy(() => import("@/pages/SyllabusBookList"));
 const SyllabusSemesters = lazy(() => import("@/pages/SyllabusSemesters"));
 const EnrollmentRules = lazy(() => import("@/pages/EnrollmentRules"));
-const EnrollmentFees = lazy(() => import("@/pages/EnrollmentFees"));
 const EnrollmentDocuments = lazy(() => import("@/pages/EnrollmentDocuments"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 
@@ -305,10 +304,6 @@ function Router() {
 
       <Route path="/enrollment/rules">{() => (
         <Suspense fallback={<RouteFallback/>}><EnrollmentRules/></Suspense>
-      )}</Route>
-
-      <Route path="/enrollment/fees">{() => (
-        <Suspense fallback={<RouteFallback/>}><EnrollmentFees/></Suspense>
       )}</Route>
 
       <Route path="/enrollment/documents">{() => (
